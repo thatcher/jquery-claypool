@@ -1,0 +1,93 @@
+[[PageOutline]]
+= Claypool Api Core =
+
+----
+== Interfaces ==
+''Claypool exposes several interface contracts that allow you to develop useful implementations. Interfaces are not checked and will result in runtime errors being thrown.''
+
+----
+=== !CachingStrategy ===
+
+Application components often need a way cache information and retrieve it at a later time. Because this pattern is so pervasive the !CachingStrategy provides a simple set of methods to allow consistent use across the implementations.
+
+==== '''add''' ==== 
+- Should return void and overwrite existing value with same id. 
+
+'''Parameters'''
+||=name||=type||=required||=description||
+||id||String||required||A unique id used to easily identify the cached object.||
+||object||Any||required||The item to be cached.||
+
+    ''>>  Cannot use interface unless the implementation is provided.''
+
+==== '''remove''' ==== 
+- Should return a non-negative integer if successful or null if the item wasn't found. 
+'''Parameters'''
+||=name||=type||=required||=description||
+||id 	||String||true 	|| The id of the object to be removed.||
+
+    ''>>  Cannot use interface unless the implementation is provided.'' 
+
+==== '''find''' ====
+- Either return the cached item represented by the id or 'null' if no match is found.
+'''Parameters'''
+||=name||=type||=required||=description||
+||id ||String ||true || The id of the object to be returned.||
+
+    ''>>  Cannot use interface unless the implementation is provided.''
+
+==== '''clear''' ==== 
+-  Empties the cache and returns void.
+
+     ''>>  Cannot use interface unless the implementation is provided.'' 
+----
+=== Configurable ===
+
+The Configurable interface defines four key methods that need to be implemented to allow for a consistent treatment of configuration. In particular Claypool.!BaseFactory will implement three of these and only leaves 'updateConfigurationCache' to be implemented by the extending class. However this interface is provided for clarity and to allow other configuration strategies to be defined and used as well.
+Methods
+
+==== '''getConfig''' ====
+- Should return the configuration.
+     ''>>  Cannot use interface unless the implementation is provided.''
+
+==== '''setConfig''' ====
+- Should set the value of $.Configuration. 
+'''Parameters'''
+||=name||=type||=required||=description||
+||configuration 	||Object 	||true 	||Internally this should modify a property of 'Claypool.Configuration' that is specific to the implementing class.||
+    '>>  Cannot use interface unless the implementation is provided.''
+
+==== '''loadConfig''' ====
+- Should implement some strategy for finding the configuration. 
+'''Parameters'''
+||=name||=type||=required||=description||
+||url 	||String ||true 	||The url is retrieved and the given 'configurationId' is applied.||
+    ''>>  Cannot use interface unless the implementation is provided.''
+
+==== '''updateConfig''' ====
+- The live/active configuration is not modified after setConfiguration, rather it's stored latently until this method is called and implements some strategy merge with or replace the global configuration.
+    ''>>  Cannot use interface unless the implementation is provided.''
+
+----
+=== Factory ===
+
+The Factory pattern is one of the most common and useful patterns for applications. It is codified clearly in this simple interface which provides the single method 'create'
+
+==== '''create''' ====
+- Cannot use interface unless the implementation is provided.
+'''Parameters'''
+||=name||=type||=required||=description||
+||any 	||Any (Implementation Specific) 	||true 	||Based on the arguments, should return the appropriate instance.||
+
+----
+===  !ContextContributor ===
+
+The Claypool.!ContextContributor provides interface method 'registerContext' which is intended to allow a declarative approach for allowing 'plug-ins' to include their own context to a given pool of context. For example Claypool's own MVC, IoC, and AOP modules each contribute to the Claypool.!ApplicationContext.
+
+==== '''registerContext''' ==== 
+- Can't use interface unless the implementation is provided.
+'''Parameters'''
+||=name||=type||=required||=description||
+||id 	||Object ||true 	||The object that will be searchable via 'get' while attempting to resolve a request for an object in the given scope.||
+
+----

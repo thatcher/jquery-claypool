@@ -1,0 +1,51 @@
+[[PageOutline]]
+= Claypool Api Application =
+Claypool.Application is the entry point for booting up your application once the document is loaded. Initializing causes Claypool to read all configurations. More importantly Claypool.Application defines the Application Context and allows other classes to contribute easily to that context.
+
+----
+== Examples ==
+
+----
+=== Booting Your Application with Claypool ===
+
+By convention a Claypool Application will use jQuery to ensure the document is loaded, then call Initialize. When the Application is loaded the event '!ApplicationLoaded' is triggered.
+
+{{{
+ $(document).ready(function(){ 
+
+    // Causes Claypool to read in your configuration and start 
+    //  managing application components. 
+
+   $.Application.Initialize(function(){ 
+
+        // closures are cool, do stuff after claypool fires up 
+        // and triggers the 'claypool:initialized' event but before
+        // it triggers the ApplicationLoaded event.
+
+    }); 
+
+    // Claypool also provides an event 'ApplicationLoaded' that 
+    // is triggered when the Application Container is finished loading. 
+
+ }); 
+}}}
+
+----
+=== Contributing to the Application Context ===
+
+Claypool's Inversion of Control, Model-View-Controller, and Aspect Containers all contribute to the Application  Context.  They all do this by registering for the claypool:initialize event.
+
+You only need to understand this example if you are extending the Claypool framework itself. This example is taken directly from Claypool.IoC's source code.
+{{{
+	$(document).bind("claypool:initialize", function(event, context){
+		context['claypool:IoC'] = new $IoC.Container();
+		if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+			$.extend(context['claypool:IoC'], new context.ContextContributor());
+			context['claypool:IoC'].registerContext("Claypool.IoC.Container");
+		}
+	}).bind("claypool:reinitialize", function(event, context){
+		context['claypool:IoC'].factory.updateConfig();
+	});
+}}}
+
+----

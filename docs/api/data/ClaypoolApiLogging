@@ -1,0 +1,427 @@
+[[PageOutline]]
+= Claypool.Logging =
+
+As applications become more complex and longer lived at a single url even stepping through a debugger can be difficult and time consuming (not to mention the lack of a useful debugger on IE). Tracking down issues can be the critical bridge between an application that can grow and one that reaches critical mass. 
+
+Category Logging has been around for many languages for many years now, but javascript still apparently was lacking a good implementation. Using logging correctly can reduce you development cost and headaches and needn't burden the performance of production code.
+
+== Examples ==
+
+'''Press F12 or Ctrl+Shift+L to see the messages logged by this application.'''
+ 
+=== Creating a Logger ===
+
+Logging relies on the notion of Categories. Categories are '.' delimited strings which allow you to turn on and off all, some, or single logger(s) so you can easily peer under the hood of any aspect of your application.
+
+{{{
+var logger = $.Logging.getLogger('MyApp.DataAccess.FeedReader'); 
+}}}
+
+=== Configuring Loggers for your Application. ===
+
+The Categories are hierarchical so in the example below a logger with the category '!DocsApp.Foo' would be logged at the level INFO (since the category '!DocsApp' is the next closest). The special Category 'root' is used for all loggers that don't fit into any configured Category.
+{{{
+$.Configuration = {  
+        logging : [ 
+           { 
+               category:'DocsApp', 
+               level:'INFO', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           },{ 
+               category:'DocsApp.Models', 
+               level:'DEBUG', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           },{ 
+               category:'DocsApp.Views', 
+               level:'DEBUG', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           },{ 
+               category:'DocsApp.Controllers', 
+               level:'DEBUG', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           },{ 
+               category:'Claypool', 
+               level:'WARN', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           },{ 
+               category:'root', 
+               level:'ERROR', 
+               appender:'Claypool.Logging.ConsoleAppender' 
+           } 
+       ] 
+}; 
+}}}
+
+=== Getting started using a Logger. ===
+Loggers allow you to use sprintf style calls which minimizes performance impact when loggers are turned down or off, because the messages are not formatted unless they are actually logged. 
+
+The general rules of logging are 
+ * (1) 86% of messages are DEBUG. 
+ * (2) 12% of messages are INFO. 
+ * (3) The remaining 2% are WARN, ERROR, and EXCEPTION. 
+ * (4) Log meaningful, human readable sentences, not reverse polish... 
+ * (5)Dont log position, eg 'Entering method', 'Leaving Method', We'll see how we can accomplish that with an Aspect using only a few lines of code. 
+
+''(P.S. Claypool will also log in Rhino!)''
+{{{
+$.extend(this, $.Logging.getLogger('A.B.C'));
+//all logging calls are chainable
+this.debug('This is my first log message!').
+     debug('This is my %s log message!', 'second'). 
+     info('This is my %s log message! And it has %d sentences.', 'third', 2).
+     warn('This is a pretty serious message.  Better be careful...');
+try{ 
+   throw new Error('Oops'); 
+}catch(e){ 
+   this.error('You made a mistake.').
+        exception(e);//formats a stack trace to the logs 
+}
+}}}
+
+=== Additive vs. Identity Logging Categories ===
+
+The Category used by a logger depends on how the logger is instantiated. Internally Claypool uses the Identity pattern because it provides a finer grain control over the logging configuration.
+
+==== Identity Logging Categories ====
+{{{
+ var AB = function(){
+    this.logger = $.Logging.getLogger('A.B');
+ };
+ AB.prototype.foo = function(){
+    this.logger.debug('Is it luck?');
+ };
+
+ var ABC = function(){
+    $.extend(this, new AB())
+    this.logger = $.Logger.getLogger('A.B.C');
+ };
+ ABC.prototype.bar = function(){
+    this.foo();
+    this.logger.debug('Dog will hunt!');
+ };
+
+ var abc = new ABC();
+ abc.bar();
+}}}
+
+Will log as:
+{{{
+A.B DEBUG: [Wed, 03 Sep 2008 17:55:57 GMT] Is it luck?
+A.B.C DEBUG: [Wed, 03 Sep 2008 17:55:57 GMT] Dog will hunt!
+}}}
+
+==== Additive Logging Categories ====
+{{{
+ var AB = function(){
+    $.extend(this, $.Logging.getLogger('A.B'));
+ };
+ AB.prototype.foo = function(){
+    this.debug('Is it luck??');
+ };
+
+ var ABC = function(){
+    $.extend(this, new AB())
+    $.extend(this, $.Logger.getLogger('A.B.C'));
+ };
+ ABC.prototype.bar = function(){
+    this.foo();
+    this.debug('Dog will hunt!');
+ };
+
+ var abc = new ABC();
+ abc.bar();
+}}}
+
+Will log as:
+{{{
+A.B.C DEBUG: [Wed, 03 Sep 2008 17:55:57 GMT] Is it luck?
+A.B.C DEBUG: [Wed, 03 Sep 2008 17:55:57 GMT] Dog will hunt!
+}}}
+----
+== Static Methods ==
+
+=== getLogger ===
+
+ ''>> Easily create new category loggers.''
+
+Normally each 'Class' has it's own logger it create inside it's constructor. That logger is then used throughout the class wherever logging is considered important or relavant. The getLogger provides a simple static method to hide the details of the Logging system, simply returning a logger to you.
+{{{
+//Assumes the namespace Example.Classes is a defined namespace. 
+var Example.Classes.MyComponent = function(){ 
+   //constructor  
+   this.logger = Claypool.Logging.getLogger('Example.Classes.MyComponent'); 
+}; 
+Example.Classes.MyComponent.prototype.someMethod = function(event){ 
+   this.logger.debug('Handling event type %s.', event.type); 
+};
+}}}
+----
+== Interfaces ==
+
+Claypool exposes several interface contracts that allow you to develop useful implementations. Interfaces are not checked and will result in runtime errors being thrown.
+
+=== Logger (Interface) ===
+
+Using loggers and understanding this interface will allow you to create a vertical view of the application flow. Think of the logger interface as the 'volume knob' that gives you the ability to throttle or shut off these messages when you don't want them, but easy pump up the jam when you do.
+
+==== debug ====
+- Debug messages should account for approximately 86% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||message 	||String ||true 	||A printf style string.
+    ||... 	||Any 	||false 	||Any number of arguments are there after treated as the objects to format into the message.
+     ''>>  Cannot use interface unless the implementation is provided.''
+
+==== info ====
+- Info messages should account for approximately 12% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||message 	||String ||true 	||A printf style string.
+    ||... 	||Any 	||false 	||Any number of arguments are there after treated as the objects to format into the message.
+     ''>>  Cannot use interface unless the implementation is provided.''
+
+==== warn ====
+- Warn messages should account for approximately less than 2% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||message 	||String ||true 	||A printf style string.
+    ||... 	||Any 	||false 	||Any number of arguments are there after treated as the objects to format into the message.
+     ''>>  Cannot use interface unless the implementation is provided.''
+
+==== error ====
+- Error messages should account for approximately less than 2% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||message 	||String ||true 	||A printf style string.
+    ||... 	||Any 	||false 	||Any number of arguments are there after treated as the objects to format into the message.
+     ''>>  Cannot use interface unless the implementation is provided.'' 
+
+==== exception ====
+- Exception stack trace logging should be used everywhere you have a catch.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||e 	||Error ||true 	||An exception whose stack trace is to be logged.
+
+
+=== Appender ===
+Appenders define where the logger will write it's message to.
+
+The Appender is responsible for the I/O operation that writes the logging message. By default the Claypool provides two appenders implementations that is enough to use Logging with Firebug, Firebug Lite, and Rhino. Other Appenders might include a Gear's SQLite Appender, and XMLHttpPost Appender and so on.
+
+==== append ====
+- Appends the formatted message to an I/O interface.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||level 	||String ||true 	||The name of the log level, eg 'DEBUG', 'INFO', etc
+    ||category 	||Any 	||false 	||Name of the logger category.
+    ||message 	||Array ||false 	||An array containing the message to be formatted and all additional objects to be formatted inside it.
+     ''>>  Cannot use interface unless the implementation is provided.''
+
+=== Formatter ===
+
+The Formatter is responsible for combining the sprintf style message and arguments in a single resulting object. In may optionally add additional information, like a time-stamp, the category, and any additional wrapper (for example it might just provide a single string ) or wrap it with XML or turn it into JSON. 
+
+Appenders own the formatter to ensure that the appender is provided with a format meaningful to it.
+Methods
+
+==== format ====
+- The format method can return any valid javascript object, though the most usual resulting format is a String.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||level 	||String ||true 	||The name of the log level, eg 'DEBUG', 'INFO', etc
+    ||category 	||Any 	||false 	||Name of the logger category.
+    ||objects 	||Array ||false 	||An array containting the message to be formatted and all additional objects to be formatted inside it.
+     ''>>  Cannot use interface unless the implementation is provided.''
+----
+== Classes ==
+
+=== !NullLogger ===
+'''Implements: Claypool.Logging.Logger (Interface)'''
+
+Claypool provides this implementation for when logging is turned off.
+
+Logging can has some impact on performance, usually only when debugging and substantial amounts of messages are logged. To allow loggers that are turned entirely off to have the absolute minimal impact on application performance, the !NullLogger simply provides an implementation for every method which is the equivalent of 'function(){return this;}'.
+
+==== debug ====
+- The optimal implementation the Logger$Interface for use when logging is turned entirely off.
+     ''>>  Equivalent to calling function(){return this;}''
+==== info ====
+- The optimal implementation the Logger$Interface for use when logging is turned entirely off.
+     ''>>  Equivalent to calling function(){return this;}''
+==== warn ====
+- The optimal implementation the Logger$Interface for use when logging is turned entirely off.
+     ''>>  Equivalent to calling function(){return this;}''
+==== error ====
+- The optimal implementation the Logger$Interface for use when logging is turned entirely off.
+     ''>>  Equivalent to calling function(){return this;}''
+==== exception ====
+- The optimal implementation the Logger$Interface for use when logging is turned entirely off.
+     ''>>  Equivalent to calling function(){return this;}''
+
+
+
+=== Logger ===
+'''Implements: Claypool.Logging.Logger (Interface)'''
+
+The Logger is the basic implementation if the Logger Interface used when a logger is in an active category. It optimizes performance by checking it's level internally before formating and appending the message.
+
+==== constructor ====
+- Creates a new instance of a Claypool.Logging.Logger.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is deeply extended by the resulting new Logger.
+
+==== debug ====
+- Debug messages should account for approximately 86% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+     ''>>  See Claypool.Logging.Logger (Interface) for method details'' 
+
+==== info ====
+- Info messages should account for approximately 12% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+     ''>>  See Claypool.Logging.Logger (Interface) for method details'' 
+
+==== warn ====
+- Warn messages should account for approximately less than 2% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+     ''>>  See Claypool.Logging.Logger (Interface) for method details'' 
+
+==== error ====
+- Error messages should account for approximately less than 2% of logging statements written into your application. Logging messages that are meaningful, complete sentences is good practice.
+     ''>>  See Claypool.Logging.Logger (Interface) for method details'' 
+
+==== exception ====
+- Exception stack trace logging should be used everywhere you have a catch.
+     ''>>  See Claypool.Logging.Logger (Interface) for method details'' 
+
+=== !LoggerFactory ===
+'''Extends: Claypool.!BaseFactory'''
+
+The !LoggerFactory provides the implementation for creating Loggers based on Claypool.Configuration.logging
+
+==== constructor ====
+- Creates a new instance of a Claypool.Logging.!LoggerFactory.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object wich is deeply extended by the resulting new !LoggerFactory.
+
+==== updateConfigurationCache ====
+- Reads in the available logging configurations and caches them for fast access by Category.
+     ''>>  See Claypool.Configurable for parameter details'' 
+
+==== create ====
+- Searches the available cached configurations for the 'closest' configured category or the 'root' logging configuration if matching category is found. If no root logger was configured, then finally the !NullLogger is returned providing the highest performance as no messages are ever logged, formatted, or even checked for level.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||category 	||String ||true 	||A '.' delimited name.
+
+==== loadConfiguration ====
+     ''>>  See Claypool.!BaseFactory for details''
+
+==== getConfiguration ====
+     ''>>  See Claypool.!BaseFactory for details''
+
+==== setConfiguration ====
+     ''>>  See Claypool.!BaseFactory for details''
+
+=== !ConsoleAppender ===
+'''Implements: Claypool.Logging.Appender'''
+
+The !ConsoleAppender requires Firebug or Firebug Lite but fails gracefully without it.
+
+The !ConsoleAppender is Claypool most basic Appender implementation, taking advantage of the power of Firebug and Firebug Lite. The !ConsoleAppender is the preferred default appender and is smart enough to check for the availability of the 'console'. When it's not available the !ConsoleAppender will attempt to instead return a !SysOutAppender so you don't have to change logging configurations to switch between the browser and rhino.
+
+==== constructor ====
+- Creates a new instance of a Claypool.Logging.!ConsoleAppender or if 'console' is not available will attempt to return a new !SysOutAppender.
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !ConsoleAppender.
+==== append ====
+- Appends the formatted message to an I/O interface.
+     ''>>  See Claypool.Logging.Appender for method details.'' 
+
+
+=== !SysOutAppender ===
+'''Implements: Claypool.Logging.Appender'''
+
+The !SysOutAppnder requires Rhino but fails gracefully without it.
+
+The !SysOutAppender is designed for being able to log with Rhino's 'print' facility which writes messages to Standard System.Out Java I/O. This is particularly useful for server-side Claypool...
+
+==== constructor ====
+- Creates a new instance of a Claypool.Logging.!SysOutAppender or Rhino is not detected will throw a Claypool.Logging.!NoAppendersAvailableError to ensure that the !NullLogger implementation is used to minimize the cost of logging (which would be pointless with no where to write the message too!)
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !SysOutAppender .
+
+==== append ====
+- Appends the formatted message to an I/O interface.
+     ''>>  See Claypool.Logging.Appender for method details.'' 
+
+
+=== !FireBugFormatter ===
+'''Implements: Claypool.Logging.Formatter'''
+
+Requires the presence of Firebug or Firebug Lite.
+
+The Firebug Formatter simple takes advantage of the fact that Firebug is available and trusts it to format the message into a string.
+
+==== constructor ====
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !FireBugFormatter .
+
+==== format ====
+    ''>>  See Claypool.Logging.Formatter for method details.''
+
+=== !DefaultFormatter ===
+'''Implements: Claypool.Logging.Formatter'''
+
+The !DefaultFormatter basically duplicates for Rhino or any other simple I/O interface, what Firebug would otherwise provide.
+
+==== constructor ====
+    ||Parameters || || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !DefaultFormatter.
+
+==== format ====
+    ''>>  See Claypool.Logging.Formatter for method details.''
+
+----
+
+== Exceptions ==
+
+Claypool tries to help regulate erros by providing a simple way to extend and identify errors regardless of their position in the hierarchy (like python or java etc).
+
+=== !ConfigurationError ===
+
+!ConfigurationError can occur when trying to load a logging configuration.
+{{{
+try{ 
+    throw new Claypool.Logging.ConfigurationError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.Logging.ConfigurationError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.ConfigurationError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+
+=== !NoAppendersAvailableError ===
+
+!NoAppendersAvailableError can occur when neither Firebug, Firebug Lite, nor Rhino are available AND no alternative appender is defined and available.
+{{{
+try{ 
+    throw new Claypool.Logging.NoAppendersAvailableError (); 
+}catch(e){ 
+   if(e.name.match("Claypool.Logging.NoAppendersAvailableError ")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----

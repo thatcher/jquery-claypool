@@ -1,0 +1,92 @@
+[[PageOutline]]
+= Claypool Api IoC (Inversion of Control) =
+----
+
+== Exceptions ==
+Claypool tries to help regulate erros by providing a simple way to extend and identify errors regardless of their position in the hierarchy (like python or java etc).
+
+=== !ContainerError ===
+!ContainerError can occur when searching the Application Context, in particular if some context contributor throws and unexpected error.
+{{{
+try{ 
+    throw new Claypool.IoC.ContainerError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.IoC.ContainerError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----
+
+=== !InstanceFactoryError ===
+!InstanceFactoryError can occur when ... TODO
+{{{
+try{ 
+    throw new Claypool.IoC.InstanceFactoryError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.IoC.InstanceFactoryError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----
+
+=== !ConfigurationError ===
+!ConfigurationError can occur when... TODO
+{{{
+try{ 
+    throw new Claypool.IoC.ConfigurationError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.IoC.ConfigurationError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.ConfigurationError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----
+
+=== !LifeCycleError ===
+!LifeCycleError can occur when ...
+{{{
+try{ 
+    throw new Claypool.IoC.LifeCycleError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.IoC.LifeCycleError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----
+
+=== !ConstructorResolutionError ===
+!ConstructorResolutionError can occur when... TODO
+{{{
+try{ 
+    throw new Claypool.IoC.ConstructorResolutionError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.IoC.ConstructorResolutionError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.NameResolutionError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+----

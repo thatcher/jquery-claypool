@@ -1,0 +1,34 @@
+[[PageOutline]]
+= Claypool Api Core =
+
+----
+== Basics ==
+Claypool core contains basic interfaces, utility and simple implementations of commonly used functions and patterns. In general the core isn't very useful by itself, but nearly every other part of Claypool will make use of all or most of the patterns in the core.
+
+Generally, the core's primary concern is providing a strong foundation for allowing consistent yet extensible configuration.
+
+----
+== Claypool.Configuration ==
+Claypool encourages an extensible, centralized configuration for an application, or at least one per major application subsystem, like 'logging' and 'mvc'. 
+
+As applications become large they often suffer from obscurity because important configuration information is buried deep inside the code. By making use of the jQuery's 'deep extend', the configuration can be added to many times.
+
+Configurations are json and simply need to be discoverable via the global '$.Configuration'.
+
+----
+=== Creating a Simple Configuration ===
+{{{
+ //Deeply extend the configuration
+ $.extend(true, $.Configuration,{ 
+    /** 
+    *   Stuff goes here.  It's json. Pretty easy.   
+    *   Just reference each modules documentation for their options. 
+    **/ 
+    //eg
+    //logging:[],
+    //ioc:[],
+    //mvc:[],
+    //aop[]
+ }); 
+}}}
+----

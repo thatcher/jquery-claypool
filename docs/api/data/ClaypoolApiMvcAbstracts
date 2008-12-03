@@ -1,0 +1,53 @@
+[[PageOutline]]
+= Claypool Api MVC (Model-View-Controller)=
+----
+
+== Abstracts ==
+----
+
+=== Controller ===
+'''Extends: Claypool.!SimpleCachingStrategy'''
+
+The Abstract Controller serves two purposes, primarily codifying the interface for controllers (though this interface is considered 'flexible' in Claypool) by providing the default 'handle' method. Though this interface is used internally and Claypool defaults to calling 'handle' when the controller is invoked, Claypool allows an easy way to let you specify what method you want the controller to be invoked based on the event which is mapped to it.
+
+==== '''constructor''' ====
+- Creates a new AbstractController.
+||=name||=type||=required||=description||
+||options ||Object 	||false ||A json object which is deeply extended by the resulting new AbstractController.||
+
+==== '''handle''' ====
+- This method is meant to codify the suggested pattern of providing a default handler method which relies opn the standard jQuery pattern of providing the event object and including the optional extra info object mvc which in turn codifies the event resolution flow.
+||=name||=type||=required||=description||
+||event ||Object 	||false 	||The event object (by default as provided by jQuery)||
+||mvc 	||Object 	||false 	||A reference to all flow participants, (model, view, and controller) as well as a closure to provide easy access to flow resolution and forwarding.||
+     ''>>  Cannot use interface unless the implementation is provided.''
+----
+
+=== HijaxController ===
+'''Extends: Claypool.MVC.Controller$Interface
+
+The Abstrac Hijax Controller adds the two additional methods that the built-in, low level Claypool Hijax Controllers each implement to make sure they hijax to the required events and DOM aand also have knowledge of all the delegated routes.
+Methods
+
+==== '''constructor''' ====
+- Creates a new instance of the Abstract Hijax Controller.
+||=name||=type||=required||=description||
+||options 	||Object 	||false 	||A json object which is deeply extended by the resulting new AbstractHijaxController.||
+
+==== '''handle''' ====
+- The handle method is implemented here to provide a generic routing implementation to the delegated controllers. More importantly, Claypool adds the extra event information 'mvc' which helps organize the mvc flow by identifying first the delegated controller as the mvc.c value as well as a continuation closure mvc.resolve that allows the high level controller to fill out the model (mvc.m - json object) and set the view (mvc.v - a container managed id) which, when called will use Claypool internal routing ability to direct flow.
+     ''>>  See Claypool.MVC.AbstractController for details.''
+
+==== '''makeResolver''' ====
+- A Powerful closure which allows high level controllers to use the mvc.resolve method to end control flow or forward control flow.
+
+==== '''attach''' ====
+- Attach is used internally to provide a simple method for built in controllers to be able to compile the specific routers used to delegate control.
+     ''>>  Cannot use interface unless the implementation is provided. ''
+
+==== '''hijax''' ====
+- Hijax must be implemented by each low level controller to delegate control.
+||=name||=type||=required||=description||
+||target 	||Object 	||true 	||The high level controller, (available through application context)||
+     ''>>  Cannot use interface unless the implementation is provided.''
+----

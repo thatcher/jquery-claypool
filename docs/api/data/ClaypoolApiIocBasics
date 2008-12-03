@@ -1,0 +1,119 @@
+[[PageOutline]]
+= Claypool Api IoC (Inversion of Control) =
+Claypool's Inversion of Control allow you to 'Inject Dependencies'. This is a very powerful tool for enabling reuse of code via only configuration (which is also referred to as 'wiring'). 
+
+For example, often application Controllers need a Data Access Object, but the Data Access Object needs to be easily configured, and have access to a Model which again in turn need to allow for some minor modification (especially for local vs. testing vs QA vs production environments.) 
+
+Isolating configuration out of your code as much as possible both reduces code and confusion, as well as maximizes re-usability. Claypool's IoC configuration options allow you access to a full power of jQuery selectors and even to !LiveQuery.
+----
+
+== Examples ==
+----
+
+=== Required properties of IoC Configuration ===
+Really you don't need to provide anything but a unique id and a Class. The 'clazz' will be resolved so namespaces will be honored.
+{{{
+$.Configuration = { 
+   ioc: [ 
+       { id: 'myAppThing', clazz:'MyApp.Things.SomeThing'} 
+   ] 
+}; 
+
+// Assumes the app has been initialized. 
+var myAppThing = $.$('myAppThing');
+}}}
+----
+
+=== Adding Selectors to an IoC Configuration ===
+The 'selector' keyword passed to the jQuery selector engine 
+{{{
+$.Configuration = { 
+   ioc: [ 
+       { id: 'myAppThing', clazz:'MyApp.Things.SomeThing', 
+           selector:'#mainNavigation' 
+       } 
+   ] 
+}; 
+// Assumes the app has been initialized. 
+var myAppThing = $.$('myAppThing'); 
+// myAppThing is also a jQuery object with all jQuery methods. 
+// assuming the selector is valid
+}}}
+----
+
+=== Adding Active Selectors to an IoC Configuration ===
+Including the keyword 'active' with the value true allows an optional library like LiveQuery to monitor the DOM to include new matches (LiveQuery is used by default)
+{{{
+$.Configuration = { 
+   ioc: [ 
+       { id: 'myAppThing', clazz:'MyApp.Things.SomeThing', 
+           active:true, 
+           selector:'#mainNav' 
+       } 
+   ] 
+}; 
+// Assumes the app has been initialized. 
+var myAppThing = $.$('myAppThing'); 
+// myAppThing is also a jQuery object with all jQuery methods.
+}}}
+----
+
+=== Adding Constructor Arguments to an IoC Configuration ===
+The 'options' keyword is treated as an array of arguments to pass to the constructor. Upto 10 constructor arguments is supported.
+{{{
+$.Configuration : { 
+   ioc: [ 
+       { id: 'myAppThing', clazz:'MyApp.Things.SomeThing', 
+           options:[{a:1, b:2, c:3}] 
+       } 
+   ] 
+}; 
+// Assumes the app has been initialized. 
+var myAppThing = $.$('myAppThing');
+}}}
+----
+
+=== Injecting Dependencies to an IoC Configuration ===
+The IoC Container can provide additional properties including other application manged components (using the 'ref://' prefix).
+{{{
+$.Configuration{ 
+   ioc: [ 
+       { id: 'myAppThing', clazz:'MyApp.Things.SomeThing', 
+           options:[{a:1, b:2, c:3}] 
+       }, 
+       { id: 'myOtherThing', clazz:'MyApp.Things.OtherThing', 
+           options:[{d:4, e:5, f:6}], 
+           inject:{ 
+               something:'ref://myAppThing', 
+               url:'http://localhost:8080/myapp/foo' 
+           } 
+       } 
+   ] 
+}; 
+// Assumes the app has been initialized. 
+var myOtherThing = $.$('myOtherThing'); 
+// Now was are assured myOtherThing has a property 'something' that is 'myAppThing' 
+// Also myOtherThing.url is 'http://localhost:8080/myapp/foo'
+}}}
+----
+
+=== Using your own Factories in an IoC Configuration ===
+The IoC Container will also let you specify a factory and a factory method which can used to create other application managed components (using the 'ref://' prefix).
+{{{
+$.Configuration{ 
+   ioc: [ 
+       { id: 'myThingFactory', clazz:'MyApp.Things.ThingFactory', 
+           options:[{a:1, b:2, c:3}] 
+       }, 
+       { id: 'myOtherThing', clazz:'MyApp.Things.OtherThing', 
+           options:[{d:4, e:5, f:6}], 
+           factory:'ref://myThingFactory', 
+           factoryMethod:'create'//optional 'create' is used by default 
+       } 
+   ] 
+}; 
+// Assumes the app has been initialized. 
+var myOtherThing = $.$('myOtherThing'); 
+// Claypool uses the specified factory to create the object
+}}}
+----

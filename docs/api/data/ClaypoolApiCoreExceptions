@@ -1,0 +1,52 @@
+[[PageOutline]]
+= Claypool Api Core =
+== Exceptions ==
+
+Claypool tries to help regulate errors by providing a simple way to extend and identify errors regardless of there position in the hierarchy (like python or java etc).
+
+=== Error ===
+
+This class serves as the basis for all Claypool defined errors.
+
+{{{
+try{ 
+    throw new Claypool.Error(); 
+}catch(e){ 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+
+
+=== !ConfigurationError ===
+
+!ConfigurationError can occur when trying to load a configuration by any class extending the Claypool.Factory.
+{{{
+try{ 
+    throw new Claypool.ConfigurationError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.ConfigurationError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}
+
+=== !NameResolutionError ===
+
+!NameResolutionError can occur when trying to resolve a string to an object using Claypool.resolveName.
+{{{
+try{ 
+    throw new Claypool.NameResolutionError(); 
+}catch(e){ 
+   if(e.name.match("Claypool.NameResolutionError")){ 
+       //This will be true 
+   } 
+   if(e.name.match("Claypool.Error")){ 
+       //This will be true 
+   } 
+} 
+}}}

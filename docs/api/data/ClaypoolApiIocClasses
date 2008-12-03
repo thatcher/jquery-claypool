@@ -1,0 +1,78 @@
+[[PageOutline]]
+= Claypool Api IoC (Inversion of Control) =
+----
+
+== Classes ==
+----
+
+=== Container ===
+'''Extends (at run time): Claypool.Application.!ContextContributor'''
+
+The IoC Container is responsible for maintaining references to Instances it has created with the !InstanceFactory and it shares all the objects it stores with the Application Context. 
+
+You'll probably never use the IoC container directly because it's job is primarily to hide the details of how Application Managed objects are created at runtime when the object is first referenced.
+
+==== '''constructor''' ====
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object wich is deeply extended by the resulting new Container.||
+
+==== '''get''' ====
+- Searches the container to determine if the object has already been created otherwise creates it using the factory, storing it for fast access later.
+||=name||=type||=required||=description||
+||id 	||String ||true 	|| The id attribute of the intended ioc configuration||
+
+==== '''registerContext''' ====
+- Used internally to register the IoC container with the Application Context. 
+     ''>>  See Claypool.Application.ContextContributor for details.''
+----
+
+=== !InstanceFactory===
+'''Extends: Claypool.!BaseFactory'''
+
+The !InstanceFactory is responsible for storing all known ioc configurations and providing the ability to create any one of them by simply referencing the configuration id.
+
+==== '''constructor''' ====
+- Creates a new InstanceFactory.
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !InstanceFactory.||
+
+==== '''create''' ====
+||=name||=type||=required||=description||
+||id 	|String ||true 	||An id used to determine the configuration the factory will use to create the object.||
+
+==== '''updateConfig''' ====
+- The Factory store a collection of configurations which allow the 'create' method to simply reference which ioc configuration it will use to create the new object. 'updateConfigurationCache' causes the Factory to read in the available configurations by searching the global scope for $.Configuration.ioc.
+----
+
+=== Instance ===
+There are several ways to use the life-cycle hooks, by event registration or attaching an Aspect to the Instance.
+
+The Instance is a wrapper class for the Container managed object. It stores the actual object in the property '_this' while also providing all the life-cycle methods responsible for creating and destroying the object.
+
+==== '''constructor''' ====
+- Creates a new Instance.
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object wich is deeply extended by the resulting new Instance.||
+==== '''precreate''' ====
+- This method is a lifecycle hook which is executed when an object is created.
+     ''>>  Triggers 'claypool:precreate' and provides the object and its guid as extra event info.'' 
+==== '''create''' ====
+- This is the real brain of the IoC creation process.
+     ''>>  Triggers 'claypool:create' and provides the object and its guid as extra event info.'' 
+==== '''postcreate''' ====
+- This method is a lifecycle hook which is executed when an object is created.
+    ''>>  Triggers 'claypool:postcreate' and provides the object and its guid as extra event info.'' 
+==== '''predestroy''' ====
+- This method is a lifecycle hook which is executed when an object is destroyed.
+     ''>>  Triggers 'claypool:predestroy' and provides the object and its guid as extra event info.'' 
+==== '''destroy''' ====
+- Deletes the internal reference to '_this'.
+     ''>>  Triggers 'claypool:destroy' and provides the object and its guid as extra event info.'' 
+==== '''postdestroy''' ====
+- This method is a lifecycle hook which is executed when an object is destroyed.
+     ''>>  Triggers 'claypool:postdestroy' and provides the objects guid as extra event info.'' 
+==== '''resolveConstructor''' ====
+- Used to ensure that the class, which is specified as a '.' delimited string, is a resolvable name, and more importantly, a function.
+||=name||=type||=required||=description||
+||constructor ||String ||true 	||A '.' delimited String representing the function to use a constructor.||
+----

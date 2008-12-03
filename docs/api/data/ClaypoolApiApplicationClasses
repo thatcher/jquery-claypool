@@ -1,0 +1,57 @@
+[[PageOutline]]
+= Claypool Api Application =
+
+----
+== Classes ==
+----
+=== Context ===
+'''Extends: Claypool.Context'''
+
+The Application Context provides the foundation for a consistent and flexible retrieval of any object that is managed by the Application. In general this allows less reliance on singleton patterns making code more reusable. 
+
+It also allows the IoC container to inject objects into objects using the 'ref://' protocol in configurations.
+
+==== '''constructor''' ====
+- Creates a new Application Context.
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object which is deeply extended by the resulting new Context.||
+
+==== '''put''' ====
+- Adds an item to the Application Context
+||=name||=type||=required||=description||
+||id 	||String ||true 	||A unique identifier across the application scope.||
+||object 	||Any 	||true 	        ||The item to be stored in application scope.||
+
+==== '''get''' ====
+- Searches the Application Context for an item stored by the given id.
+||=name||=type||=required||=description||
+||id 	||String ||true 	||A unique key used to identify the object in the application context.||
+
+=== !ContextContributor ===
+'''Implements: Claypool.!ContextContributor'''
+
+The !ContextContributor allows other classes to be searched (in order of registration) whenever the Application Context is searched.
+
+==== '''constructor''' ====
+- Creates a new !ContextContributor.
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object which is deeply extended by the resulting new !ContextContributor.||
+
+==== '''registerContext''' ====
+- Attaches this class to the Application Context.
+||=name||=type||=required||=description||
+||id 	||String ||true 	||A unique id identifying this context among contributors.||
+
+=== Aware ===
+
+A class can easy have built in access to the global application context by extending this class.
+
+==== '''constructor''' ====
+- Creates a new Application Aware class.
+||=name||=type||=required||=description||
+||options 	||Object ||false 	||A json object which is deeply extended by the resulting new Aware object.
+
+==== '''getApplicationContext''' ====
+- Returns the global Application Context.
+
+----

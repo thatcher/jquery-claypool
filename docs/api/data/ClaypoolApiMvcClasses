@@ -1,0 +1,44 @@
+[[PageOutline]]
+= Claypool Api MVC (Model-View-Controller)=
+----
+
+== Classes ==
+----
+
+=== Container ===
+'''Extends: Claypool.Application.ContextContributor$Interface
+
+Thre MVC Container, like the IoC, container allows all low level controllers to be directly accessible via the application context. It would ,however, be unusual for you to need to access these objects directly.
+
+==== '''constructor''' ====
+- Unlike the IoC Container the MVC Container uses its object factory to create all of it managed objects as soon as it's created. Because event delegation is such a fundamental pattern in Claypool MVC, the low level controllers, though no different than any Application Managed Object, need to be created eagerly so that they can bind to all the required event (on specified elements or the document) immediatly allow the rest of the high level controllers to remain dormant until actually required.
+||=name||=type||=required||=description||
+||options ||Object 	||false ||A json object which is deeply extended by the resulting new Container.||
+==== '''get''' ====
+- Searches the container to determine if the object has already been created otherwise creates it using the factory, storing it for fast access later. 
+||=name||=type||=required||=description||
+||id   ||String ||true 	||A globally unique id.||
+     ''>>  Retreives an object from the container or creates if it hasn't been created yet.''
+==== '''registerContext''' ====
+- Used internally to register the MVC container with the Application Context. 
+     ''>>  See Claypool.Application.ContextContributor for details.''
+----
+
+=== Factory ===
+'''Extends: Claypool.IoC.Factory$Interface'''
+
+Claypool MVC use the same highly flexible factory pattern to provide a configuration store and object creation process that Claypool IoC provides (by using the IoC Factory internally). You will probably never use this class directly but it's important to understand that the low-level controllers which (delegate control) provied by Claypool are eagerly created as soon as the ControllerFactory is created.
+
+==== '''constructor''' ====
+- Creates a new instance of the ControllerFactory.
+||=name||=type||=required||=description||
+||options ||Object ||false ||A json object which is deeply extended by the resulting new ControllerFactory.||
+==== '''updateConfigurationCache''' ====
+- The Factory stores a collection of configurations which allow the 'create' method to simply reference which mvc configuration it will use to create the new object. 'updateConfigurationCache' causes the Factory to read in the available configurations by searching the global scope for Claypool.Configuration.mvc.
+==== '''initializeHijaxController''' ====
+- Because the Controller Factory is just an extension of the IoC InstanceFactory the MVC Controller Factory uses this method internally to transform the spcialized built-in Controller configuration into a standard IoC configuration and instantiate eagerly since they act as the application event delegates.
+||=name||=type||=required||=description||
+||mvcConfiguration 	||Object 	||true 	||A json object which describes the hijax controller.||
+||key 	||String 	||true 	||At this stage this is one of 'hijax:a', 'hijax:form', 'hijax:event' or 'hijax:server'.||
+||clazz 	||String 	||true 	||The Class name (as a String) of the implemnting Hijax Controller'.||
+----

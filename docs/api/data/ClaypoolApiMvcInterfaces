@@ -1,0 +1,7 @@
+[[PageOutline]]
+= Claypool Api MVC (Model-View-Controller)=
+----
+
+== Interfaces ==
+Claypool.MVC exposes no interfaces;
+----

@@ -1,0 +1,16 @@
+/* 
+    Document   : api.css
+    Created on : Oct 27, 2007, 9:32:37 AM
+    Author     : cthatcher
+    Description:
+        This describes the Claypool API App Ln'F
+*/
+#content h2, #content h3, #content h4 {
+	color: #BB0000;
+}
+
+
+#content pre {
+    border: solid thin #999;
+    padding: 1em;
+}

@@ -1,0 +1,92 @@
+[[PageOutline]]
+= Claypool Api MVC (Model-View-Controller)=
+Claypool's Model-View-Controller framework provides low-level controllers that allow your own applications Controllers to remain dormant until they are actually required. The basic components are very generic and can be used to integrate which whatever Model and View technologies you prefer, or none at all.
+
+As applications become large, separation of the html and javascript is often the critical point of failure as your scripters becomes responsible for managing layout and css because the markup has become hidden deeply inside the code, and data access is duplicated and fragile because it is intimately mixed with business logic and html update and modification. 
+
+Taking advantage of MVC separation lets your team work more efficiently and allows optimal reuse of code and skill sets. It is also critical to easy integration with emerging frameworks like Gears and Air.
+----
+
+== Examples ==
+----
+
+=== The Basic Event Hijax Controller ===
+The Event Controller allows you to register all important events at start-up but the application managed components that are interested in those events don't need to be created until they are actually used the first time.
+
+{{{
+$.merge($.Configuration.mvc['hijax:event'], [{ 
+   id:'myCustomEventHijax', //required 
+   selector:'',            //optional jQuery selector 
+   filter:'',              //optional appended to selector 
+   active:true,            //optional use livequery 
+   preventDefault:true,    //optional disable browser default behavior 
+   stopPropagation:true,   //optional damn the bubble/trickle 
+   strategy:'all',         //optional route to 'all' or the 'first' match 
+   hijaxMap:               //required event delegated with mvc object 
+   [{event:'SomeEvent', controller:'#myController', action:'someMethod' },
+    {event:'AnotherEvent',controller:'#anotherController' /*default action is 'handle'*/ }] 
+}]);
+}}}
+----
+
+=== The Basic Link Hijax Controller ===
+The Link Controller automatically binds to regular html 'a' elements. What makes it special is that the wiring to your controllers is done via regular expression matching on the url. For all it's simplicity don't underestimate the power of this controller. The following two hijax:link maps are enough to drive most of GMail...
+
+{{{
+$.extend(true, $.Configuration, { 
+   ioc: [ 
+       { id: 'myController',       clazz:'MyApp.Controllers.MyController'} 
+       { id: 'anotherController',  clazz:'MyApp.Controllers.AnotherController'} 
+   ], 
+   mvc: { 
+       'hijax:link'[{ 
+           id:'myLinkHashHijax',  //required 
+           filter:'[href^=#]',     //optional filter on links 
+           active:true,            //optional use livequery 
+           preventDefault:true,    //optional disable browser default behavior 
+           stopPropagation:true,   //optional damn the bubble/trickle 
+           strategy:'first',       //optional route to 'all' or the 'first' match 
+           hijaxMap: 
+           [{urls:'#foo.*$', controller:'myController',      action:'someMethod'}, 
+            {urls:'#bar.*$', controller:'anotherController'/*default 'handle'*/}] 
+       },{ 
+           id:'myLinkQueryHijax',//required 
+           filter:'[href^=?]', 
+           active:true,            //optional use livequery 
+           preventDefault:true,    //optional disable browser default behavior 
+           stopPropagation:true,   //optional damn the bubble/trickle 
+           strategy:'first',       //optional route to 'all' or the 'first' match 
+           hijaxMap: 
+           [{urls:'search',  controller:'myController', action:'searchMethod'}] 
+       }] 
+   } 
+}); 
+}}}
+
+=== The Basic Form Hijax Controller ===
+
+
+The Form Controller automatically binds to regular html 'form' elements. What makes it special is that the wiring to your controllers is done via regular expression matching on the url.
+{{{
+$.extend(true, $.Configuration, { 
+   ioc: [ 
+       { id: 'myController',       clazz:'MyApp.Controllers.MyController'} 
+       { id: 'anotherController',  clazz:'MyApp.Controllers.AnotherController'} 
+   ], 
+   mvc: { 
+       'hijax:form'[{ 
+           id:'myFormPostHijax',//required 
+           filter:'',//optional filter 
+           active:false,           //optional use livequery 
+           preventDefault:true,    //optional disable browser default behavior 
+           stopPropagation:true,   //optional damn the bubble/trickle 
+           strategy:'first',       //optional route to 'all' or the 'first' match 
+           hijaxMap: 
+           [{urls:'#foo.*$', controller:'myController',    action:'someMethod'}, 
+            {urls:'#bar.*$', controller:'anotherController' /*default 'handle'*/}] 
+       }] 
+   } 
+}); 
+}}}
+
+----

@@ -1,0 +1,9 @@
+[[PageOutline]]
+= Claypool Api IoC (Inversion of Control) =
+ * [ClaypoolApiApplicationBasics] 
+ * [ClaypoolApiApplicationStaticMethods] 
+ * [ClaypoolApiApplicationInterfaces]
+ * [ClaypoolApiApplicationAbstracts]
+ * [ClaypoolApiApplicationClasses]
+ * [ClaypoolApiApplicationExceptions]
+----

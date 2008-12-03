@@ -1,0 +1,70 @@
+[[PageOutline]]
+= Claypool Api Core =
+== Abstracts ==
+
+''Abstract Classes, like Interfaces, in Claypool are not constrained other than by-convention. As such they will result in runtime exceptions being thrown if the required methods definitions are not implemented by the extending class.''
+
+=== Context ===
+'''Extends: Claypool.!SimpleCachingStrategy'''
+
+The Claypool.!Context is also a powerful extension of the !SimpleCachingStrategy that reduces it down to a simple 'put'/'get' model. This model is common in server-side application frameworks and allows a context to be used in a consistent way to provide easy access to a 'bag' of objects (usually in a hierarchy like 'application > session > request'). The methods 'put' and 'get' are obviously very close to the !CachingStrategy 'add' and 'find', but allow an additional level of abstraction to hide the details of the contexts internal management.
+
+==== constructor ====
+- Creates a new instance of a Context. 
+    ||'''Parameters'''|| || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is extended by the resulting new !SimpleCachingStrategy.
+
+==== put ==== 
+- Can't use interface unless the implementation is provided.
+    ||'''Parameters'''|| || ||
+    ||name 	||type 	||required 	||description
+    ||id 	||String 	||true 	||A unique id used to easily identify the in the given context.
+    ||object 	||Any 	||true 	||The item to be available via the given content.
+
+==== get ==== 
+- Can't use interface unless the implementation is provided.
+    ||'''Parameters'''|| || ||
+    ||name 	||type 	||required 	||description
+    ||id 	||String 	||true 	||The id of the object to be returned.
+
+
+=== Factory  ===
+'''Implements: Claypool.Factory Claypool.Configurable'''
+
+'''Extends: Claypool.!SimpleCachingStrategy'''
+
+The Claypool.Factory is still Abstract, but does define the basic 'getConfiguration', 'setConfiguration' and 'loadConfiguration' which establishes the core patterns for the IoC, MVC, and AOP modules. The 'updateConfigurationCache' is left for each module to modify based on individual requirements.
+
+==== constructor ==== 
+- Creates a new instance of a Claypool.!BaseFactory.
+    ||'''Parameters'''|| || ||
+    ||name 	||type 	||required 	||description
+    ||options 	||Object ||false 	||A json object which is extended by the resulting new Factory.
+
+==== loadConfiguration ==== 
+- Claypool can load dynamically via AJAX when Claypool.Configuration is unavailable using the relative url 'application.context.js'.
+
+     ''>>  See Claypool.Configurable for parameter details''
+
+==== getConfiguration ==== 
+- Either return the configuration or null if none exists and can't be loaded.
+
+     ''>>  See Claypool.Configurable for parameter details''
+
+==== setConfiguration ==== 
+- Modifies a property of Claypool.Configuration based on the given implementations.
+
+     ''>>  See Claypool.Configurable for parameter details''
+
+==== updateConfigurationCache ====
+- Can't use interface unless the implementation is provided.
+     
+     ''>>  See Claypool.Configurable for parameter details''
+
+==== create ====
+- Can't use interface unless the implementation is provided.
+
+     ''>>  See Claypool.Factory for parameter details''
+
+----

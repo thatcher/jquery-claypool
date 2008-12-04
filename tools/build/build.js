@@ -1,7 +1,7 @@
 load(
-    "javascript/tools/js/ParseMaster.js", 
-    "javascript/tools/js/pack.js", 
-    "javascript/tools/js/writeFile.js"
+    "tools/js/ParseMaster.js", 
+    "tools/js/pack.js", 
+    "tools/js/writeFile.js"
     );
 
 var out = readFile( arguments[0] );

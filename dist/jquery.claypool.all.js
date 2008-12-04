@@ -1215,7 +1215,7 @@ Claypool.AOP={
 	            var aopConfiguration;//entire config
 	            var aopconf;//unit of config
 	            var i;
-	            var targetRef;
+	            var targetRef, namespace, prop, genconf;
 	            try{
 	                this.logger.debug("Configuring Claypool AOP AspectFactory");
 	                aopConfiguration = this.getConfig()||[];
@@ -1259,11 +1259,29 @@ Claypool.AOP={
 	                            *   flexible enough to allowa namespaced class, and in either case,
 	                            *   it's specified as a string so we have to resolve it
 	                            */
-	                            this.logger.debug("Creating aspect id %s", aopconf.id);
-	                            aopconf.target = 
-	                                $.resolveName(aopconf.target);
-	                            this.add(aopconf.id, aopconf);
-	                            this.create(aopconf.id);//this creates the aspect
+	                            if(aopconf.target.match(/\.\*^/)){
+	                                //The string ends with '.*' which implies the target is every function
+	                                //in the namespace.  hence we resolve the namespace, look for every
+	                                //function and create a new filter for each function.
+	                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+	                                for(prop in namespace){
+	                                    if($.isFunction(namespace[prop])){
+	                                        //extend the original aopconf replacing the id and target
+	                                        genconf = $.extend({
+	                                            id : aopconf.id+$.createGUID(),
+	                                            target : namespace[prop] 
+	                                        }, aopconf );
+    	                                    this.logger.debug("Creating aspect id %s", genconf.id);
+            	                            this.add(genconf.id);
+            	                            this.create(genconf.id);//this creates the aspect
+	                                    }
+	                                }
+	                            }else{
+    	                            this.logger.debug("Creating aspect id %s", aopconf.id);
+    	                            aopconf.target =  $.resolveName(aopconf.target);
+    	                            this.add(aopconf.id, aopconf);
+    	                            this.create(aopconf.id);//this creates the aspect
+	                            }
 	                        }
 	                    }catch(e){
 	                        //Log the expection but allow other Aspects to be configured.
@@ -1853,8 +1871,15 @@ Claypool.IoC={
 	                for(i=0;i<iocConfiguration.length;i++){
 	                    try{
 	                        iocconf = iocConfiguration[i];
-	                        this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
-	                        this.add( iocconf.id, iocconf );
+	                        if(iocconf.scan && iocconf.factory){
+    	                        this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
+	                            iocConfiguration = iocConfiguration.concat(
+	                                $.resolveName(iocconf.factory).scan(iocconf.scan)
+                                );
+	                        }else{
+    	                        this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
+    	                        this.add( iocconf.id, iocconf );
+	                        }
 	                    }catch(e){
 	                        this.logger.exception(e);
 	                        return false;
@@ -2286,6 +2311,57 @@ Claypool.MVC={
 	                this.logger.exception(e);
 	                throw new $MVC.ConfigurationError(e);
 	            }
+	        },
+	        scan: function(name){
+	            var log = this.logger||$Log.getLogger("Claypool.MVC.Factory$Class");
+	            log.debug("Scanning %s" , name);
+	            var prop, 
+	                scanBase, 
+	                configsByConvention = [],
+	                idNamingConvention = function(localName, type){
+	                    return ("#"+localName.substring(0,1).toLowerCase()+localName.substring(1)+type);
+	                },
+	                domNamingConvention = function(localName){
+	                    return ("#"+localName.substring(0,1).toLowerCase()+localName.substring(1));
+	                };
+	            try{
+                    scanBase = $.resolveName(name);
+                    for(prop in scanBase){
+	                    log.debug("Scan Checking %s.%s" , name, prop);
+                        if($.isFunction(scanBase[prop])){
+	                        log.debug("Found Function Definition on %s.%s" , name, prop);
+                            if(name.match(".Models")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Model"),
+                                   clazz: name+"."+prop
+                                });
+                            }else if(name.match(".Views")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "View"),
+                                   clazz: name+"."+prop,
+                                   selector: domNamingConvention(prop)
+                                });
+                            }else if(name.match(".Controllers")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Controller"),
+                                   clazz: name+"."+prop
+                                });
+                            }else if(name.match(".Services")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Service"),
+                                   clazz: name+"."+prop
+                                });
+                            }
+                        }  
+                    }
+                }catch(e){
+                    log.error("Error Scanning %s!!", name).exception(e);   
+                }
+                return configsByConvention;
 	        },
 	        /**@private*/
 	        initializeHijaxController: function(mvcConfig, key, clazz, options){

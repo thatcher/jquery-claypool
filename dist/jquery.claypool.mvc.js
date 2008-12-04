@@ -116,6 +116,57 @@ Claypool.MVC={
 	                throw new $MVC.ConfigurationError(e);
 	            }
 	        },
+	        scan: function(name){
+	            var log = this.logger||$Log.getLogger("Claypool.MVC.Factory$Class");
+	            log.debug("Scanning %s" , name);
+	            var prop, 
+	                scanBase, 
+	                configsByConvention = [],
+	                idNamingConvention = function(localName, type){
+	                    return ("#"+localName.substring(0,1).toLowerCase()+localName.substring(1)+type);
+	                },
+	                domNamingConvention = function(localName){
+	                    return ("#"+localName.substring(0,1).toLowerCase()+localName.substring(1));
+	                };
+	            try{
+                    scanBase = $.resolveName(name);
+                    for(prop in scanBase){
+	                    log.debug("Scan Checking %s.%s" , name, prop);
+                        if($.isFunction(scanBase[prop])){
+	                        log.debug("Found Function Definition on %s.%s" , name, prop);
+                            if(name.match(".Models")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Model"),
+                                   clazz: name+"."+prop
+                                });
+                            }else if(name.match(".Views")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "View"),
+                                   clazz: name+"."+prop,
+                                   selector: domNamingConvention(prop)
+                                });
+                            }else if(name.match(".Controllers")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Controller"),
+                                   clazz: name+"."+prop
+                                });
+                            }else if(name.match(".Services")){
+	                            log.debug("Configuring by Convention %s.%s" , name, prop);
+                                configsByConvention.push({
+                                   id: idNamingConvention(prop, "Service"),
+                                   clazz: name+"."+prop
+                                });
+                            }
+                        }  
+                    }
+                }catch(e){
+                    log.error("Error Scanning %s!!", name).exception(e);   
+                }
+                return configsByConvention;
+	        },
 	        /**@private*/
 	        initializeHijaxController: function(mvcConfig, key, clazz, options){
 	            var configuration;

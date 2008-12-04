@@ -181,8 +181,15 @@ Claypool.IoC={
 	                for(i=0;i<iocConfiguration.length;i++){
 	                    try{
 	                        iocconf = iocConfiguration[i];
-	                        this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
-	                        this.add( iocconf.id, iocconf );
+	                        if(iocconf.scan && iocconf.factory){
+    	                        this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
+	                            iocConfiguration = iocConfiguration.concat(
+	                                $.resolveName(iocconf.factory).scan(iocconf.scan)
+                                );
+	                        }else{
+    	                        this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
+    	                        this.add( iocconf.id, iocconf );
+	                        }
 	                    }catch(e){
 	                        this.logger.exception(e);
 	                        return false;

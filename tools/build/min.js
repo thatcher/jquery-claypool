@@ -1,4 +1,4 @@
-load("javascript/tools/js/jsmin.js", "javascript/tools/js/writeFile.js");
+load("tools/js/jsmin.js", "tools/js/writeFile.js");
 
 // arguments
 var inFile = arguments[0];

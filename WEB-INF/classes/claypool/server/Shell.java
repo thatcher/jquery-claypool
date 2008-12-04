@@ -26,7 +26,7 @@ public class Shell extends ScriptableObject implements FileListener{
     
     private Context cx;
     private String basePath;
-    private FileMonitor monitor = new FileMonitor (3000);
+    private FileMonitor monitor = new FileMonitor (1500);
     
     public Shell(String basePath, String appFile) {
         this.basePath = basePath;
@@ -155,8 +155,22 @@ public class Shell extends ScriptableObject implements FileListener{
     public void fileChanged (File file) {
         //Because the Context/Thread relationship the smartest thing I could
         //think to do is modify/touch WEB-INF/web.xml to force a reload.
-        File webXml = new File(this.basePath + "/WEB-INF/web.xml");
-        webXml.setLastModified(new java.util.Date().getTime());
+        logger.info("Detected change to application sources.  Reloading...");
+        try{
+            logger.info("Trying default reload trigger (/WEB-INF/web.xml)");
+            File webXml = new File(this.basePath + "/WEB-INF/web.xml");
+            webXml.setLastModified(new java.util.Date().getTime());
+        }catch(Exception e){
+            //ignore logger.error(ioe.toString());
+        }
+        //Damn jetty thinks maven is the shit.  
+        try{
+            logger.info("Trying jetty reload trigger (/scripts/jetty/contexts/claypool.xml)");
+            File webXml = new File(this.basePath + "/scripts/jetty/contexts/claypool.xml");
+            webXml.setLastModified(new java.util.Date().getTime());
+        }catch(Exception e){
+            //ignore logger.error(ioe.toString());
+        }
     }
     
 }

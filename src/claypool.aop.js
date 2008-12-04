@@ -150,7 +150,7 @@ Claypool.AOP={
 	            var aopConfiguration;//entire config
 	            var aopconf;//unit of config
 	            var i;
-	            var targetRef;
+	            var targetRef, namespace, prop, genconf;
 	            try{
 	                this.logger.debug("Configuring Claypool AOP AspectFactory");
 	                aopConfiguration = this.getConfig()||[];
@@ -194,11 +194,29 @@ Claypool.AOP={
 	                            *   flexible enough to allowa namespaced class, and in either case,
 	                            *   it's specified as a string so we have to resolve it
 	                            */
-	                            this.logger.debug("Creating aspect id %s", aopconf.id);
-	                            aopconf.target = 
-	                                $.resolveName(aopconf.target);
-	                            this.add(aopconf.id, aopconf);
-	                            this.create(aopconf.id);//this creates the aspect
+	                            if(aopconf.target.match(/\.\*^/)){
+	                                //The string ends with '.*' which implies the target is every function
+	                                //in the namespace.  hence we resolve the namespace, look for every
+	                                //function and create a new filter for each function.
+	                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+	                                for(prop in namespace){
+	                                    if($.isFunction(namespace[prop])){
+	                                        //extend the original aopconf replacing the id and target
+	                                        genconf = $.extend({
+	                                            id : aopconf.id+$.createGUID(),
+	                                            target : namespace[prop] 
+	                                        }, aopconf );
+    	                                    this.logger.debug("Creating aspect id %s", genconf.id);
+            	                            this.add(genconf.id);
+            	                            this.create(genconf.id);//this creates the aspect
+	                                    }
+	                                }
+	                            }else{
+    	                            this.logger.debug("Creating aspect id %s", aopconf.id);
+    	                            aopconf.target =  $.resolveName(aopconf.target);
+    	                            this.add(aopconf.id, aopconf);
+    	                            this.create(aopconf.id);//this creates the aspect
+	                            }
 	                        }
 	                    }catch(e){
 	                        //Log the expection but allow other Aspects to be configured.

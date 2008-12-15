@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,6 +101,17 @@ public class RequestHandler
           ScriptableObject.defineProperty(attributes, attrName,     request.getAttribute(attrName), 0);
         }
         
+        if(request.getContentLength()>0){
+            String inputString = "";
+            String input;
+            BufferedReader in = request.getReader();
+            while((input = in.readLine()) != null)
+               inputString = inputString + input;
+            in.close();
+            ScriptableObject.defineProperty(req, "body",             inputString, 0);
+        }else{
+            ScriptableObject.defineProperty(req, "body",             "", 0);
+        }
         ScriptableObject.defineProperty(req, "characterEncoding",   request.getCharacterEncoding(), 0);
         ScriptableObject.defineProperty(req, "contentLength",       request.getContentLength(), 0);
         ScriptableObject.defineProperty(req, "contentType",         request.getContentType(), 0);

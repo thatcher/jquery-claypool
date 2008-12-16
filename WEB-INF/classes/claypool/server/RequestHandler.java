@@ -101,16 +101,26 @@ public class RequestHandler
           ScriptableObject.defineProperty(attributes, attrName,     request.getAttribute(attrName), 0);
         }
         
-        if(request.getContentLength()>0){
-            String inputString = "";
-            String input;
-            BufferedReader in = request.getReader();
-            while((input = in.readLine()) != null)
-               inputString = inputString + input;
-            in.close();
-            ScriptableObject.defineProperty(req, "body",             inputString, 0);
-        }else{
-            ScriptableObject.defineProperty(req, "body",             "", 0);
+        BufferedReader in = null;
+        try{
+            if(request.getContentLength()>0){
+                String inputString = "";
+                String input = "";
+                    in = request.getReader();
+                    input = in.readLine();
+                    while(input != null){
+                        logger.debug(input);
+                        inputString = inputString + input;
+                        input = in.readLine();
+                    }
+                ScriptableObject.defineProperty(req, "body",             inputString, 0);
+            }else{
+                ScriptableObject.defineProperty(req, "body",             "", 0);
+            }
+        }catch(Exception e){
+            logger.error("Failed to read request body.", e);
+        }finally{
+            try{in.close();}catch(Exception ignore){}
         }
         ScriptableObject.defineProperty(req, "characterEncoding",   request.getCharacterEncoding(), 0);
         ScriptableObject.defineProperty(req, "contentLength",       request.getContentLength(), 0);

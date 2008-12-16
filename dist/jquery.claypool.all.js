@@ -2794,7 +2794,7 @@ Claypool.Server={
                 $Web.log.error("Error Handling Request.").exception(e);
                 response.headers.contentType = "text/html";
                 response.headers.status = 500;
-                response.body = "<html><head></head><body>"+e+"</body></html>";
+                response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
             }
 	    },
 	    render: function(request, response){
@@ -2958,6 +2958,45 @@ Claypool.Server={
 	            }
 	            return response;
 	        }
+	    },
+	    ConsoleServlet$Class:{
+	        constructor: function(options){
+	            $.extend( this, new $Web.Servlet(options));
+	            $.extend( this, $Web.ConsoleServlet$Class);
+	            $.extend(true, this, options);
+	            this.logger = $Log.getLogger("Claypool.Server.ConsoleServlet");
+	        },
+	        handlePost: function(request, response, mvc){
+	            var retval = "ok";
+	            try{
+	                this.logger.info("Executing command :\n%s", request.body);
+	                retval = eval(String(request.body));
+	                retval = (retval===undefined)?"ok":retval;
+	                this.logger.info("Finished Executing command :\n%s", request.body);
+	                response.body = retval||"error: see server logs.";
+	            }catch(e){
+	                this.logger.error("Error executing command. \n\n%s", request.body).
+	                    exception(e);
+	                response.body = e.toString();
+	            }
+	            response.body = retval;
+                response.headers["Content-Type"] = "text/plain";
+                response.headers.status = 200;
+                return response;
+	        },
+	        run: function(command){
+	            var _this = this;
+                jQuery.ajax({ 
+                    type:'POST',  
+                    url:'console/',   
+                    processData:false,  
+                    contentType:'text', 
+                    data:command,
+                    success:function(rsp){
+                        _this.logger.info(rsp);
+                    }
+                });
+	        }
 	    }
 	});
 	/**@global*/
@@ -2966,7 +3005,9 @@ Claypool.Server={
 	/**@constructorAlias*/
 	$Web.Servlet                 		= $Web.Servlet$Abstract.constructor;
 	/**@constructorAlias*/
-	$Web.WebProxyServlet                 = $Web.WebProxyServlet$Class.constructor;
+	$Web.WebProxyServlet                = $Web.WebProxyServlet$Class.constructor;
+	/**@constructorAlias*/
+	$Web.ConsoleServlet                 = $Web.ConsoleServlet$Class.constructor;
 })( Claypool,/*Required Modules*/
 	Claypool.Logging,
 	Claypool.MVC,

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,13 +45,13 @@ public class RequestHandler
         this.servletContext = servletContext;
         // load the JavaScript files for the web app framework and
         // the files for the specific web app.
-        logger.debug("Loading application container: " + applicationContainer);
+        logger.debug("Loading application container: " +applicationBasePath+ applicationContainer);
         shell.put("cwd", shell, applicationBasePath);
-        shell.loadFile( applicationContainer );
+        shell.loadFile( "file:/"+applicationBasePath+applicationContainer );
         /*Scriptable cwd = shell.getContext().newObject(shell);
         ScriptableObject.defineProperty(cwd, "applicationBasePath", applicationBasePath, 0);*/
         Callable locationSetter = (Callable)shell.getGetterOrSetter( "location", 0, true);
-        Object[] args = {applicationLocation};
+        Object[] args = {applicationBasePath+applicationLocation};
         locationSetter.call(
             shell.getContext(),
             shell,
@@ -103,7 +104,7 @@ public class RequestHandler
         
         BufferedReader in = null;
         try{
-            if(request.getContentLength()>0){
+            if(request.getContentLength()>0 && !request.getContentType().startsWith("application/x-www-form-urlencoded")){
                 String inputString = "";
                 String input = "";
                     in = request.getReader();
@@ -215,6 +216,7 @@ public class RequestHandler
         logger.debug("Raw Response fields: " +responseHeadersFields);
         logger.debug("Raw Response fields length: " +responseHeadersFields.length);
         int contentLength = -1;
+        String contentType = "text/html";
         //TODO: Why the heck 1!!!
         for(int i = 1; i < responseHeadersFields.length; i++){
             String responseHeaderValue =  Context.toString(
@@ -229,6 +231,9 @@ public class RequestHandler
                 if(responseHeadersFields[i].toString().equalsIgnoreCase("Content-Length")){
                     logger.debug("contentLength : " + responseHeaderValue);
                     contentLength = Integer.parseInt(responseHeaderValue.replace(" ",""));
+                }else if(responseHeadersFields[i].toString().equalsIgnoreCase("Content-Type")){
+                    logger.debug("contentType : " + responseHeaderValue);
+                    contentType = responseHeaderValue;
                 }
                 response.addHeader(
                     responseHeadersFields[i].toString(),
@@ -239,18 +244,23 @@ public class RequestHandler
                     ));
             }
         }
-        String body = Context.toString(
-            ScriptableObject.getProperty(res, "body")
-        );
-        if(! (contentLength > -1) ){
-            contentLength = body.length();
+        if(contentType.indexOf("image") > -1){
+            byte[] body = (byte[])Context.toType(
+                ScriptableObject.getProperty(res, "body"),
+                byte[].class
+            );
+            response.getOutputStream().write(body);
+        }else{
+            String body = Context.toString(
+                ScriptableObject.getProperty(res, "body")
+            );
+            if(! (contentLength > -1) ){
+                contentLength = body.length();
+                response.setContentLength(contentLength);
+                logger.debug("Actual Body Length ===> " + contentLength);
+                response.getWriter().println(body);
+            }
         }
-        response.setContentLength(contentLength);
-        //this is not always accurate, not what we know based on the header
-        //passed back from the javascript.
-        //It's not good to have a mystery like this.
-        logger.debug("Actual Body Length ===> " + contentLength);
-        response.getWriter().println(body);
         return true;
     }
     

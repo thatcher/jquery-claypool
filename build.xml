@@ -18,35 +18,22 @@
     <property name="DOCS_DIR"       location="${PREFIX}/docs"               description="Folder for docs target"  />
     <property name="TEST_DIR"       location="${PREFIX}/test"               description="Folder for test target"  />
     <property name="DIST_DIR"       location="${PREFIX}/dist"               description="Folder for jquery, min, lite and packed target" />
+    <property name="BUILD_DIR"      location="${PREFIX}/build"               description="Folder for build artifacts" />
     <property name="TOOLS_DIR"      location="${PREFIX}/tools"              description="Files for parsing etc."/>
     <property name="LIB_DIR"        location="${PREFIX}/lib"                description="Folder for jQuery and additional third party js libraries" />
     <property name="CLASSES_DIR"    location="${basedir}/WEB-INF/classes"   description="Local Classes like Servlets"  />
 
     <!-- Files names for distribution -->
-    <property name="CLAYPOOL_CORE"   			location="${DIST_DIR}/jquery.claypool.core.js" />
-    <property name="CLAYPOOL_CORE_MIN"  		location="${DIST_DIR}/jquery.claypool.core.min.js" />
-    <property name="CLAYPOOL_LOGGING"   		location="${DIST_DIR}/jquery.claypool.logging.js" />
-    <property name="CLAYPOOL_LOGGING_MIN"   	location="${DIST_DIR}/jquery.claypool.logging.min.js" />
-    <property name="CLAYPOOL_APPLICATION"   	location="${DIST_DIR}/jquery.claypool.application.js" />
-    <property name="CLAYPOOL_APPLICATION_MIN"	location="${DIST_DIR}/jquery.claypool.application.min.js" />
-    <property name="CLAYPOOL_IOC"   			location="${DIST_DIR}/jquery.claypool.ioc.js" />
-    <property name="CLAYPOOL_IOC_MIN"   		location="${DIST_DIR}/jquery.claypool.ioc.min.js" />
-    <property name="CLAYPOOL_MVC"   			location="${DIST_DIR}/jquery.claypool.mvc.js" />
-    <property name="CLAYPOOL_MVC_MIN"   		location="${DIST_DIR}/jquery.claypool.mvc.min.js" />
-    <property name="CLAYPOOL_AOP"   			location="${DIST_DIR}/jquery.claypool.aop.js" />
-    <property name="CLAYPOOL_AOP_MIN"   		location="${DIST_DIR}/jquery.claypool.aop.min.js" />
-    <property name="CLAYPOOL_SERVER"   			location="${DIST_DIR}/jquery.claypool.server.js" />
-    <property name="CLAYPOOL_SERVER_MIN"   		location="${DIST_DIR}/jquery.claypool.server.min.js" />
-    <property name="CLAYPOOL_DATA"   			location="${DIST_DIR}/jquery.claypool.data.js" />
-    <property name="CLAYPOOL_DATA_MIN"   		location="${DIST_DIR}/jquery.claypool.data.min.js" />
-    <property name="CLAYPOOL_DAO"   			location="${DIST_DIR}/jquery.claypool.dao.js" />
-    <property name="CLAYPOOL_DAO_MIN"   		location="${DIST_DIR}/jquery.claypool.dao.min.js" />
-    <property name="CLAYPOOL_TEMPLATE"   		location="${DIST_DIR}/jquery.claypool.template.js" />
-    <property name="CLAYPOOL_TEMPLATE_MIN"   	location="${DIST_DIR}/jquery.claypool.template.min.js" />
-    <property name="CLAYPOOL_TEST"   			location="${DIST_DIR}/jquery.claypool.test.js" />
-    <property name="CLAYPOOL_TEST_MIN"   		location="${DIST_DIR}/jquery.claypool.test.min.js" />
-    <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/jquery.claypool.all.js" />
-    <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/jquery.claypool.all.min.js" />
+    <property name="CLAYPOOL_CORE"   			location="${SRC_DIR}/core" />
+    <property name="CLAYPOOL_LOGGING"   		location="${SRC_DIR}/logging" />
+    <property name="CLAYPOOL_APPLICATION"   	location="${SRC_DIR}/application" />
+    <property name="CLAYPOOL_IOC"   			location="${SRC_DIR}/ioc" />
+    <property name="CLAYPOOL_MVC"   			location="${SRC_DIR}/mvc" />
+    <property name="CLAYPOOL_AOP"   			location="${SRC_DIR}/aop" />
+    <property name="CLAYPOOL_SERVER"   			location="${SRC_DIR}/server" />
+    <property name="CLAYPOOL_TEST"   			location="${SRC_DIR}/test" />
+    <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/jquery.claypool.js" />
+    <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/jquery.claypool.min.js" />
     
     <!-- Plugin File Names for Distribution -->
     
@@ -86,42 +73,6 @@
     </target>
     
     <target name="lint" depends="concat">
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_CORE}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_LOGGING}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_APPLICATION}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_IOC}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_MVC}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_AOP}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_SERVER}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_DATA}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_DAO}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_TEMPLATE}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_TEST}" />
-        </java>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${CLAYPOOL_ALL}" />
-        </java>
     </target>
     
     <target name="compile">
@@ -135,118 +86,151 @@
     </target>
     
     <target name="clean">
-        <delete  dir="${LIB_DIR}/jquery"/>
-        <delete  dir="${LIB_DIR}/ui"/>
-        <delete  dir="${LIB_DIR}/fx"/>
-        <delete  dir="${LIB_DIR}/plugins"/>
-        <delete  dir="${LIB_DIR}/themes"/>
-        <delete dir="${DOCS_DIR}" />
         <delete dir="${DIST_DIR}" />
+        <delete dir="${BUILD_DIR}" />
     </target>
     
     <target name="concat" description="Main claypool build">
+        <mkdir dir="${BUILD_DIR}" />
+        
     	<!-- CORE -->
         <echo message="Building ${CLAYPOOL_CORE}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_CORE}">
-            <fileset dir="${SRC_DIR}" includes="claypool.core.js" />
+        <concat destfile="${BUILD_DIR}/core.js">
+            <fileset dir="${CLAYPOOL_CORE}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="configuration.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="cache.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="context.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="router.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_CORE}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/core.js" />
+        </java>
         <echo message="${CLAYPOOL_CORE} built." />
         
     	<!-- LOGGING -->
         <echo message="Building ${CLAYPOOL_LOGGING}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_LOGGING}">
-            <fileset dir="${SRC_DIR}" includes="claypool.logging.js" />
+        <concat destfile="${BUILD_DIR}/logging.js">
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="level.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="logger.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="appender.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="formatter.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/logging.js" />
+        </java>
         <echo message="${CLAYPOOL_LOGGING} built." />
         
     	<!-- APPLICATION -->
         <echo message="Building ${CLAYPOOL_APPLICATION}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_APPLICATION}">
-            <fileset dir="${SRC_DIR}" includes="claypool.application.js" />
+        <concat destfile="${BUILD_DIR}/app.js">
+            <fileset dir="${CLAYPOOL_APPLICATION}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_APPLICATION}" includes="context.js" />
+            <fileset dir="${CLAYPOOL_APPLICATION}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_APPLICATION}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/app.js" />
+        </java>
         <echo message="${CLAYPOOL_APPLICATION} built." />
         
     	<!-- IOC -->
         <echo message="Building ${CLAYPOOL_IOC}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_IOC}">
-            <fileset dir="${SRC_DIR}" includes="claypool.ioc.js" />
+        <concat destfile="${BUILD_DIR}/ioc.js">
+            <fileset dir="${CLAYPOOL_IOC}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_IOC}" includes="instance.js" />
+            <fileset dir="${CLAYPOOL_IOC}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_IOC}" includes="container.js" />
+            <fileset dir="${CLAYPOOL_IOC}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_IOC}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/ioc.js" />
+        </java>
         <echo message="${CLAYPOOL_IOC} built." />
         
     	<!-- MVC -->
         <echo message="Building ${CLAYPOOL_MVC}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_MVC}">
-            <fileset dir="${SRC_DIR}" includes="claypool.mvc.js" />
+        <concat destfile="${BUILD_DIR}/mvc.js">
+            <fileset dir="${CLAYPOOL_MVC}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="view.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="controller.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="hijax.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="container.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_MVC}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/mvc.js" />
+        </java>
         <echo message="${CLAYPOOL_MVC} built." />
         
     	<!-- AOP -->
         <echo message="Building ${CLAYPOOL_AOP}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_AOP}">
-            <fileset dir="${SRC_DIR}" includes="claypool.aop.js" />
+        <concat destfile="${BUILD_DIR}/aop.js">
+            <fileset dir="${CLAYPOOL_AOP}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_AOP}" includes="aspect.js" />
+            <fileset dir="${CLAYPOOL_AOP}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_AOP}" includes="container.js" />
+            <fileset dir="${CLAYPOOL_AOP}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_AOP}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/aop.js" />
+        </java>
         <echo message="${CLAYPOOL_AOP} built." />
         
     	<!-- SERVER -->
         <echo message="Building ${CLAYPOOL_SERVER}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_SERVER}">
-            <fileset dir="${SRC_DIR}" includes="claypool.server.js" />
+        <concat destfile="${BUILD_DIR}/server.js">
+            <fileset dir="${CLAYPOOL_SERVER}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="servlet.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="scaffold.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="proxy.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="e4x.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="console.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/server.js" />
+        </java>
         <echo message="${CLAYPOOL_SERVER} built." />
         
-    	<!-- DATA -->
-        <echo message="Building ${CLAYPOOL_DATA}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_DATA}">
-            <fileset dir="${SRC_DIR}" includes="claypool.data.js" />
-        </concat>
-        <echo message="${CLAYPOOL_DATA} built." />
-        
-    	<!-- DAO -->
-        <echo message="Building ${CLAYPOOL_DAO}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_DAO}">
-            <fileset dir="${SRC_DIR}" includes="claypool.dao.js" />
-        </concat>
-        <echo message="${CLAYPOOL_DAO} built." />
-        
-    	<!-- BINDING -->
-        <echo message="Building ${CLAYPOOL_TEMPLATE}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_TEMPLATE}">
-            <fileset dir="${SRC_DIR}" includes="claypool.template.js" />
-        </concat>
-        <echo message="${CLAYPOOL_TEMPLATE} built." />
-        
+    	
     	<!-- TEST (MoonUnit)-->
         <echo message="Building ${CLAYPOOL_TEST}" />
-        <mkdir dir="${DIST_DIR}" />
-        <concat destfile="${CLAYPOOL_TEST}">
-            <fileset dir="${SRC_DIR}" includes="claypool.test.js" />
+        <concat destfile="${BUILD_DIR}/munit.js">
+            <fileset dir="${CLAYPOOL_TEST}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_TEST}" includes="test.js" />
+            <fileset dir="${CLAYPOOL_TEST}" includes="runner.js" />
+            <fileset dir="${CLAYPOOL_TEST}" includes="error.js" />
+            <fileset dir="${CLAYPOOL_TEST}" includes="plugin.js" />
         </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/munit.js" />
+        </java>
         <echo message="${CLAYPOOL_TEST} built." />
         
     	<!-- ALL -->
         <echo message="Building ${CLAYPOOL_ALL}" />
         <mkdir dir="${DIST_DIR}" />
         <concat destfile="${CLAYPOOL_ALL}">
-            <fileset dir="${SRC_DIR}" includes="claypool.core.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.logging.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.application.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.aop.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.ioc.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.mvc.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.server.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.data.js" />
-            <fileset dir="${SRC_DIR}" includes="claypool.dao.js" />
-            <!--fileset dir="${SRC_DIR}" includes="claypool.binding.js" /-->
+            <fileset dir="${BUILD_DIR}" includes="core.js" />
+            <fileset dir="${BUILD_DIR}" includes="logging.js" />
+            <fileset dir="${BUILD_DIR}" includes="app.js" />
+            <fileset dir="${BUILD_DIR}" includes="aop.js" />
+            <fileset dir="${BUILD_DIR}" includes="ioc.js" />
+            <fileset dir="${BUILD_DIR}" includes="mvc.js" />
+            <fileset dir="${BUILD_DIR}" includes="server.js" />
+            <fileset dir="${BUILD_DIR}" includes="munit.js" />
         </concat>
         <echo message="${CLAYPOOL_ALL} built." />
     </target>

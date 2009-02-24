@@ -15,6 +15,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 
 /**
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 public class Servlet extends HttpServlet {
 
     //protected ThreadLocal threadRequestHandler;
-    protected RequestHandler requestHandler = null;
+    //protected RequestHandler requestHandler = null;
     protected String applicationContainer;
     protected String applicationLocation;
     protected String applicationBasePath;
@@ -43,6 +44,8 @@ public class Servlet extends HttpServlet {
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    HttpSession session = request.getSession(true);
+        RequestHandler requestHandler = (RequestHandler)session.getValue("requestHandler");
 	    if(requestHandler == null){
     		getServletConfig().getServletContext().log("CONTEXT PATHNAME : " + request.getContextPath());
     		getServletConfig().getServletContext().log("SERVLET PATHNAME : " + request.getServletPath());
@@ -54,6 +57,7 @@ public class Servlet extends HttpServlet {
                 applicationLocation, 
                 applicationBasePath,
                 getServletConfig().getServletContext());
+            session.putValue("requestHandler", requestHandler);
 	    }
 	    if(!requestHandler.processRequest(request, response)){
 	        String staticResource = applicationBasePath + request.getPathInfo();

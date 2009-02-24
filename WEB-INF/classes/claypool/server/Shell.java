@@ -1,4 +1,4 @@
-// This is just a JavaScript shell that has some host objects. It would be
+ // This is just a JavaScript shell that has some host objects. It would be
 // a good idea that host objects useful to a server-side framework be added.
 // These may include File and Database objects. It is amazing how easy it is
 // to create your own shell and host objects with Rhino since the entire Java
@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.log4j.Logger;
 
@@ -33,7 +35,6 @@ public class Shell extends ScriptableObject implements FileListener{
         
         cx = Context.enter();
         cx.initStandardObjects(this);
-
         // host objects --------------
 
         // Give easy access to the global object by making a global property named "global".
@@ -82,7 +83,7 @@ public class Shell extends ScriptableObject implements FileListener{
     {
       Shell shell = (Shell)getTopLevelScope(thisObj);
       for (int i = 0; i < args.length; i++) {
-         shell.processFile(Context.toString(args[i]));
+         shell.processAbsoluteFile(Context.toString(args[i]));
       }
     }
     
@@ -119,14 +120,23 @@ public class Shell extends ScriptableObject implements FileListener{
      */
     private void processAbsoluteFile(String absoluteFileName) {
         logger.debug("Loading Script: " + absoluteFileName);
-        FileReader in = null;
+        BufferedReader in = null;
         try {
-            in = new FileReader(absoluteFileName);
+            //in = new FileReader(absoluteFileName);
             // reloads changed files
-            monitor.addFile (new File (absoluteFileName));
+            
+            URL url = new URL(absoluteFileName);
+    		URLConnection uc = url.openConnection();
+    
+    		InputStreamReader input = new InputStreamReader(uc.getInputStream());
+    		in = new BufferedReader(input);
+
+            if(absoluteFileName.startsWith("file:/")){
+                monitor.addFile (new File (absoluteFileName));
+            }
         }
-        catch (FileNotFoundException ex) {
-            Context.reportError("Couldn't open file \"" + absoluteFileName + "\".");
+        catch (IOException ex) {
+            Context.reportError("Couldn't open file \"" + absoluteFileName + "\".\n\n" + ex);
             return;
         }
 
@@ -165,8 +175,8 @@ public class Shell extends ScriptableObject implements FileListener{
         }
         //Damn jetty thinks maven is the shit.  
         try{
-            logger.info("Trying jetty reload trigger (/scripts/jetty/contexts/claypool.xml)");
-            File webXml = new File(this.basePath + "/scripts/jetty/contexts/claypool.xml");
+            logger.info("Trying jetty reload trigger (/scripts/server/contexts/claypool.xml)");
+            File webXml = new File(this.basePath + "/scripts/server/contexts/claypool.xml");
             webXml.setLastModified(new java.util.Date().getTime());
         }catch(Exception e){
             //ignore logger.error(ioe.toString());

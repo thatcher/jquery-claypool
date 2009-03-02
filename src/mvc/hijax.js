@@ -46,13 +46,11 @@
             this.logger.debug("Handling pattern: %s", data.pattern);
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
-            var target, action, resolver, defaultView;
-            var resolvedResponses = [];
             var _this = this;
             return jQuery(this.forwardingList).each(function(){
-                //the event is the first arg, and then tack back on the original extra args.
-                var _event = data.args[0];
-                var extra = [];
+                var target, 
+                    action, 
+                    defaultView;
                 for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
@@ -63,11 +61,13 @@
                         this.payload.controller.replace('Controller', 'View') : null;
                     defaultView = this.payload.controller.match('Service') ?
                         this.payload.controller.replace('Service', 'View') : defaultView;
-                    (function(){
-                        var m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
+                    (function(t){
+                        var  _event = data.args[0],//the event is the first arg, 
+                            extra = [],//and then tack back on the original extra args.
+                            m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
                             v = defaultView,
                             c = target;
-                        $.extend(_event, {
+                        var eventflow = $.extend( {}, _event, {
                            m: function(){
                                if(arguments.length === 0){
                                    return m;
@@ -111,6 +111,7 @@
                                        }
                                    }
                                }
+                               return this;//chain
                            },
                            c : function(){
                                var target, action, controller;
@@ -131,13 +132,13 @@
                                     }
                                     controller[action](_event, extra);
                                }
-                               return this;
+                               return this;//chain
                            },
-                            render:_this.renderer(_event)
+                           render:_this.renderer()
                         });
-                    })();
-                    //tack back on the extra event arguments
-                    target[this.payload.action||"handle"].apply(target, [ _event ].concat(extra) );
+                        //tack back on the extra event arguments
+                        target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
+                    })(this);
                 }catch(e){
                     e = e?e:new Error();
                     if(e.name&&e.name.indexOf("Claypool.Application.ContextError")>-1){
@@ -220,17 +221,16 @@
          * @type String
          */
         //provides a continuation for the mvc flow to allow room for asynch dao's and the like
-        renderer: function(event){
+        renderer: function(){
             var _this = this;
             var callbackStack = [];
-            var forwardedEvent = event;
             return function(callback){
-                var mvc = this;
-                var target;
-                var controller;
-                var action;
-                var view, viewMethod;
-                var guidedEventRegistration;
+                var target,
+                    controller,
+                    action,
+                    view, 
+                    viewMethod,
+                    guidedEventRegistration;
                 /**
                 *   callbacks are saved until any forwarding is completed and then executed sequentially 
                 *   by popping off the top (so in reverse of the order they where added)
@@ -238,17 +238,17 @@
                 if(callback&&$.isFunction(callback)){
                     callbackStack.push(callback);
                 }
-                _this.logger.debug(" - Resolving Control - %s)", mvc.c());
+                _this.logger.debug(" - Resolving Control - %s)", this.c());
                 try{
                     //a view can specifiy a method other than the default 'update'
                     //by providing a '.name' on the view
-                    view = mvc.v();
+                    view = this.v();
                     //If a writer is provided, the default view method is 'render'
-                    viewMethod = $.isFunction(mvc.write)?"render":"update";
+                    viewMethod = $.isFunction(this.write)?"render":"update";
                     if(view.indexOf(".") > -1){
                         viewMethod = view.split('.');
                         view = viewMethod[0];
-                        //always use the last so we can additively use the mvc resolver in closures
+                        //always use the last so we can additively use the mvc v value in closures
                         viewMethod = viewMethod[viewMethod.length-1];
                     }
                     _this.logger.debug("Calling View %s.%s", view, viewMethod);
@@ -256,12 +256,12 @@
                     if(view){
                         if($.isFunction(view[viewMethod])){
                             //if a 'writer' is provided the view is called with both args
-                            if(mvc.write){
-                                view.write = mvc.write;
-                                view.append = mvc.append;
-                                view[viewMethod](mvc.m());
+                            if(this.write){
+                                view.write = this.write;
+                                view.append = this.append;
+                                view[viewMethod](this.m());
                             }else{
-                                view[viewMethod](mvc.m());
+                                view[viewMethod](this.m());
                             }
                             _this.logger.debug("Cascading callbacks");
                             while(callbackStack.length > 0){ (callbackStack.pop())(); }
@@ -274,7 +274,7 @@
                                 _this.logger.warn("The view is reattached to the dom.");
                                 //unbind handler
                                 $(document).unbind(guidedEventRegistration);
-                                newView.update(mvc.m());
+                                newView.update(this.m());
                                 _this.logger.debug("Cascading callbacks");
                                 while(callbackStack.length > 0){ (callbackStack.pop())(); }
                             });
@@ -282,10 +282,10 @@
                             _this.logger.debug("View method cannot be resolve", viewMethod);
                         }
                     }else{
-                        _this.logger.warn("Cant resolve view %s. ", mvc.v());
+                        _this.logger.warn("Cant resolve view %s. ", this.v());
                     }
                 }catch(e){
-                    _this.logger.error("Error resolving flow %s => %s", mvc.c(), mvc.v()).
+                    _this.logger.error("Error resolving flow %s => %s", this.c(), this.v()).
                         exception(e);
                     throw e;
                 }

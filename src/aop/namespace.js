@@ -1,7 +1,7 @@
 
 Claypool.AOP={
 /*
- * Claypool.AOP @VERSION - A Web 1.6180339... Javascript Application Framework
+ * Claypool.AOP @VERSION@ - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)

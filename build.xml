@@ -5,7 +5,11 @@
 <project name="Claypool" default="default" basedir=".">
     <description>Builds, tests, and runs the project Claypool.</description>
     
-    <property name="JQUERY_LIB" location="../../../jQuery/trunk/"/><!-- test 39 />--> 
+    <!-- BASIC PROJECT PROPERTIES TO HELP TRACK VERSION -->
+    <property name="PROJECT_TITLE"            value="jquery.claypool" />
+    <property name="BUILD_MAJOR"              value="1" />
+    <property name="BUILD_MINOR"              value="0" />
+    <property name="BUILD_ID"                 value="rc1" />
     
     <property description="Java Jars" name="JAVA_LIB_DIR" location="WEB-INF/lib" />
     <property description="Rhino JS Engine" name="RHINO_JAR" location="${JAVA_LIB_DIR}/js.jar" />
@@ -32,8 +36,8 @@
     <property name="CLAYPOOL_AOP"   			location="${SRC_DIR}/aop" />
     <property name="CLAYPOOL_SERVER"   			location="${SRC_DIR}/server" />
     <property name="CLAYPOOL_TEST"   			location="${SRC_DIR}/test" />
-    <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/jquery.claypool.js" />
-    <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/jquery.claypool.min.js" />
+    <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js" />
+    <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.min.js" />
     
     <!-- Plugin File Names for Distribution -->
     
@@ -41,36 +45,6 @@
     <target name="default" depends="lint, min, compile"/>
     
     <target name="all" depends="default"/>
-    
-    <target name="support">
-       <copy todir="${LIB_DIR}">
-           <fileset dir="${JQUERY_LIB}/">
-               <include name="jquery/src/*.js"/>
-               <include name="jquery/dist/*.js"/>
-               <include name="jquery/**/*.json"/>
-               <include name="ui/current/*.js"/>
-               <include name="ui/experimental/*.js"/>
-               <include name="ui/**/*.json"/>
-               <include name="fx/current/*.js"/>
-               <include name="fx/experimental/*.js"/>
-               <include name="fx/**/*.json"/>
-               <include name="plugins/dimensions/jquery.dimensions*.js"/>
-               <include name="plugins/livequery/jquery.livequery*.js"/>
-               <include name="plugins/form/form/jquery.form*.js"/>
-               <include name="themes/"/>
-           </fileset>
-       </copy>
-        <delete failonerror="false" quiet="true">
-            <fileset dir="${CLASSES_DIR}">
-                <include name="**/*"/>
-            </fileset>
-        </delete>
-        <delete failonerror="false" quiet="true">
-            <fileset dir="${CLASSES_DIR}">
-                <include name="**/*"/>
-            </fileset>
-        </delete>
-    </target>
     
     <target name="lint" depends="concat">
     </target>
@@ -96,6 +70,11 @@
     	<!-- CORE -->
         <echo message="Building ${CLAYPOOL_CORE}" />
         <concat destfile="${BUILD_DIR}/core.js">
+            <filterchain>    
+                <replacetokens>
+                    <token key="VERSION" value="${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+                </replacetokens>
+            </filterchain>
             <fileset dir="${CLAYPOOL_CORE}" includes="namespace.js" />
             <fileset dir="${CLAYPOOL_CORE}" includes="configuration.js" />
             <fileset dir="${CLAYPOOL_CORE}" includes="cache.js" />

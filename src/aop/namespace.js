@@ -32,15 +32,5 @@ Claypool.AOP={
 (function($, $$, $$AOP){
     
     $.manage("Claypool.AOP.Container", "claypool:AOP");
-    /*$(document).bind("claypool:initialize", function(event, context){
-        context['claypool:AOP'] = new $$AOP.Container();
-        if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-            $.extend(context['claypool:AOP'], new context.ContextContributor());
-            context['claypool:AOP'].registerContext("Claypool.AOP.Container");
-        }
-    }).bind("claypool:reinitialize", function(event, context){
-        context['claypool:AOP'].factory.updateConfig();
-    });*/
-    
     
 })(  jQuery, Claypool, Claypool.AOP );

@@ -37,77 +37,9 @@ Claypool.MVC = {
 };
 
 (function($, $Log, $$MVC){
-    $.manage("Claypool.MVC.Container", "claypool:MVC");
-    /*$(document).bind("claypool:initialize", function(event, context){
-        context['claypool:MVC'] = new $$MVC.Container();
-        if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-            $.extend(context['claypool:MVC'], new context.ContextContributor());
-            context['claypool:MVC'].registerContext("Claypool.MVC.Container");
-        }
-    }).bind("claypool:reinitialize", function(event, context){
-        context['claypool:MVC'].factory.updateConfig();
-    });*/
     
-    /*$(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-        registrationFunction.apply(_this, [configuration, "hijax:a", "Claypool.MVC.HijaxController", {
-            selector:       'a',
-            event:          'click',
-            strategy:       'first',
-            routerKeys:     'urls',
-            hijaxKey:       'link',
-            eventNamespace: "Claypool:MVC:HijaxLinkController",
-            getTarget:     function(event){ 
-                var link = event.target||event.currentTarget;
-                while(link.tagName.toUpperCase()!='A'){
-                    link = jQuery(link).parent()[0];
-                }
-                return jQuery(link).attr("href");
-            }
-        }]);
-        registrationFunction.apply(_this, [configuration, "hijax:button",  "Claypool.MVC.HijaxController", {
-            selector:       ':button',
-            event:          'click',
-            strategy:       'all',
-            routerKeys:     'urls',
-            hijaxKey:       'button',
-            eventNamespace: "Claypool:MVC:HijaxButtonController",
-            getTarget:     function(event){ 
-                return event.target.value;
-            }
-        }]);
-        registrationFunction.apply(_this, [configuration, "hijax:input",  "Claypool.MVC.HijaxController", {
-            selector:       'input',
-            event:          'click',
-            strategy:       'all',
-            routerKeys:     'urls',
-            hijaxKey:       'button',
-            eventNamespace: "Claypool:MVC:HijaxInputController",
-            getTarget:     function(event){ 
-                return event.target.name;
-            }
-        }]);
-        registrationFunction.apply(_this, [configuration, "hijax:form",    "Claypool.MVC.HijaxController", {
-            selector:       'form',
-            event:          'submit',
-            strategy:       'first',
-            routerKeys:     'urls',
-            hijaxKey:       'form',
-            eventNamespace: "Claypool:MVC:HijaxFormController",
-            getTarget:     function(event){ 
-                return event.target.action;
-            }
-        }]);
-        registrationFunction.apply(_this, [configuration, "hijax:event",   "Claypool.MVC.HijaxController", {
-            strategy:       'all',
-            routerKeys:     'event',
-            hijaxKey:       'event',
-            eventNamespace: "Claypool:MVC:HijaxEventController",
-            getTarget:     function(event){ 
-                return event.type;
-            }
-        }]);
-    });*/
-        
+    $.manage("Claypool.MVC.Container", "claypool:MVC");
+    
 })(  jQuery, Claypool, Claypool.MVC );
 
 
@@ -352,7 +284,7 @@ Claypool.MVC = {
             this.logger.debug("Hijaxing %s: %s", this.hijaxKey, target);
             var _this = this;
             var _hijax = function(event){
-                //var retVal = true;
+                var retVal = true;
                 _this.logger.info("Hijaxing %s: ", _this.hijaxKey);
                 if(_this.stopPropagation){
                     _this.logger.debug("Stopping propogation of event");
@@ -361,10 +293,10 @@ Claypool.MVC = {
                 if(_this.preventDefault){
                     _this.logger.debug("Preventing default event behaviour");
                     event.preventDefault();
-                    //retVal = false;
+                    retVal = false;
                 }
                 _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
-                //return retVal;
+                return retVal;
             };
             if(this.event){
                 /**This is a specific event hijax so we bind once and dont think twice  */
@@ -586,7 +518,7 @@ Claypool.MVC = {
                     configuration = {};
                     configuration.id = mvcConfig[key][i].id;
                     configuration.clazz = clazz;
-                    configuration.options = [ $.extend(true,mvcConfig[key][i], options||{}) ];
+                    configuration.options = [ $.extend(true, options||{}, mvcConfig[key][i]) ];
                     this.logger.debug("Adding MVC Configuration for Controller Id: %s", configuration.id);
                     this.add( configuration.id, configuration );
                 }

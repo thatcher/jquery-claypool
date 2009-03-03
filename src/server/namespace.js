@@ -15,20 +15,7 @@ Claypool.Server={
  */
 };
 (function($, $$, $$Web){
-    /**
-    $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-        registrationFunction.apply(_this, [configuration, "hijax:server", "Claypool.MVC.HijaxController", {
-            event:          'claypool:serve',
-            strategy:       'first',
-            routerKeys:     'urls',
-            hijaxKey:       'request',
-            eventNamespace: "Claypool:Server:HijaxServerController",
-            getTarget:     function(event, request){ 
-                return request.url;//request/response object
-            }
-        }]);
-    });
-    */
+    
     $.router( "hijax:server", {
         event:          'claypool:serve',
         strategy:       'first',

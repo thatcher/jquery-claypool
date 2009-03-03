@@ -178,7 +178,7 @@
             this.logger.debug("Hijaxing %s: %s", this.hijaxKey, target);
             var _this = this;
             var _hijax = function(event){
-                //var retVal = true;
+                var retVal = true;
                 _this.logger.info("Hijaxing %s: ", _this.hijaxKey);
                 if(_this.stopPropagation){
                     _this.logger.debug("Stopping propogation of event");
@@ -187,10 +187,10 @@
                 if(_this.preventDefault){
                     _this.logger.debug("Preventing default event behaviour");
                     event.preventDefault();
-                    //retVal = false;
+                    retVal = false;
                 }
                 _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
-                //return retVal;
+                return retVal;
             };
             if(this.event){
                 /**This is a specific event hijax so we bind once and dont think twice  */

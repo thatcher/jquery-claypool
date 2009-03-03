@@ -24,14 +24,5 @@ Claypool.IoC={
 (function($, $$, $$IoC){
 	
     $.manage("Claypool.IoC.Container", "claypool:IoC");
-	/*$(document).bind("claypool:initialize", function(event, context){
-		context['claypool:IoC'] = new $$IoC.Container();
-		if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-			$.extend(context['claypool:IoC'], new context.ContextContributor());
-			context['claypool:IoC'].registerContext("Claypool.IoC.Container");
-		}
-	}).bind("claypool:reinitialize", function(event, context){
-		context['claypool:IoC'].factory.updateConfig();
-	});*/
 
 })(  jQuery, Claypool, Claypool.IoC );

@@ -32,16 +32,6 @@ Claypool.AOP={
 (function($, $$, $$AOP){
     
     $.manage("Claypool.AOP.Container", "claypool:AOP");
-    /*$(document).bind("claypool:initialize", function(event, context){
-        context['claypool:AOP'] = new $$AOP.Container();
-        if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-            $.extend(context['claypool:AOP'], new context.ContextContributor());
-            context['claypool:AOP'].registerContext("Claypool.AOP.Container");
-        }
-    }).bind("claypool:reinitialize", function(event, context){
-        context['claypool:AOP'].factory.updateConfig();
-    });*/
-    
     
 })(  jQuery, Claypool, Claypool.AOP );
 
@@ -60,7 +50,7 @@ Claypool.AOP={
     $$AOP.Aspect = function(options){
         this.id   = null;
         this.type = null;
-        $$.extend(this.$$.SimpleCachingStrategy);
+        $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.AOP.Aspect");
         //only 'first' and 'all' are honored at this point
@@ -115,7 +105,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.createGUID(), _weave(f));
+                        this.add($.guid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -210,6 +200,7 @@ Claypool.AOP={
          */
         $$AOP.Before = function(options){
             $$.extend( this, $AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Before");
             this.type = "before";
         };
@@ -250,6 +241,7 @@ Claypool.AOP={
          */
         $$AOP.Around = function(options){
             $$.extend( this,  $$AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Around");
             this.type = "around";
         };
@@ -328,7 +320,7 @@ Claypool.AOP={
                         //  resolve the advice which must be specified as an optionally
                         //  namespaced string eg 'Foo.Bar.goop' 
                         if(!$.isFunction(aopconf.advice)){
-                            aopconf.advice = $.resolveName(aopconf.advice);
+                            aopconf.advice = $.resolve(aopconf.advice);
                         }
                         //If the adive is to be applied to an application managed instance
                         //then bind to its lifecycle events to weave and unweave the
@@ -365,7 +357,7 @@ Claypool.AOP={
                                 //The string ends with '.*' which implies the target is every function
                                 //in the namespace.  hence we resolve the namespace, look for every
                                 //function and create a new filter for each function.
-                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+                                namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
                                 for(prop in namespace){
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
@@ -380,7 +372,7 @@ Claypool.AOP={
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
-                                aopconf.target =  $.resolveName(aopconf.target);
+                                aopconf.target =  $.resolve(aopconf.target);
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }

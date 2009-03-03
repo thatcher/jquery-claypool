@@ -44,7 +44,7 @@
                         //  resolve the advice which must be specified as an optionally
                         //  namespaced string eg 'Foo.Bar.goop' 
                         if(!$.isFunction(aopconf.advice)){
-                            aopconf.advice = $.resolveName(aopconf.advice);
+                            aopconf.advice = $.resolve(aopconf.advice);
                         }
                         //If the adive is to be applied to an application managed instance
                         //then bind to its lifecycle events to weave and unweave the
@@ -81,7 +81,7 @@
                                 //The string ends with '.*' which implies the target is every function
                                 //in the namespace.  hence we resolve the namespace, look for every
                                 //function and create a new filter for each function.
-                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+                                namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
                                 for(prop in namespace){
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
@@ -96,7 +96,7 @@
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
-                                aopconf.target =  $.resolveName(aopconf.target);
+                                aopconf.target =  $.resolve(aopconf.target);
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }

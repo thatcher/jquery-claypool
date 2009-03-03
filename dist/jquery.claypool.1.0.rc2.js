@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc1 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc2 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -1974,16 +1974,6 @@ Claypool.AOP={
 (function($, $$, $$AOP){
     
     $.manage("Claypool.AOP.Container", "claypool:AOP");
-    /*$(document).bind("claypool:initialize", function(event, context){
-        context['claypool:AOP'] = new $$AOP.Container();
-        if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-            $.extend(context['claypool:AOP'], new context.ContextContributor());
-            context['claypool:AOP'].registerContext("Claypool.AOP.Container");
-        }
-    }).bind("claypool:reinitialize", function(event, context){
-        context['claypool:AOP'].factory.updateConfig();
-    });*/
-    
     
 })(  jQuery, Claypool, Claypool.AOP );
 
@@ -2002,7 +1992,7 @@ Claypool.AOP={
     $$AOP.Aspect = function(options){
         this.id   = null;
         this.type = null;
-        $$.extend(this.$$.SimpleCachingStrategy);
+        $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.AOP.Aspect");
         //only 'first' and 'all' are honored at this point
@@ -2057,7 +2047,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.createGUID(), _weave(f));
+                        this.add($.guid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -2152,6 +2142,7 @@ Claypool.AOP={
          */
         $$AOP.Before = function(options){
             $$.extend( this, $AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Before");
             this.type = "before";
         };
@@ -2192,6 +2183,7 @@ Claypool.AOP={
          */
         $$AOP.Around = function(options){
             $$.extend( this,  $$AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Around");
             this.type = "around";
         };
@@ -2270,7 +2262,7 @@ Claypool.AOP={
                         //  resolve the advice which must be specified as an optionally
                         //  namespaced string eg 'Foo.Bar.goop' 
                         if(!$.isFunction(aopconf.advice)){
-                            aopconf.advice = $.resolveName(aopconf.advice);
+                            aopconf.advice = $.resolve(aopconf.advice);
                         }
                         //If the adive is to be applied to an application managed instance
                         //then bind to its lifecycle events to weave and unweave the
@@ -2307,7 +2299,7 @@ Claypool.AOP={
                                 //The string ends with '.*' which implies the target is every function
                                 //in the namespace.  hence we resolve the namespace, look for every
                                 //function and create a new filter for each function.
-                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+                                namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
                                 for(prop in namespace){
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
@@ -2322,7 +2314,7 @@ Claypool.AOP={
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
-                                aopconf.target =  $.resolveName(aopconf.target);
+                                aopconf.target =  $.resolve(aopconf.target);
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }
@@ -2626,15 +2618,6 @@ Claypool.IoC={
 (function($, $$, $$IoC){
 	
     $.manage("Claypool.IoC.Container", "claypool:IoC");
-	/*$(document).bind("claypool:initialize", function(event, context){
-		context['claypool:IoC'] = new $$IoC.Container();
-		if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-			$.extend(context['claypool:IoC'], new context.ContextContributor());
-			context['claypool:IoC'].registerContext("Claypool.IoC.Container");
-		}
-	}).bind("claypool:reinitialize", function(event, context){
-		context['claypool:IoC'].factory.updateConfig();
-	});*/
 
 })(  jQuery, Claypool, Claypool.IoC );
 
@@ -3559,7 +3542,7 @@ Claypool.MVC = {
             this.logger.debug("Hijaxing %s: %s", this.hijaxKey, target);
             var _this = this;
             var _hijax = function(event){
-                //var retVal = true;
+                var retVal = true;
                 _this.logger.info("Hijaxing %s: ", _this.hijaxKey);
                 if(_this.stopPropagation){
                     _this.logger.debug("Stopping propogation of event");
@@ -3568,10 +3551,10 @@ Claypool.MVC = {
                 if(_this.preventDefault){
                     _this.logger.debug("Preventing default event behaviour");
                     event.preventDefault();
-                    //retVal = false;
+                    retVal = false;
                 }
                 _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
-                //return retVal;
+                return retVal;
             };
             if(this.event){
                 /**This is a specific event hijax so we bind once and dont think twice  */
@@ -4031,20 +4014,7 @@ Claypool.Server={
  */
 };
 (function($, $$, $$Web){
-    /**
-    $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-        registrationFunction.apply(_this, [configuration, "hijax:server", "Claypool.MVC.HijaxController", {
-            event:          'claypool:serve',
-            strategy:       'first',
-            routerKeys:     'urls',
-            hijaxKey:       'request',
-            eventNamespace: "Claypool:Server:HijaxServerController",
-            getTarget:     function(event, request){ 
-                return request.url;//request/response object
-            }
-        }]);
-    });
-    */
+    
     $.router( "hijax:server", {
         event:          'claypool:serve',
         strategy:       'first',

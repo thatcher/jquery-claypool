@@ -14,7 +14,7 @@
     $$AOP.Aspect = function(options){
         this.id   = null;
         this.type = null;
-        $$.extend(this.$$.SimpleCachingStrategy);
+        $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.AOP.Aspect");
         //only 'first' and 'all' are honored at this point
@@ -69,7 +69,7 @@
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.createGUID(), _weave(f));
+                        this.add($.guid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -164,6 +164,7 @@
          */
         $$AOP.Before = function(options){
             $$.extend( this, $AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Before");
             this.type = "before";
         };
@@ -204,6 +205,7 @@
          */
         $$AOP.Around = function(options){
             $$.extend( this,  $$AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Around");
             this.type = "around";
         };

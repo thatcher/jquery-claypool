@@ -24,7 +24,28 @@
             return this;
 	    }
 	});
-	
+	/*
+     *   -   Model-View-Controller Patterns  -
+     *
+     *   Claypool MVC provides some low level built in controllers which a used to 
+     *   route control to your controllers.  These Claypool provided controllers have a convenient
+     *   configuration, though in general most controllers, views, and models should be
+     *   configured using the general ioc configuration patterns and are simply referenced as targets.
+     *
+     *   The Claypool built-in controllers are:
+     *       hijax:a - maps url patterns in hrefs to controllers.
+     *           The href resource is resolved via ajax and the result is delivered to the specified
+     *           controllers 'handle' method
+     * 
+     *       hijax:form - maps form submissions to controllers.
+     *           The submittion is handled via ajax and the postback is delivered to the specified
+     *           controllers 'handle' method
+     *
+     *       hijax:button - maps button (not submit buttons) to controllers.
+     *           This is really useful for dialogs etc when 'cancel' is just a button but 'ok' is a submit.
+     *
+     *       hijax:event - maps custom or dom events to controllers.  
+     */
 	$.router( "hijax:a", {
         selector        : 'a',
         event           : 'click',
@@ -32,7 +53,7 @@
         routerKeys      : 'urls',
         hijaxKey        : 'link',
         eventNamespace  : "Claypool:MVC:HijaxLinkController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             var link = event.target||event.currentTarget;
             while(link.tagName.toUpperCase()!='A'){
                 link = $(link).parent()[0];
@@ -46,18 +67,18 @@
         routerKeys      : 'urls',
         hijaxKey        : 'button',
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.target.value;
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'click',
+        event           : 'blur',
         strategy        : 'all',
-        routerKeys      : 'urls',
-        hijaxKey        : 'button',
+        routerKeys      : 'names',
+        hijaxKey        : 'input',
         eventNamespace  : "Claypool:MVC:HijaxInputController",
-        getTarget       : function(event){ 
-            return event.target.name;
+        target       : function(event){ 
+            return event.target.value;
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -66,7 +87,7 @@
         routerKeys      : 'urls',
         hijaxKey        : 'form',
         eventNamespace  : "Claypool:MVC:HijaxFormController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.target.action;
         }
     }).router( "hijax:event",{
@@ -74,7 +95,7 @@
         routerKeys      : 'event',
         hijaxKey        : 'event',
         eventNamespace  : "Claypool:MVC:HijaxEventController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.type;
         }
     });

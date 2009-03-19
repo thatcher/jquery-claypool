@@ -10,29 +10,6 @@ Claypool.MVC = {
  * $Rev: 265 $
  * 
  *
- *   -   Model-View-Controller Patterns  -
- *
- *   Claypool MVC provides some low level built in controllers which a used to 
- *   route control to your controllers.  These Claypool provided controllers have a convenient
- *   configuration, though in general most controllers, views, and models should be
- *   configured using the general ioc configuration patterns and are simply referenced as targets.
- *
- *   The Claypool built-in controllers are:
- *       Claypool.MVC.HijaxLinkController - maps url patterns in hrefs to custom controllers.
- *           The href resource is resolved via ajax and the result is delivered to the specified
- *           controllers 'handle' method
- * 
- *       Claypool.MVC.HijaxFormController - maps form submissions to custom controllers.
- *           The submittion is handled via ajax and the postback is delivered to the specified
- *           controllers 'handle' method
- *
- *       Claypool.MVC.HijaxButtonController - maps button (not submit buttons) to custom controllers.
- *           This is really useful for dialogs etc when 'cancel' is just a button but 'ok' is a submit.
- *
- *       Claypool.MVC.HijaxEventController - maps events to custom controllers.  This would normally
- *           be browser events based on the dom, but with providers like jQuery the eventing
- *           is much richer.  By default the event system is provided by jquery.
- *
  */
 };
 
@@ -157,7 +134,6 @@ Claypool.MVC = {
                 var target, 
                     action, 
                     defaultView;
-                for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
                     target = $.$(this.payload.controller);
@@ -173,6 +149,7 @@ Claypool.MVC = {
                             m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
                             v = defaultView,
                             c = target;
+                        for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                         var eventflow = $.extend( {}, _event, {
                            m: function(){
                                if(arguments.length === 0){
@@ -240,7 +217,13 @@ Claypool.MVC = {
                                }
                                return this;//chain
                            },
-                           render:_this.renderer()
+                           render:_this.renderer(),
+                           reset:function(){
+                               m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
+                               v = defaultView;
+                               c = target;
+                               return this;//chain
+                           }
                         });
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
@@ -295,7 +278,7 @@ Claypool.MVC = {
                     event.preventDefault();
                     retVal = false;
                 }
-                _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
+                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
                 return retVal;
             };
             if(this.event){
@@ -399,7 +382,7 @@ Claypool.MVC = {
             };
         },
         /**returns some part of the event to use in router, eg event.type*/
-        getTarget: function(event){
+        target: function(event){
             throw new $$.MethodNotImplementedError();
         }
     });
@@ -681,7 +664,28 @@ Claypool.MVC = {
             return this;
 	    }
 	});
-	
+	/*
+     *   -   Model-View-Controller Patterns  -
+     *
+     *   Claypool MVC provides some low level built in controllers which a used to 
+     *   route control to your controllers.  These Claypool provided controllers have a convenient
+     *   configuration, though in general most controllers, views, and models should be
+     *   configured using the general ioc configuration patterns and are simply referenced as targets.
+     *
+     *   The Claypool built-in controllers are:
+     *       hijax:a - maps url patterns in hrefs to controllers.
+     *           The href resource is resolved via ajax and the result is delivered to the specified
+     *           controllers 'handle' method
+     * 
+     *       hijax:form - maps form submissions to controllers.
+     *           The submittion is handled via ajax and the postback is delivered to the specified
+     *           controllers 'handle' method
+     *
+     *       hijax:button - maps button (not submit buttons) to controllers.
+     *           This is really useful for dialogs etc when 'cancel' is just a button but 'ok' is a submit.
+     *
+     *       hijax:event - maps custom or dom events to controllers.  
+     */
 	$.router( "hijax:a", {
         selector        : 'a',
         event           : 'click',
@@ -689,7 +693,7 @@ Claypool.MVC = {
         routerKeys      : 'urls',
         hijaxKey        : 'link',
         eventNamespace  : "Claypool:MVC:HijaxLinkController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             var link = event.target||event.currentTarget;
             while(link.tagName.toUpperCase()!='A'){
                 link = $(link).parent()[0];
@@ -703,18 +707,18 @@ Claypool.MVC = {
         routerKeys      : 'urls',
         hijaxKey        : 'button',
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.target.value;
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'click',
+        event           : 'blur',
         strategy        : 'all',
-        routerKeys      : 'urls',
-        hijaxKey        : 'button',
+        routerKeys      : 'names',
+        hijaxKey        : 'input',
         eventNamespace  : "Claypool:MVC:HijaxInputController",
-        getTarget       : function(event){ 
-            return event.target.name;
+        target       : function(event){ 
+            return event.target.value;
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -723,7 +727,7 @@ Claypool.MVC = {
         routerKeys      : 'urls',
         hijaxKey        : 'form',
         eventNamespace  : "Claypool:MVC:HijaxFormController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.target.action;
         }
     }).router( "hijax:event",{
@@ -731,7 +735,7 @@ Claypool.MVC = {
         routerKeys      : 'event',
         hijaxKey        : 'event',
         eventNamespace  : "Claypool:MVC:HijaxEventController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.type;
         }
     });

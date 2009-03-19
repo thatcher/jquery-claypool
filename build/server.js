@@ -22,7 +22,7 @@ Claypool.Server={
         routerKeys:     'urls',
         hijaxKey:       'request',
         eventNamespace: "Claypool:Server:HijaxServerController",
-        getTarget:     function(event, request){ 
+        target:     function(event, request){ 
             return request.url;//request/response object
         }
     });

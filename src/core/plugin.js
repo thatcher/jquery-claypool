@@ -9,7 +9,7 @@
     var globalContext = [],
         guid = 0,
         plugins = {},
-        $log;
+        env;
         
     $.extend(plugins, {
 	    /**
@@ -67,7 +67,7 @@
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime();
+            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random*100000000);
         },
         /**
          * Describe what this method does
@@ -126,7 +126,27 @@
                 }
             }
             return this;//chain
-        }
+        },
+        /**
+         * Describe what this method does
+         * @private
+         * @param {String} paramName Describe this parameter
+         * @returns Describe what it returns
+         * @type String
+         */
+         env: function(){
+             //an environment is set or defined by calling
+             //$.env('defaults', 'client.dev')
+             if(arguments.length == 2){
+                 //env is flat so deep extension isnt necessary
+                 env = $.extend( env||{}, 
+                     $.config('env.'+arguments[0]),
+                     $.config('env.'+arguments[1]));
+                 return env;
+             }else{
+                 return env[arguments[0]]||null;
+             }
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;

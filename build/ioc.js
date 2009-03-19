@@ -22,7 +22,7 @@ Claypool.IoC={
  * @requires OtherClassName
  */
 (function($, $$, $$IoC){
-	
+    
     $.manage("Claypool.IoC.Container", "claypool:IoC");
 
 })(  jQuery, Claypool, Claypool.IoC );

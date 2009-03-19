@@ -51,7 +51,6 @@
                 var target, 
                     action, 
                     defaultView;
-                for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
                     target = $.$(this.payload.controller);
@@ -67,6 +66,7 @@
                             m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
                             v = defaultView,
                             c = target;
+                        for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                         var eventflow = $.extend( {}, _event, {
                            m: function(){
                                if(arguments.length === 0){
@@ -134,7 +134,13 @@
                                }
                                return this;//chain
                            },
-                           render:_this.renderer()
+                           render:_this.renderer(),
+                           reset:function(){
+                               m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
+                               v = defaultView;
+                               c = target;
+                               return this;//chain
+                           }
                         });
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
@@ -189,7 +195,7 @@
                     event.preventDefault();
                     retVal = false;
                 }
-                _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
+                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
                 return retVal;
             };
             if(this.event){
@@ -293,7 +299,7 @@
             };
         },
         /**returns some part of the event to use in router, eg event.type*/
-        getTarget: function(event){
+        target: function(event){
             throw new $$.MethodNotImplementedError();
         }
     });

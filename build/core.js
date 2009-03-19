@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc2 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc5 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -623,7 +623,7 @@ var Claypool={
     var globalContext = [],
         guid = 0,
         plugins = {},
-        $log;
+        env;
         
     $.extend(plugins, {
 	    /**
@@ -681,7 +681,7 @@ var Claypool={
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime();
+            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random*100000000);
         },
         /**
          * Describe what this method does
@@ -740,7 +740,27 @@ var Claypool={
                 }
             }
             return this;//chain
-        }
+        },
+        /**
+         * Describe what this method does
+         * @private
+         * @param {String} paramName Describe this parameter
+         * @returns Describe what it returns
+         * @type String
+         */
+         env: function(){
+             //an environment is set or defined by calling
+             //$.env('defaults', 'client.dev')
+             if(arguments.length == 2){
+                 //env is flat so deep extension isnt necessary
+                 env = $.extend( env||{}, 
+                     $.config('env.'+arguments[0]),
+                     $.config('env.'+arguments[1]));
+                 return env;
+             }else{
+                 return env[arguments[0]]||null;
+             }
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;

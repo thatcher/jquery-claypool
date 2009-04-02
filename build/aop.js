@@ -199,7 +199,7 @@ Claypool.AOP={
          * @constructor
          */
         $$AOP.Before = function(options){
-            $$.extend( this, $AOP.Aspect);
+            $$.extend( this, $$AOP.Aspect);
             $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Before");
             this.type = "before";

@@ -442,14 +442,19 @@ Claypool.Server={
             var _this = this;
             var proxyURL = this.router[this.strategy||"all"]( request.requestURI );
             request.headers["Claypool-Proxy"] = this.proxyHost||"127.0.0.1";
+			var params = {};
+			for (var prop in request.parameters){
+				this.logger.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
+				params[prop+'']=request.parameters[prop]+'';
+			}
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
                 _this.logger.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
                 $.ajax({
                     type:"GET",
                     dataType:"text",
                     async:false,
-                    data:request.parameters,
-                    url:proxyURL[0].payload.rewrite,
+                    data:params,
+                    url:proxyURL[0].payload.rewrite+'',
                     beforeSend: function(xhr){
                         _this.logger.debug("Copying Request headers for Proxied Request");
                         for(var header in request.headers){
@@ -461,7 +466,7 @@ Claypool.Server={
                     },
                     success: function(text){
                         _this.logger.debug("Got response for proxy.");
-                        response.body = text;//xml.toString();
+                        response.body = text;
                         _this.logger.debug("Setting Response Status 200.");
                         response.headers.status = 200;
                     },

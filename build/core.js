@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc6 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc8 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -681,7 +681,7 @@ var Claypool={
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random*100000000);
+            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does

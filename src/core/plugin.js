@@ -67,7 +67,7 @@
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random*100000000);
+            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does

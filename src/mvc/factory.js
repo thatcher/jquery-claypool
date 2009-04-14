@@ -111,7 +111,7 @@
                     configuration = {};
                     configuration.id = mvcConfig[key][i].id;
                     configuration.clazz = clazz;
-                    configuration.options = [ $.extend(true, options||{}, mvcConfig[key][i]) ];
+                    configuration.options = [ $.extend(true, {}, options, mvcConfig[key][i]) ];
                     this.logger.debug("Adding MVC Configuration for Controller Id: %s", configuration.id);
                     this.add( configuration.id, configuration );
                 }

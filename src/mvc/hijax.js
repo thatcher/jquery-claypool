@@ -14,7 +14,6 @@
      * @constructor
      */
     $$MVC.HijaxController = function(options){
-        $$.extend(this, $$MVC.Controller);
         /*defaults*/
         $.extend(true, this, {
             forwardingList:[],
@@ -86,12 +85,14 @@
                                            m[arguments[0]] = [];
                                        }
                                        $.merge(m[arguments[0]], arguments[1]);
+                                   }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
+                                       m[arguments[0]] = arguments[1];
                                    }else if(arguments[1] instanceof Object){
                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
                                            m[arguments[0]] = {};
                                        }
                                        $.extend(true, m[arguments[0]], arguments[1]);
-                                   }   
+                                   }
                                }
                                return this;//chain
                            },
@@ -166,7 +167,7 @@
             this.router.compile(this.hijaxMap, this.routerKeys);//, "controller", "action");
             var _this = this;
             if(this.active&&(this.selector!==""||this.filter!=="")){
-                this.logger.debug("Actively Hijaxing %s's.", this.hijaxKey);
+                this.logger.debug("Actively Hijaxing %s's %s%s", this.hijaxKey, this.selector, this.filter);
                 $(this.selector+this.filter).livequery(function(){
                     _this.hijax(this);
                 });

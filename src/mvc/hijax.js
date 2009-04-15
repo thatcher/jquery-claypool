@@ -14,6 +14,7 @@
      * @constructor
      */
     $$MVC.HijaxController = function(options){
+		$$.extend(this, $$MVC.Controller);
         /*defaults*/
         $.extend(true, this, {
             forwardingList:[],
@@ -131,7 +132,7 @@
                                         //cache it for speed on later use
                                         _this.add(target[0], controller);
                                     }
-                                    controller[action](_event, extra);
+                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
                                }
                                return this;//chain
                            },
@@ -141,7 +142,15 @@
                                v = defaultView;
                                c = target;
                                return this;//chain
-                           }
+                           },
+						   params: function(param){
+						   	   if (arguments.length === 0) {
+							   	return t.map ? t.map : {};
+							   }
+							   else {
+							   	return t.map && t.map[param] ? t.map[param] : null;
+							   }
+						   }
                         });
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
@@ -296,7 +305,7 @@
                         exception(e);
                     throw e;
                 }
-                return _this;//chain
+                return this;//chain
             };
         },
         /**returns some part of the event to use in router, eg event.type*/

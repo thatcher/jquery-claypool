@@ -64,21 +64,21 @@
         selector        : ':button',
         event           : 'click',
         strategy        : 'all',
-        routerKeys      : 'urls',
+        routerKeys      : 'ids',
         hijaxKey        : 'button',
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
-            return event.target.value;
+            return event.target.id;
         }
     }).router( "hijax:input",{
         selector        : 'input',
         event           : 'blur',
         strategy        : 'all',
-        routerKeys      : 'names',
+        routerKeys      : 'ids',
         hijaxKey        : 'input',
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
-            return event.target.value;
+            return event.target.id;
         }
     }).router( "hijax:form",{
         selector        : 'form',

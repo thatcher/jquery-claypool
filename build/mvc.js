@@ -97,6 +97,7 @@ Claypool.MVC = {
      * @constructor
      */
     $$MVC.HijaxController = function(options){
+		$$.extend(this, $$MVC.Controller);
         /*defaults*/
         $.extend(true, this, {
             forwardingList:[],
@@ -214,7 +215,7 @@ Claypool.MVC = {
                                         //cache it for speed on later use
                                         _this.add(target[0], controller);
                                     }
-                                    controller[action](_event, extra);
+                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
                                }
                                return this;//chain
                            },
@@ -224,7 +225,15 @@ Claypool.MVC = {
                                v = defaultView;
                                c = target;
                                return this;//chain
-                           }
+                           },
+						   params: function(param){
+						   	   if (arguments.length === 0) {
+							   	return t.map ? t.map : {};
+							   }
+							   else {
+							   	return t.map && t.map[param] ? t.map[param] : null;
+							   }
+						   }
                         });
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
@@ -379,7 +388,7 @@ Claypool.MVC = {
                         exception(e);
                     throw e;
                 }
-                return _this;//chain
+                return this;//chain
             };
         },
         /**returns some part of the event to use in router, eg event.type*/
@@ -705,21 +714,21 @@ Claypool.MVC = {
         selector        : ':button',
         event           : 'click',
         strategy        : 'all',
-        routerKeys      : 'urls',
+        routerKeys      : 'ids',
         hijaxKey        : 'button',
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
-            return event.target.value;
+            return event.target.id;
         }
     }).router( "hijax:input",{
         selector        : 'input',
         event           : 'blur',
         strategy        : 'all',
-        routerKeys      : 'names',
+        routerKeys      : 'ids',
         hijaxKey        : 'input',
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
-            return event.target.value;
+            return event.target.id;
         }
     }).router( "hijax:form",{
         selector        : 'form',

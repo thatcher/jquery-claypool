@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc9 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc10 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -276,7 +276,7 @@ var Claypool={
                     if(pattern){
                         this.logger.debug("Compiling \n\tpattern: %s for \n\ttarget.", pattern);
 						/**
-						 * Suggestion from Martin Hrabovƒçin
+						 * Suggestion from Martin Hrabovƒ?in
 						 * allow capturing via |:param|
 						 */
 						pattern = pattern.replace(/\|\:\w+\|/g, function(){
@@ -710,7 +710,7 @@ var Claypool={
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime()+"-"+Math.round(Math.random()*100000000);
+            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does

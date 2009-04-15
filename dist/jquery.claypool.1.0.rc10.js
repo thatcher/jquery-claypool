@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc1 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc10 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -264,21 +264,32 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        
         compile: function(patternMap, patternKey){
             this.logger.debug("compiling patterns for match strategies");
-            var pattern, routable;
+            var pattern, routable, params;
             var i, j; 
             patternKey = patternKey.split('|');//supports flexible pattern keys
             for(i=0;i<patternMap.length;i++){
                 for( j = 0; j<patternKey.length;j++){
                     pattern = patternMap[i][patternKey[j]];
+					params = [];
                     if(pattern){
                         this.logger.debug("Compiling \n\tpattern: %s for \n\ttarget.", pattern);
+						/**
+						 * Suggestion from Martin HrabovÄ?in
+						 * allow capturing via |:param|
+						 */
+						pattern = pattern.replace(/\|\:\w+\|/g, function(){
+							var name;
+							name = arguments[0].substring(2,arguments[0].length-1);
+							params.push(name);
+							return '(\\w+)';
+						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
                         this.add(String($.guid()) , {
                             pattern:new RegExp(pattern), 
-                            payload:patternMap[i]
+                            payload:patternMap[i],
+							params : params
                         });
                     }
                 }
@@ -296,14 +307,23 @@ var Claypool={
         
         first: function(string){
             this.logger.debug("Using strategy 'first'");
-            var route, id;
+            var route, id, map = {};
             for(id in this.cache){
                 route = this.find(id);
                 this.logger.debug("checking pattern %s for string %s", route.pattern, string);
                 if(route&&route.pattern&&route.pattern.test&&route.pattern.test(string)){
                     this.logger.debug("found match for \n\tpattern: %s \n\ttarget : %s ", 
                         route.pattern, route.payload.controller||route.payload.rewrite );
-                    return [route];
+					if (route.params && route.params.length > 0) {
+						//make a parameter map
+						string.replace(route.pattern, function(){
+							var i;
+							for (i = 1; i < arguments.length - 2; i++) {
+								map[route.params[i-1]] = arguments[i];
+							}
+						});
+					}
+                    return [$.extend({map: map}, route)];
                 }
             }
             this.logger.debug("found no match for \n\tpattern: %s", string);
@@ -319,14 +339,23 @@ var Claypool={
         all: function(string){
             this.logger.debug("Using strategy 'all'");
             var routeList = [];
-            var route, id;
+            var route, id, map = {};
             for(id in this.cache){
                 route = this.find(id);
                 this.logger.debug("checking pattern: %s for string %s", route.pattern, string);
                 if(route&&route.pattern&&route.pattern.test&&route.pattern.test(string)){
                     this.logger.debug("found match for \n\tpattern: %s \n\ttarget : %s ", 
                         route.pattern, route.payload.controller);
-                    routeList.push(route);
+					if (route.params && route.params.length > 0) {
+						//make a parameter map
+						string.replace(route.pattern, function(){
+							var i;
+							for (i = 1; i < arguments.length - 2; i++) {
+								map[route.params[i-1]] = arguments[i];
+							}
+						});
+					}
+                    routeList.push($.extend({map: map}, route));
                 }
             }
             if(routeList.length===0){this.logger.debug("found no match for \n\tpattern: %s", string);}
@@ -623,7 +652,7 @@ var Claypool={
     var globalContext = [],
         guid = 0,
         plugins = {},
-        $log;
+        env;
         
     $.extend(plugins, {
 	    /**
@@ -681,7 +710,7 @@ var Claypool={
          * @type String
          */
         guid: function(){
-            return (++guid)+"-"+new Date().getTime();
+            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does
@@ -740,7 +769,27 @@ var Claypool={
                 }
             }
             return this;//chain
-        }
+        },
+        /**
+         * Describe what this method does
+         * @private
+         * @param {String} paramName Describe this parameter
+         * @returns Describe what it returns
+         * @type String
+         */
+         env: function(){
+             //an environment is set or defined by calling
+             //$.env('defaults', 'client.dev')
+             if(arguments.length == 2){
+                 //env is flat so deep extension isnt necessary
+                 env = $.extend( env||{}, 
+                     $.config('env.'+arguments[0]),
+                     $.config('env.'+arguments[1]));
+                 return env;
+             }else{
+                 return env[arguments[0]]||null;
+             }
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
@@ -1974,16 +2023,6 @@ Claypool.AOP={
 (function($, $$, $$AOP){
     
     $.manage("Claypool.AOP.Container", "claypool:AOP");
-    /*$(document).bind("claypool:initialize", function(event, context){
-        context['claypool:AOP'] = new $$AOP.Container();
-        if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-            $.extend(context['claypool:AOP'], new context.ContextContributor());
-            context['claypool:AOP'].registerContext("Claypool.AOP.Container");
-        }
-    }).bind("claypool:reinitialize", function(event, context){
-        context['claypool:AOP'].factory.updateConfig();
-    });*/
-    
     
 })(  jQuery, Claypool, Claypool.AOP );
 
@@ -2002,7 +2041,7 @@ Claypool.AOP={
     $$AOP.Aspect = function(options){
         this.id   = null;
         this.type = null;
-        $$.extend(this.$$.SimpleCachingStrategy);
+        $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.AOP.Aspect");
         //only 'first' and 'all' are honored at this point
@@ -2057,7 +2096,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.createGUID(), _weave(f));
+                        this.add($.guid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -2151,7 +2190,8 @@ Claypool.AOP={
          * @constructor
          */
         $$AOP.Before = function(options){
-            $$.extend( this, $AOP.Aspect);
+            $$.extend( this, $$AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Before");
             this.type = "before";
         };
@@ -2192,6 +2232,7 @@ Claypool.AOP={
          */
         $$AOP.Around = function(options){
             $$.extend( this,  $$AOP.Aspect);
+            $.extend(true, this, options);
             this.logger = $.logger("Claypool.AOP.Around");
             this.type = "around";
         };
@@ -2270,7 +2311,7 @@ Claypool.AOP={
                         //  resolve the advice which must be specified as an optionally
                         //  namespaced string eg 'Foo.Bar.goop' 
                         if(!$.isFunction(aopconf.advice)){
-                            aopconf.advice = $.resolveName(aopconf.advice);
+                            aopconf.advice = $.resolve(aopconf.advice);
                         }
                         //If the adive is to be applied to an application managed instance
                         //then bind to its lifecycle events to weave and unweave the
@@ -2307,7 +2348,7 @@ Claypool.AOP={
                                 //The string ends with '.*' which implies the target is every function
                                 //in the namespace.  hence we resolve the namespace, look for every
                                 //function and create a new filter for each function.
-                                namespace = $.resolveName(aopconf.target.substring(0, aopconf.target.length - 2));
+                                namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
                                 for(prop in namespace){
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
@@ -2322,7 +2363,7 @@ Claypool.AOP={
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
-                                aopconf.target =  $.resolveName(aopconf.target);
+                                aopconf.target =  $.resolve(aopconf.target);
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }
@@ -2624,17 +2665,8 @@ Claypool.IoC={
  * @requires OtherClassName
  */
 (function($, $$, $$IoC){
-	
+    
     $.manage("Claypool.IoC.Container", "claypool:IoC");
-	/*$(document).bind("claypool:initialize", function(event, context){
-		context['claypool:IoC'] = new $$IoC.Container();
-		if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-			$.extend(context['claypool:IoC'], new context.ContextContributor());
-			context['claypool:IoC'].registerContext("Claypool.IoC.Container");
-		}
-	}).bind("claypool:reinitialize", function(event, context){
-		context['claypool:IoC'].factory.updateConfig();
-	});*/
 
 })(  jQuery, Claypool, Claypool.IoC );
 
@@ -3285,29 +3317,6 @@ Claypool.MVC = {
  * $Rev: 265 $
  * 
  *
- *   -   Model-View-Controller Patterns  -
- *
- *   Claypool MVC provides some low level built in controllers which a used to 
- *   route control to your controllers.  These Claypool provided controllers have a convenient
- *   configuration, though in general most controllers, views, and models should be
- *   configured using the general ioc configuration patterns and are simply referenced as targets.
- *
- *   The Claypool built-in controllers are:
- *       Claypool.MVC.HijaxLinkController - maps url patterns in hrefs to custom controllers.
- *           The href resource is resolved via ajax and the result is delivered to the specified
- *           controllers 'handle' method
- * 
- *       Claypool.MVC.HijaxFormController - maps form submissions to custom controllers.
- *           The submittion is handled via ajax and the postback is delivered to the specified
- *           controllers 'handle' method
- *
- *       Claypool.MVC.HijaxButtonController - maps button (not submit buttons) to custom controllers.
- *           This is really useful for dialogs etc when 'cancel' is just a button but 'ok' is a submit.
- *
- *       Claypool.MVC.HijaxEventController - maps events to custom controllers.  This would normally
- *           be browser events based on the dom, but with providers like jQuery the eventing
- *           is much richer.  By default the event system is provided by jquery.
- *
  */
 };
 
@@ -3395,7 +3404,7 @@ Claypool.MVC = {
      * @constructor
      */
     $$MVC.HijaxController = function(options){
-        $$.extend(this, $$MVC.Controller);
+		$$.extend(this, $$MVC.Controller);
         /*defaults*/
         $.extend(true, this, {
             forwardingList:[],
@@ -3432,7 +3441,6 @@ Claypool.MVC = {
                 var target, 
                     action, 
                     defaultView;
-                for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
                     target = $.$(this.payload.controller);
@@ -3448,6 +3456,7 @@ Claypool.MVC = {
                             m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
                             v = defaultView,
                             c = target;
+                        for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                         var eventflow = $.extend( {}, _event, {
                            m: function(){
                                if(arguments.length === 0){
@@ -3467,12 +3476,14 @@ Claypool.MVC = {
                                            m[arguments[0]] = [];
                                        }
                                        $.merge(m[arguments[0]], arguments[1]);
+                                   }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
+                                       m[arguments[0]] = arguments[1];
                                    }else if(arguments[1] instanceof Object){
                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
                                            m[arguments[0]] = {};
                                        }
                                        $.extend(true, m[arguments[0]], arguments[1]);
-                                   }   
+                                   }
                                }
                                return this;//chain
                            },
@@ -3511,11 +3522,25 @@ Claypool.MVC = {
                                         //cache it for speed on later use
                                         _this.add(target[0], controller);
                                     }
-                                    controller[action](_event, extra);
+                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
                                }
                                return this;//chain
                            },
-                           render:_this.renderer()
+                           render:_this.renderer(),
+                           reset:function(){
+                               m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
+                               v = defaultView;
+                               c = target;
+                               return this;//chain
+                           },
+						   params: function(param){
+						   	   if (arguments.length === 0) {
+							   	return t.map ? t.map : {};
+							   }
+							   else {
+							   	return t.map && t.map[param] ? t.map[param] : null;
+							   }
+						   }
                         });
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
@@ -3541,7 +3566,7 @@ Claypool.MVC = {
             this.router.compile(this.hijaxMap, this.routerKeys);//, "controller", "action");
             var _this = this;
             if(this.active&&(this.selector!==""||this.filter!=="")){
-                this.logger.debug("Actively Hijaxing %s's.", this.hijaxKey);
+                this.logger.debug("Actively Hijaxing %s's %s%s", this.hijaxKey, this.selector, this.filter);
                 $(this.selector+this.filter).livequery(function(){
                     _this.hijax(this);
                 });
@@ -3559,7 +3584,7 @@ Claypool.MVC = {
             this.logger.debug("Hijaxing %s: %s", this.hijaxKey, target);
             var _this = this;
             var _hijax = function(event){
-                //var retVal = true;
+                var retVal = true;
                 _this.logger.info("Hijaxing %s: ", _this.hijaxKey);
                 if(_this.stopPropagation){
                     _this.logger.debug("Stopping propogation of event");
@@ -3568,10 +3593,10 @@ Claypool.MVC = {
                 if(_this.preventDefault){
                     _this.logger.debug("Preventing default event behaviour");
                     event.preventDefault();
-                    //retVal = false;
+                    retVal = false;
                 }
-                _this.handle({pattern: _this.getTarget.apply(_this, arguments), args:arguments});
-                //return retVal;
+                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
+                return retVal;
             };
             if(this.event){
                 /**This is a specific event hijax so we bind once and dont think twice  */
@@ -3670,11 +3695,11 @@ Claypool.MVC = {
                         exception(e);
                     throw e;
                 }
-                return _this;//chain
+                return this;//chain
             };
         },
         /**returns some part of the event to use in router, eg event.type*/
-        getTarget: function(event){
+        target: function(event){
             throw new $$.MethodNotImplementedError();
         }
     });
@@ -3793,7 +3818,7 @@ Claypool.MVC = {
                     configuration = {};
                     configuration.id = mvcConfig[key][i].id;
                     configuration.clazz = clazz;
-                    configuration.options = [ $.extend(true, options||{}, mvcConfig[key][i]) ];
+                    configuration.options = [ $.extend(true, {}, options, mvcConfig[key][i]) ];
                     this.logger.debug("Adding MVC Configuration for Controller Id: %s", configuration.id);
                     this.add( configuration.id, configuration );
                 }
@@ -3956,7 +3981,28 @@ Claypool.MVC = {
             return this;
 	    }
 	});
-	
+	/*
+     *   -   Model-View-Controller Patterns  -
+     *
+     *   Claypool MVC provides some low level built in controllers which a used to 
+     *   route control to your controllers.  These Claypool provided controllers have a convenient
+     *   configuration, though in general most controllers, views, and models should be
+     *   configured using the general ioc configuration patterns and are simply referenced as targets.
+     *
+     *   The Claypool built-in controllers are:
+     *       hijax:a - maps url patterns in hrefs to controllers.
+     *           The href resource is resolved via ajax and the result is delivered to the specified
+     *           controllers 'handle' method
+     * 
+     *       hijax:form - maps form submissions to controllers.
+     *           The submittion is handled via ajax and the postback is delivered to the specified
+     *           controllers 'handle' method
+     *
+     *       hijax:button - maps button (not submit buttons) to controllers.
+     *           This is really useful for dialogs etc when 'cancel' is just a button but 'ok' is a submit.
+     *
+     *       hijax:event - maps custom or dom events to controllers.  
+     */
 	$.router( "hijax:a", {
         selector        : 'a',
         event           : 'click',
@@ -3964,7 +4010,7 @@ Claypool.MVC = {
         routerKeys      : 'urls',
         hijaxKey        : 'link',
         eventNamespace  : "Claypool:MVC:HijaxLinkController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             var link = event.target||event.currentTarget;
             while(link.tagName.toUpperCase()!='A'){
                 link = $(link).parent()[0];
@@ -3975,21 +4021,21 @@ Claypool.MVC = {
         selector        : ':button',
         event           : 'click',
         strategy        : 'all',
-        routerKeys      : 'urls',
+        routerKeys      : 'ids',
         hijaxKey        : 'button',
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
-        getTarget       : function(event){ 
-            return event.target.value;
+        target       : function(event){ 
+            return event.target.id;
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'click',
+        event           : 'blur',
         strategy        : 'all',
-        routerKeys      : 'urls',
-        hijaxKey        : 'button',
+        routerKeys      : 'ids',
+        hijaxKey        : 'input',
         eventNamespace  : "Claypool:MVC:HijaxInputController",
-        getTarget       : function(event){ 
-            return event.target.name;
+        target       : function(event){ 
+            return event.target.id;
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -3998,7 +4044,7 @@ Claypool.MVC = {
         routerKeys      : 'urls',
         hijaxKey        : 'form',
         eventNamespace  : "Claypool:MVC:HijaxFormController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.target.action;
         }
     }).router( "hijax:event",{
@@ -4006,7 +4052,7 @@ Claypool.MVC = {
         routerKeys      : 'event',
         hijaxKey        : 'event',
         eventNamespace  : "Claypool:MVC:HijaxEventController",
-        getTarget       : function(event){ 
+        target       : function(event){ 
             return event.type;
         }
     });
@@ -4031,27 +4077,14 @@ Claypool.Server={
  */
 };
 (function($, $$, $$Web){
-    /**
-    $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-        registrationFunction.apply(_this, [configuration, "hijax:server", "Claypool.MVC.HijaxController", {
-            event:          'claypool:serve',
-            strategy:       'first',
-            routerKeys:     'urls',
-            hijaxKey:       'request',
-            eventNamespace: "Claypool:Server:HijaxServerController",
-            getTarget:     function(event, request){ 
-                return request.url;//request/response object
-            }
-        }]);
-    });
-    */
+    
     $.router( "hijax:server", {
         event:          'claypool:serve',
         strategy:       'first',
         routerKeys:     'urls',
         hijaxKey:       'request',
         eventNamespace: "Claypool:Server:HijaxServerController",
-        getTarget:     function(event, request){ 
+        target:     function(event, request){ 
             return request.url;//request/response object
         }
     });
@@ -4471,14 +4504,19 @@ Claypool.Server={
             var _this = this;
             var proxyURL = this.router[this.strategy||"all"]( request.requestURI );
             request.headers["Claypool-Proxy"] = this.proxyHost||"127.0.0.1";
+			var params = {};
+			for (var prop in request.parameters){
+				this.logger.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
+				params[prop+'']=request.parameters[prop]+'';
+			}
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
                 _this.logger.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
                 $.ajax({
                     type:"GET",
                     dataType:"text",
                     async:false,
-                    data:request.parameters,
-                    url:proxyURL[0].payload.rewrite,
+                    data:params,
+                    url:proxyURL[0].payload.rewrite+'',
                     beforeSend: function(xhr){
                         _this.logger.debug("Copying Request headers for Proxied Request");
                         for(var header in request.headers){
@@ -4490,7 +4528,7 @@ Claypool.Server={
                     },
                     success: function(text){
                         _this.logger.debug("Got response for proxy.");
-                        response.body = text;//xml.toString();
+                        response.body = text;
                         _this.logger.debug("Setting Response Status 200.");
                         response.headers.status = 200;
                     },
@@ -4780,612 +4818,3 @@ Claypool.Server={
     
     
 })(  jQuery, Claypool, Claypool.Server );
-
-Claypool.MoonUnit={
-/*
- * Claypool.MoonUnit @VERSION@ - A Web 1.6180339... Javascript Application Framework
- *
- * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
- *
- * $Date: 2008-08-06 14:34:08 -0400 (Wed, 06 Aug 2008) $
- * $Rev: 265 $
- * 
- *
- *   -   Unit Testing Patterns  -
- */
-};
-
-
-/**
- *       The AbstractTest provides everything a test needs to run
- *       expect that it requires one method to be implemented. 
- *       That method is, of course 'test'.
- *
- *       The AbstractTest also provides default implementations
- *       of 'setup' and 'teardown' which do nothing but potentially
- *       log the fact that they have been called and do nothing.
- *
- * @credit Based on jQuery testrunner.js by John Resig and the jQuery Team
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-    /**
-     * @constructor
-     */
-    $$MUnit.AbstractTest = function(options){
-        $.extend(true, this, {
-            id: null,     //descriptive metadata
-            results:[],//an array of objects with test result details
-            queue:[], //holds a list of methods to be executed synchronously
-            blocking:false,//state
-            timeout:0,//state
-            coverage:{
-                total: 0,
-                covered : 0,
-                uncovered : 0
-            },
-            stats:{
-                passed:0,
-                failed:0,
-                total:0,
-                startTime:0,
-                endTime:0
-            }
-        });
-        $.extend(true, this, options);
-        try{
-            this.logger = $.logger("Claypool.MoonUnit.AbstractTest");
-        }catch(e){
-            //  ignore if the logger fails, we have to be safe since we are
-            //  testing claypool itself
-            this.fallback();
-        }
-    };
-    
-    $.extend($$MUnit.AbstractTest.prototype,{
-        //should provide a safe failover for anything we use from the software being tested
-        fallback: function(){
-            //  ignore if the logger fails, we have to be safe since we are
-            //  testing claypool itself
-            var nullFunction=function(){};
-            this.logger =  {
-                debug:nullFunction,
-                info:nullFunction,
-                warn:nullFunction,
-                error:nullFunction,
-                exception:nullFunction
-            };
-        },
-        test: function(){
-          throw new Error("Test method must be implemented!");  
-        },
-        expect: function(numberOfExpectedAsserts) {
-            this.expected = numberOfExpectedAsserts;
-        },
-        setup: function(){
-            this.logger.debug("Doing Nothing to Set Up for Test ");
-        },
-        teardown: function(){
-            this.logger.debug("Doing Nothing to Tear Down the test Test ");
-        },
-        // all assert* are loosely based on jQuery testrunner.js
-        assertTrue: function(statement, msg){
-            this.results.push( [!!statement, msg] );
-        },
-        assertFalse: function(statement, msg){
-            this.results.push( [!statement, msg] );
-        },
-        assertNull: function(statement, msg){
-            this.results.push( [(statement===null), msg] );
-        },
-        assertNotNull: function(statement, msg){
-            this.results.push( [(statement!==null), msg] );
-        },
-        assertUndefined: function(statement, msg){
-            this.results.push( [(statement===undefined), msg] );
-        },
-        assertDefined: function(statement, msg){
-            this.results.push( [(statement!==undefined), msg] );
-        },
-        assertEqual: function(expected, actual, msg){
-            this.results.push( [(expected==actual), msg] );
-        },
-        assertNotEqual: function(expected, actual, msg){
-            this.results.push( [(expected!=actual), msg] );
-        },
-        assertSame: function(expected, actual, msg){
-            this.results.push( [(expected===actual), msg] );
-        },
-        assertDifferent: function(expected, actual, msg){
-            this.results.push( [(expected!==actual), msg] );
-        },
-        fail: function(msg){
-            this.results.push( [false, msg]);
-        },
-        synchronize: function(callback) {
-            this.queue[this.queue.length] = callback;
-            if(!this.blocking) {
-                this.process();
-            }
-        },
-        process: function() {
-            var call = null;
-            this.logger.debug("Processing Synchronized Test Queue");
-            while(this.queue.length && !this.blocking) {
-                this.logger.debug("Queue length before call: %s", this.queue.length);
-                call = this.queue[0];
-                this.queue = this.queue.slice(1);
-                call();
-                this.logger.debug("Queue length after call: %s", this.queue.length);
-            }
-        },
-        stop: function(allowFailure) {
-            var _this = this;
-            _this.blocking = true;
-            var handler = allowFailure ? _this.start : function() {
-                throw new $$MUnit.TimedOutError();
-            };
-        },
-        start: function() {
-            // A slight delay, to avoid any current callbacks
-            var _this = this;
-            setTimeout( function(){
-                if(_this.timeout){
-                    clearTimeout(_this.timeout);
-                }
-                _this.blocking = false;
-                _this.process();
-            }, 13);
-        },
-        summarize: function(){
-            var testRunSummary = {
-                id          : this.id,
-                description : this.description,
-                coverage    : this.coverage,
-                stats       : this.stats,
-                results     : this.results,
-                namespace   : this.namespace||null,
-                $class      : this.$class||null,
-                method      : this.method||null,
-                encode      : function(s){
-                    return s.replace(/&(?!\w+([;\s]|$))/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                }
-            };
-            for(var prop in this){
-                if(prop.match(/Test$/)){
-                    testRunSummary[prop] = this[prop];
-                }
-            }
-            return testRunSummary;
-        },
-        run: function(abstractTestDetails){
-           throw new $$.MethodNotImplementedError();
-        }
-    });
-    
-})(  jQuery, Claypool, Claypool.MoonUnit );
-
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-    /**
-     * @constructor
-     */
-    /**
-    *   - MethodTestRunner -
-    *
-    *   @author Chris Thatcher
-    *   @credit Based on jQuery testrunner.js by John Resig and the jQuery Team
-    *   @description
-    *       The MethodTestRunner helps organize a collection of tests meant to 
-    *       cover single method
-    */
-    $$MUnit.MethodTestRunner = function(options){
-        $$.extend(this, $$MUnit.AbstractTest);
-        $.extend(true, this, options);
-        this.id = this.method;
-        this.internalError = null; //helps us flag unexpected errors
-        try{
-            this.logger = $.logger("Claypool.MoonUnit.MethodTestRunner");
-        }catch(e){
-            //  ignore if the logger fails, we have to be safe since we are
-            //  testing claypool itself
-            this.fallback();
-        }
-    };
-    
-    $.extend($$MUnit.MethodTestRunner.prototype,
-        $$MUnit.AbstractTest.prototype,{
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        run: function(name, nowait){
-            var _this = this;
-            this.logger.debug( "Test Details: \n\tmethod : %s \n\tdescription : %s ", 
-                this.method||"NO METHOD SPECIFIED!!",
-                this.description||"NO DESCRIPTION PROVIDED!!" );
-            try{
-                this.logger.debug("Setting up for Test: \n\t\t %s", this.method);
-                this.setup();
-                this.logger.info("Running Test: \n\t\t %s", this.method);
-                this.stats.startTime = (new Date()).getTime();
-                this.logger.debug("Synchronizing test function %s", this.test.toString());
-                this.synchronize(function() {
-                    _this.results = [];
-                    try {
-                        _this.logger.debug("Running Synchronized function %s", _this.test.toString());
-                        _this.test();
-                    } catch(e) {
-                        _this.logger.exception(e);
-                        //need to do something to flag that the test ended
-                        //unexpectedly.  
-                        _this.internalError = e.stackTrace?e.stackTrace():e.toString();
-                        _this.stats.total++;
-                        _this.stats.failed++;
-                    }
-                });
-                this.logger.debug("Synchronizing test result examination.");
-                this.synchronize(function() {
-                    _this.logger.debug("Running test result examination.");
-                    // don't output pause tests
-                    if(nowait) {return;}
-                    
-                    //  Methods have a default coverage of 100% assuming they
-                    //  exist becuase they are considered the atomic unit of testing
-                    //  If however an expected number of tests is specified,
-                    //  coverage is based instead on that assertion
-                    _this.coverage.total = _this.expected||1;
-                    for ( var i = 0; i < _this.results.length; i++ ) {
-                        _this.stats.total++;
-                        if ( !_this.results[i][0] ) {
-                            _this.stats.failed++;
-                        } else { _this.stats.passed++; }
-                    }	
-                    if(_this.expected && _this.expected != _this.results.length) {
-                        _this.logger.warn("Did not run the expected number of tests.");
-                        _this.incomplete =  "Expected " + _this.expected + " assertions, but " + _this.results.length + " were run." ;
-                    }else{
-                        _this.logger.debug("Ran the expected number of tests.");
-                    }
-                    _this.coverage.covered = _this.expected?_this.stats.total:1;
-                    _this.coverage.uncovered = _this.expected?(_this.expected - _this.stats.total):1;
-                });
-            }catch(e){
-                this.logger.error("Error Running Test: %s", this.method);
-                this.logger.exception(e);
-            }finally{
-                this.logger.debug("Tearing down for Test: \n\t\t %s", this.method);
-                this.stats.endTime = (new Date()).getTime();
-                this.stats.totalTime = this.stats.endTime - this.stats.startTime;
-                this.teardown();
-            }
-        }
-    });
-})(  jQuery, Claypool, Claypool.MoonUnit );
-
-/**
- *  The ClassTestSuite helps organize a collection of tests meant to 
- *  cover an entire class (conceptual) of functions
- *
- * @credit Based on jQuery testrunner.js by John Resig and the jQuery Team
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-    /**
-     * @constructor
-     */	
-    $$MUnit.ClassTestRunner = function(options){
-        $$.extend(this, $$MUnit.AbstractTest);
-        $.extend(true, this,  options);
-        this.id = this.$class;
-        try{
-            this.logger = $.logger("Claypool.MoonUnit.ClassTestRunner");
-        }catch(e){
-            this.fallback();
-        }
-    };
-    
-    $.extend($$MUnit.ClassTestRunner.prototype,
-        $$MUnit.AbstractTest.prototype, {
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        run: function(){
-            //  The ClassTestRunners job is basically to run an array of MethodTestRunners
-            //  while keeping track of the metadata associated with the time it takes the 
-            //  classes tests to complete as well as statistics accross methods
-            var methodTest;
-            var mi;
-            this.logger.debug( "Class TestSuite Details: \n\tclass : %s \n\tdescription : %s ", 
-                this.$class||"NO CLASSNAME SPECIFIED!!",
-                this.description||"NO DESCRIPTION PROVIDED!!" );
-            this.coverage.total = 0;
-            this.coverage.covered = 0;
-            var clazz = $.resolve(this.$class);
-            var prop;
-            if(clazz.prototype && $.isFunction(clazz)){
-                //one for the constructor
-                this.coverage.total++;
-                for(prop in clazz.prototype){
-                    if($.isFunction(clazz.prototype[prop])){
-                        this.coverage.total++;
-                    }
-                }
-            }else{
-                //this is an object and may represent an interface
-                for(prop in clazz){
-                    if($.isFunction(clazz[prop])){
-                        this.coverage.total++;
-                    }
-                }
-            }
-            if(this.methodTests&&this.methodTests.length){
-                this.coverage.covered = this.methodTests.length;
-                this.coverage.uncovered = this.coverage.total - this.coverage.covered;
-                this.stats.startTime = (new Date()).getTime();
-                for( mi = 0; mi < this.methodTests.length; mi++){
-                    try{
-                        this.logger.debug("Running method test %d for class %s", mi, this.$class);
-                        methodTest = new $$MUnit.MethodTestRunner(
-                            this.methodTests[mi]
-                        );
-                        methodTest.run();
-                        this.results.push(methodTest.summarize());
-                        this.stats.total++;
-                        if(methodTest.stats.failed>0){
-                            this.stats.failed++;
-                        }else{
-                            this.stats.passed++;
-                        }
-                    }catch(e){
-                        this.logger.error("Error Running method test %d for class %s", mi, this.$class);
-                        this.logger.exception(e);
-                    }finally{
-                        this.logger.debug("Finished Running method test %d for class %s", mi, this.$class);
-                    }
-                }
-                this.stats.endTime = (new Date()).getTime();
-                this.stats.totalTime = this.stats.endTime - this.stats.startTime;
-            }else{
-                //coverage is zero percent because there are no method tests for the class.
-                this.logger.warn("There are no method tests for the class %s.", this.$class);
-            }
-        }
-    });
-    
-})(  jQuery, Claypool, Claypool.MoonUnit );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-    /**
-     * @constructor
-     */	
-    /**
-    *   - NamespaceTestRunner -
-    *
-    *   @author Chris Thatcher
-    *   @credit Based on jQuery testrunner.js by John Resig and the jQuery Team
-    *   @description
-    *       The NamespaceTestRunner helps organize a collection of tests meant to 
-    *       cover an entire 'namespace' (conceptual 'package' or 'module') of functions
-    */
-    $$MUnit.NamespaceTestRunner = function(options){
-        $$.extend(this, $$MUnit.AbstractTest);
-        $.extend(true, this, options);
-        this.id = this.namespace;
-        this.staticMethods = [];
-        this.classes = [];
-        try{
-            this.logger = $.logger("Claypool.MoonUnit.NamespaceTestRunner");
-        }catch(e){
-            this.fallback();
-        }
-     };
-     
-     $.extend($$MUnit.NamespaceTestRunner.prototype,
-        $$MUnit.AbstractTest.prototype,{
-         /**
-          * Describe what this method does
-          * @private
-          * @param {String} paramName Describe this parameter
-          * @returns Describe what it returns
-          * @type String
-          */
-        run: function(){
-            //  The NamespaceTestRunner job is basically to run an array of ClassTestRunners
-            //  while keeping track of the metadata associated with the time it takes the 
-            //  namespace tests to complete as well as statistics accross methods
-            var methodTest;
-            var classTest;
-            var i;
-            this.logger.debug( "Namespace TestSuite Details: \n\tnamespace : %s \n\tdescription : %s ", 
-                this.namespace||"NO NAMESPACE SPECIFIED!!",
-                this.description||"NO DESCRIPTION PROVIDED!!" );
-            this.coverage.total = 0;
-            this.coverage.covered = 0;
-            this.coverage.uncoveredByName = [];
-            var namespace = $.resolve(this.namespace);
-            var counted = {};//helps us account for aliases
-            for(var prop in namespace){
-                if($.isFunction(namespace[prop])){
-                    if(!(counted[prop]===namespace[prop])){
-                        this.coverage.total++;
-                        this.coverage.uncoveredByName.push(prop);
-                        counted[prop] = namespace[prop];
-                    }
-                }
-            }
-            this.stats.startTime = (new Date()).getTime();
-            if(this.staticMethodTests&&this.staticMethodTests.length){
-                this.coverage.covered += this.staticMethodTests.length;
-                this.coverage.uncovered = this.coverage.total - this.coverage.covered;
-                for( i = 0; i < this.staticMethodTests.length; i++){
-                    try{
-                        this.logger.debug("Running static method test %d for namespace %s", i, this.namespace);
-                        methodTest = new $$MUnit.MethodTestRunner(
-                            this.staticMethodTests[i]
-                        );
-                        methodTest.run();
-                        this.results.push(methodTest.summarize());
-                        this.stats.total++;
-                        if(methodTest.stats.failed>0){
-                            this.stats.failed++;
-                        }else{
-                            this.stats.passed++;
-                        }
-                    }catch(e){
-                        this.logger.error("Error Running method test %d for namespace %s", i, this.namespace);
-                        this.logger.exception(e);
-                    }finally{
-                        this.logger.debug("Finished Running method test %d for namespace %s", i, this.namespace);
-                    }
-                    this.stats.endTime = (new Date()).getTime();
-                    this.stats.totalTime = this.stats.endTime - this.stats.startTime;
-                }
-            }else{
-                //coverage is zero percent because there are no method tests for the class.
-                this.logger.info("There are no static methods for the namespace %s.", this.namespace);
-            }
-            if(this.classTests&&this.classTests.length){
-                this.coverage.covered += this.classTests.length;
-                this.coverage.uncovered = this.coverage.total - this.coverage.covered;
-                for( i = 0; i < this.classTests.length; i++){
-                    try{
-                        this.logger.debug("Running class test %d for namespace %s", i, this.namespace);
-                        classTest = new $$MUnit.ClassTestRunner(
-                            this.classTests[i]
-                        );
-                        classTest.run();
-                        this.results.push(classTest.summarize());
-                        this.stats.total++;
-                        if(classTest.stats.failed>0){
-                            this.stats.failed++;
-                        }else{
-                            this.stats.passed++;
-                        }
-                    }catch(e){
-                        this.logger.error("Error Running class test %d for namespace %s", i, this.namespace);
-                        this.logger.exception(e);
-                    }finally{
-                        this.logger.debug("Finished Running class test %d for namespace %s", i, this.namespace);
-                    }
-                }
-            }else{
-                //coverage is zero percent because there are no method tests for the class.
-                this.logger.warn("There are no class tests for the namespace %s.", this.namespace);
-            }
-            this.stats.endTime = (new Date()).getTime();
-            this.stats.totalTime = this.stats.endTime - this.stats.startTime;
-        }
-    });
-    
-})(  jQuery, Claypool, Claypool.MoonUnit );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-	/**
-	 * @constructor
-	 */
-    $$MUnit.TimedOutError = function(e, options){  
-        var details = {
-            name:"Claypool.MoonUnit.TimedOutError",
-            message:"Test timed out."
-        };$.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-	
-})(  jQuery, Claypool, Claypool.MoonUnit );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MUnit){
-	/**
-	 * @constructor
-	 */
-    //TODO : what is the useful static plugin that could be derived from Claypool.Server?
-    //      console ?
-    
-	$.extend($, {
-	    testapi : function(apiTestSuite){
-            var testsuite;
-            for(var namespaceSuite in apiTestSuite){
-                testsuite = new $$MUnit.NamespaceTestRunner( apiTestSuite[namespaceSuite].id );
-                testsuite.run();
-                $(apiTestSuite[namespaceSuite].template).setTemplateElement("testResultsTemplate");
-                $(apiTestSuite[namespaceSuite].template).processTemplate(testsuite.summarize());   
-            }
-            
-            //HIDING AND REVEALING
-            $( 'div.namespace_tests' ).livequery(function(){
-                $(this).bind('click', function(){
-                    var _this = this;
-                    if(!$(this).hasClass('display')){
-                        $(this).toggleClass('display');
-                        $(".namespace_stats", _this).slideDown();
-                        $(".namespace_times", _this).slideDown(function(){
-                                $(".namespace_results", $(_this).parent()).slideDown();
-                            });
-                    }else{
-                        $(this).toggleClass('display');
-                        $(".namespace_results", $(_this).parent()).slideUp(function(){
-                            $(".namespace_times", _this).slideUp();
-                            $(".namespace_stats", _this).slideUp();
-                        });
-                    }
-                });
-            });
-            
-            $( 'div.class_tests' ).livequery(function(){
-                $(this).bind('click', function(){
-                    var _this = this;
-                    if(!$(this).hasClass('display')){
-                        $(this).toggleClass('display');
-                        $(".class_results", $(_this).parent()).slideDown();
-                    }else{
-                        $(this).toggleClass('display');
-                        $(".class_results", $(_this).parent()).slideUp();
-                    }
-                });
-            });
-	    }
-	});
-	
-})(  jQuery, Claypool, Claypool.MoonUnit );

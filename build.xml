@@ -9,17 +9,17 @@
     <property name="PROJECT_TITLE"            value="jquery.claypool" />
     <property name="BUILD_MAJOR"              value="1" />
     <property name="BUILD_MINOR"              value="0" />
-    <property name="BUILD_ID"                 value="rc10" />
+    <property name="BUILD_ID"                 value="rc11" />
     
     <property description="Java Jars" name="JAVA_LIB_DIR" location="WEB-INF/lib" />
     <property description="Rhino JS Engine" name="RHINO_JAR" location="${JAVA_LIB_DIR}/js.jar" />
-    <property description="JSLint Syntax Checking Engine" name="JSLINT_JAR" location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" />
+    <property description="JSLint Syntax Checker" name="JSLINT_JAR" location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" />
     <property description="Javax Servlet API" name="SERVLET_JAR" location="../../lib/servlet-api.jar" />
     <property description="Log4j Logging API" name="LOG4J_JAR" location="${JAVA_LIB_DIR}/log4j-1.2.15.jar" />
+    <property description="YUI Compressor" name="YUI_MIN_JAR" location="${JAVA_LIB_DIR}/yuicompressor-2.4.1.jar" />
 
     <property name="PREFIX"         location="${basedir}/"                  description="Target parent folder for built files"   />
     <property name="SRC_DIR"        location="${PREFIX}/src"                description="Folder for source files"  />
-    <property name="DOCS_DIR"       location="${PREFIX}/docs"               description="Folder for docs target"  />
     <property name="TEST_DIR"       location="${PREFIX}/test"               description="Folder for test target"  />
     <property name="DIST_DIR"       location="${PREFIX}/dist"               description="Folder for jquery, min, lite and packed target" />
     <property name="BUILD_DIR"      location="${PREFIX}/build"               description="Folder for build artifacts" />
@@ -42,22 +42,11 @@
     <!-- Plugin File Names for Distribution -->
     
     <!-- BUILD TARGETS -->
-    <target name="default" depends="lint, min, compile"/>
+    <target name="default" depends="lint, min"/>
     
     <target name="all" depends="default"/>
     
-    <target name="lint" depends="concat">
-    </target>
-    
-    <target name="compile">
-        <javac srcdir="${CLASSES_DIR}" source="1.5" target="1.5">
-            <classpath>
-                <path location="${RHINO_JAR}"/>
-                <path location="${SERVLET_JAR}"/>
-                <path location="${LOG4J_JAR}"/>
-            </classpath>
-        </javac>
-    </target>
+    <target name="lint" depends="concat"/>
     
     <target name="clean">
         <delete dir="${DIST_DIR}" />
@@ -216,25 +205,20 @@
         <echo message="${CLAYPOOL_ALL} built." />
     </target>
 
-    <target name="min" depends="concat" description="Remove all comments and whitespace, no compression">
-        <echo message="Building ${CLAYPOOL_ALL_MIN}" />
-        <java jar="${RHINO_JAR}" fork="true">
-            <arg value="${TOOLS_DIR}/build/min.js" />
+    
+    <target name="min" depends="concat" >
+        <echo message="Compressing Distibution" />
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_ALL_MIN}"/>
             <arg value="${CLAYPOOL_ALL}" />
-            <arg value="${CLAYPOOL_ALL_MIN}" />
-        </java>
-        <echo message="${CLAYPOOL_ALL_MIN} built." />
-    </target>
-
-    <target name="runtest">
-		<echo message="Running Automated Test Suite" />
-		<java classname="org.mozilla.javascript.tools.shell.Main" fork="true">
-            <arg value="${TOOLS_DIR}/runtest/test.js" />
             <classpath>
-                <pathelement path="${CLASSES_DIR}"/>
                 <pathelement location="${RHINO_JAR}"/>
             </classpath>
         </java>
-		<echo message="Test Suite Finished" />
-	</target>
+        <echo message="Finished Compressing Distibution" />
+    </target>
 </project>

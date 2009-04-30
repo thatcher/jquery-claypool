@@ -1,6 +1,6 @@
 var Claypool={
 /*
- * Claypool 1.0.rc10 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc11 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -276,9 +276,16 @@ var Claypool={
                     if(pattern){
                         this.logger.debug("Compiling \n\tpattern: %s for \n\ttarget.", pattern);
 						/**
-						 * Suggestion from Martin Hrabovƒ?in
+						 * Suggestion from Martin Hrabovƒçin
 						 * allow capturing via |:param|
+						 * also added '<:foo(regexp):>/<:bar(regexp):>'
 						 */
+                        pattern = pattern.replace(/<\:(.+?)\:\>/g, function(){
+							var name, i = arguments[0].indexOf('(');
+							name = arguments[0].substring(2,i);
+							params.push(name);
+							return arguments[0].substring(i,arguments[0].length-2);
+						});
 						pattern = pattern.replace(/\|\:\w+\|/g, function(){
 							var name;
 							name = arguments[0].substring(2,arguments[0].length-1);

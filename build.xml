@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- You may freely edit this file. See commented blocks below for -->
-<!-- some examples of how to customize the build. -->
-<!-- (If you delete it and reopen the project it will be recreated.) -->
 <project name="Claypool" default="default" basedir=".">
     <description>Builds, tests, and runs the project Claypool.</description>
     
@@ -21,11 +18,10 @@
     <property name="PREFIX"         location="${basedir}/"                  description="Target parent folder for built files"   />
     <property name="SRC_DIR"        location="${PREFIX}/src"                description="Folder for source files"  />
     <property name="TEST_DIR"       location="${PREFIX}/test"               description="Folder for test target"  />
-    <property name="DIST_DIR"       location="${PREFIX}/dist"               description="Folder for jquery, min, lite and packed target" />
-    <property name="BUILD_DIR"      location="${PREFIX}/build"               description="Folder for build artifacts" />
+    <property name="DIST_DIR"       location="${PREFIX}/dist"               description="Folder for concat and min target" />
+    <property name="BUILD_DIR"      location="${PREFIX}/build"              description="Folder for build artifacts" />
     <property name="TOOLS_DIR"      location="${PREFIX}/tools"              description="Files for parsing etc."/>
-    <property name="LIB_DIR"        location="${PREFIX}/lib"                description="Folder for jQuery and additional third party js libraries" />
-    <property name="CLASSES_DIR"    location="${basedir}/WEB-INF/classes"   description="Local Classes like Servlets"  />
+    <property name="LIB_DIR"        location="${PREFIX}/lib"                description="Folder for jquery and livequery libraries" />
 
     <!-- Files names for distribution -->
     <property name="CLAYPOOL_CORE"   			location="${SRC_DIR}/core" />

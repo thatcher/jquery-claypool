@@ -2,87 +2,54 @@ h1. Welcome to Claypool
 
 h3. A Web 1.6180339... Javascript Application Framework
 
-Claypool is a small, concise, railable application framework for jQuery that
-allows you to use an MVC approach to build large, long-lived applications.
+jquery-claypool is a small, concise, railable application framework for jquery that
+allows you to use an mvc approach to build large, long-lived applications.
 It keeps your code clean, maintainable, and flexible saving your project time and cost.
 
-Claypool is primarily a client-side application framework.  It focuses on
-an application architecture that is becoming more common. Specifically the 
+jquery-claypool is primarily a client-side application framework.  it focuses on
+an application architecture that is becoming more common. specifically the 
 application is delivered once as html, css, and javascript; then, the application
 focuses on providing a seamless user experience by consuming services via
-AJAX.
+ajax.
 
-Claypool is also a server-side web-application and persistence framework that includes everything
-needed to create database-backed web-applications according to the
-Model-View-Control pattern of separation. The difference with traditional web-app
-approaches is that Claypool Server focuses on providing Services, exposing the view (also
+jquery-claypool is also a server-side web-application and persistence framework that 
+includes everything needed to create database-backed web-applications according to the
+model-view-control pattern of separation. the difference with traditional web-app
+approaches is that claypool server focuses on providing services, exposing the view (also
 called the presentation) into xml/json/xhtml templates that are used to continually
 update the application running on the client. 
 
-The model on both the client and the server may be
-"smart" domain objects (such as Account, Product, Person, Post) that holds all
-the business logic and knows how to save data via ReSTful web services like a 
-"eXiST":http://exist-db.org (a native XML database) a public json service or even persist themselves to a database. 
-The controller handles the incoming event or requests (such as Save New Account, 
-Update Product, Show Post) by manipulating the model and directing data to the view.
-
-In Claypool, the model may be straight ajax or handled by what's called an object-relational mapping
-layer via JStORM (requires Google Gears on the client). The same JStORM Models will
-work on the server as well (with SQLite or MySQL), again allowing code to be reused
-in either the client or the server.  This layer allows you to present the data from
-database rows as objects and embellish these data objects with business logic
-methods. You can read more about "JStoRM":http://www.urielkatz.com/archive/detail/introducing-jstorm/.
-
-The controller and view framework are provided by the Claypool, which handles both
-layers by its two parts:  Claypool.MVC.View and Claypool.MVC.Controller.
-
-
 h3. Getting started
+
+remember jquery-claypool is primarily a pure client-side app framework so you can develop
+apps that run entirely on static html in apache, a local html file, or using whatever 
+sever-side language choose to develop with.  simply deliver the app, and provide services to
+it.
+
+h4. Claypool Web Server
+
+jquery-claypool comes with the spectacular jetty server by default, so you don't
+have to install or configure anything to play around, but you can also simply
+drop a project directly into your tomcat webapps dir if you're already that advanced.
 
 # Start the web server: <tt>ant -f scripts/build.xml run</tt>
 # Go to http://localhost:8080/ and see the template project.
 # Follow the guidelines to start developing your application
 
-
-h4. Claypool Web Server
-
-Of course, remember Claypool is also a pure client-side app framework so you can develop
-apps that run entirely on static html in Apache, a local html file, or using whatever 
-sever-side language choose to develop with.  Simply deliver the app, and provide services to
-it.
-
-Claypool comes with the spectacular Jetty server by default, so you don't
-have to install or configure anything to play around, but you can also simply
-drop a project directly into your Tomcat webapps dir if you're already that advanced.
-
-Developing on the server with Claypool, is exactly like developing on the client with 
-Claypool.  It runs in a simulated browser environment and loads javascript the same way,
-from the html that houses your app.  Like Aptana, you can choose to load specific scripts
+developing on the server with jquery-claypool, is exactly like developing on the client with 
+jquery-claypool.  It runs in a simulated browser environment and loads javascript the same way,
+from the html that houses your app.  like aptana's jaxer, you can choose to load specific scripts
 on the server or client.
 
 h3. Debugging Claypool
 
-On the client, of course it's a cinch with "FireBug":http://getfirebug.com/.  But 
-Claypool comes with an advanced Category Logging Framework that allows you to tune
+on the client, of course it's a cinch with "FireBug":http://getfirebug.com/.  But 
+jquery-claypool comes with an advanced category logging framework that allows you to tune
 messages to the firebug console.
 
-On the server Claypool makes use of the exact same Category Logging Framework. When
+On the server jquery-laypool makes use of the exact same category logging framework. When
 you run the server from the console and view the application you will see the Logging
-statements written to system out.  Of course messages can be adjusted to be written 
-to server.log, production.log, and test.log files.
-
-
-
-
-h3. Console
-
-You can interact with the domain model by starting the console through Firebug. 
-Here you'll have all parts of the application configured, just like it is when the
-application is running. You can inspect domain models, change values, and post to your 
-services or save to the database.
-
-To reload your controllers and models after launching the application simply <tt>reload!</tt>
-
+statements written to system out.  
 
 
 h3. Description of contents

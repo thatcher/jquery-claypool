@@ -45,7 +45,7 @@
 						 * allow capturing via |:param|
 						 * also added '<:foo(regexp):>/<:bar(regexp):>'
 						 */
-                        pattern = pattern.replace(/<\:(.+?)\:\>/g, function(){
+                        pattern = pattern.replace(/\<\:(.+?)\:\>/g, function(){
 							var name, i = arguments[0].indexOf('(');
 							name = arguments[0].substring(2,i);
 							params.push(name);

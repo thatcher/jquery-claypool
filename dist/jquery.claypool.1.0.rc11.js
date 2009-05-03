@@ -1,13 +1,11 @@
 var Claypool={
-/*
+/**
  * Claypool 1.0.rc11 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
- * $Date: 2008-09-27 13:17:28 -0400 (Sat, 27 Sep 2008) $
- * $Rev: 273 $
  */
 	Logging:{
 	    //because we log in core we need a safe way to null logging
@@ -280,7 +278,7 @@ var Claypool={
 						 * allow capturing via |:param|
 						 * also added '<:foo(regexp):>/<:bar(regexp):>'
 						 */
-                        pattern = pattern.replace(/<\:(.+?)\:\>/g, function(){
+                        pattern = pattern.replace(/\<\:(.+?)\:\>/g, function(){
 							var name, i = arguments[0].indexOf('(');
 							name = arguments[0].substring(2,i);
 							params.push(name);

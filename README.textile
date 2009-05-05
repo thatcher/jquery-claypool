@@ -1,96 +1,74 @@
-h1. Welcome to Claypool 
+h1. Welcome to jQuery-Claypool 
 
-h3. A Web 1.6180339... Javascript Application Framework
+h2. A Web 1.6180339... jQuery Application Framework
 
-jquery-claypool is a small, concise, railable application framework for jquery that
-allows you to use an mvc approach to build large, long-lived applications.
-It keeps your code clean, maintainable, and flexible saving your project time and cost.
+jquery-claypool is a small, concise, fast, railable javascript application framework,
+built as a jquery-plugin that provides all the usual important patterns for 
+large, long-lived client-side apps, server-side apps, or something strangely, 
+beautifully in the middle.
+          
+like django, rails, and spring but built for jquery.  jquery-claypool provides
+a powerful routing framework, simple scanners for nearly-zero configuration, highly
+optimized category logging, aspect oriented filters, automagically managed inversion 
+of control, sinlge point of entry, swappable environments and minimal requirement mvc.  
+and if all of those big words don't scare you away, jquery-claypool will make your 
+life simpler, cheaper, and most importantly lazier. cheers to lazy.
 
-jquery-claypool is primarily a client-side application framework.  it focuses on
-an application architecture that is becoming more common. specifically the 
-application is delivered once as html, css, and javascript; then, the application
-focuses on providing a seamless user experience by consuming services via
-ajax.
+jquery-claypool is both a client (browser) and server-side framework that fits in
+a compressed, gzipped file that is smaller than jquery itself.  we can achieve
+this by simply allowing you to use whatever model and view plugins you love the most,
+while simultaneously letting you write controllers the same way you would write event
+handler without jquery-claypool.  i.e. there is no notion of framework required
+extension patterns.  you decide how you like to write and we just wire it up cleanly and 
+most importantly, transparently.
 
-jquery-claypool is also a server-side web-application and persistence framework that 
-includes everything needed to create database-backed web-applications according to the
-model-view-control pattern of separation. the difference with traditional web-app
-approaches is that claypool server focuses on providing services, exposing the view (also
-called the presentation) into xml/json/xhtml templates that are used to continually
-update the application running on the client. 
+h3. dependencies
+* works with jquery 1.2.6 and 1.3.2(client)
+* requires livequery (soon we will add live())
 
-h3. Getting started
+h2. New to Claypool? 
 
-remember jquery-claypool is primarily a pure client-side app framework so you can develop
-apps that run entirely on static html in apache, a local html file, or using whatever 
-sever-side language choose to develop with.  simply deliver the app, and provide services to
-it.
+h3. Peruse it.
 
-h4. Claypool Web Server
+h4. Download / fork / watch jquery-claypool at 
 
-jquery-claypool comes with the spectacular jetty server by default, so you don't
-have to install or configure anything to play around, but you can also simply
-drop a project directly into your tomcat webapps dir if you're already that advanced.
+"github":http://github.com/thatcher/jquery-claypool/tree/master
 
-# Start the web server: <tt>ant -f scripts/build.xml run</tt>
-# Go to http://localhost:8080/ and see the template project.
-# Follow the guidelines to start developing your application
+h4. Join the discussion group / mailing list at
 
-developing on the server with jquery-claypool, is exactly like developing on the client with 
-jquery-claypool.  It runs in a simulated browser environment and loads javascript the same way,
-from the html that houses your app.  like aptana's jaxer, you can choose to load specific scripts
-on the server or client.
+'Google Groups':http://groups.google.com/group/jquery-claypool
 
-h3. Debugging Claypool
+h4. Report any bugs you find on the
 
-on the client, of course it's a cinch with "FireBug":http://getfirebug.com/.  But 
-jquery-claypool comes with an advanced category logging framework that allows you to tune
-messages to the firebug console.
+'bug tracker':http://claypooljs.lighthouseapp.com/
+      
+h4. Documentation is being constructed at
 
-On the server jquery-laypool makes use of the exact same category logging framework. When
-you run the server from the console and view the application you will see the Logging
-statements written to system out.  
+'jquery plugins':http://docs.jquery.com/Plugins/Claypool
 
+h2. Choose it.
 
-h3. Description of contents
+* Small, 14K gzipped.
+* MIT/GPL Style License.
+* Scales memory effeciency.
+* Powered by jQuery.
 
-* app
-** Holds all the code that's specific to this particular application.
+h2. Use it.
 
-* app/controllers
-** Holds controllers.
+jquery-claypool comes with template projects to get you rolling in minutes.
 
-* app/models
-** Holds models.
-  
-* app/views
-** Holds the views and template files for the view.
+h3. Client Example Project 
 
-* app/services
-** Holds API classes for web services.
+"Download .ZIP":http://github.com/thatcher/jquery-claypool-client/zipball/master
+"Download .TAR":http://github.com/thatcher/jquery-claypool-client/tarball/master
 
-* app/config
-** Configuration files for the Claypool environment, the routing map, inversion of control, logging, and other dependencies.
+h3. Server Example Project 
 
-* lib 
-** Application specific libraries. 
-    
-* images
-** Images
-  
-* css
-** Stylesheets
-  
-* scripts
-** Helper scripts for building distributables (think concat and min), running the server.
+"Download .ZIP":http://github.com/thatcher/jquery-claypool-server/zipball/master
+"Download .TAR":http://github.com/thatcher/jquery-claypool-server/tarball/master
 
-* tests
-** Unit and functional tests along with fixtures.
+h4. copyright 2008-2009--20XX ClaypoolJS
 
-* plugins
-** External libraries that the application depends on. 
-  
-h2. More Documentation
+h4. author christopher j thatcher
 
-Please see our continued documentation at the jQueryClaypool:http://docs.jquery.com/Plugins/Claypool/
-  
+h4. contact <:thatcher:>.<:christopher:>@<:gmail:>.<:com:>

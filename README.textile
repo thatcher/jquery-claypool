@@ -1,4 +1,4 @@
-h1. Welcome to jQuery-Claypool 
+h1. Welcome to jQuery-Claypool (http://claypooljs.com)
 
 h2. A Web 1.6180339... jQuery Application Framework
 
@@ -36,15 +36,15 @@ h4. Download / fork / watch jquery-claypool at
 
 h4. Join the discussion group / mailing list at
 
-'Google Groups':http://groups.google.com/group/jquery-claypool
+"google groups":http://groups.google.com/group/jquery-claypool
 
 h4. Report any bugs you find on the
 
-'bug tracker':http://claypooljs.lighthouseapp.com/
+"bug tracker":http://claypooljs.lighthouseapp.com/
       
 h4. Documentation is being constructed at
 
-'jquery plugins':http://docs.jquery.com/Plugins/Claypool
+"jquery plugins":http://docs.jquery.com/Plugins/Claypool
 
 h2. Choose it.
 
@@ -67,7 +67,7 @@ h3. Server Example Project
 "Download .ZIP":http://github.com/thatcher/jquery-claypool-server/zipball/master
 "Download .TAR":http://github.com/thatcher/jquery-claypool-server/tarball/master
 
-h4. copyright 2008-2009--20XX ClaypoolJS
+h4. copyright 2008-2009 ClaypoolJS
 
 h4. author christopher j thatcher
 

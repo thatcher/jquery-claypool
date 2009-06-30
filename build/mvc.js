@@ -208,7 +208,7 @@ Claypool.MVC = {
                                     c = target[0];
                                     v  = c.match('Controller') ? c.replace('Controller', 'View') : null;
                                     v  = c.match('Service') ? c.replace('Service', 'View') : v;
-                                    action = (target.length>0&&target[1].length>0)?target[1]:"handle";
+                                    action = (target.length>1&&target[1].length>0)?target[1]:"handle";
                                     controller = _this.find(target[0]);
                                     if(controller === null){
                                         controller = $.$(target[0]);

@@ -39,8 +39,6 @@
                     case 'GET':
                         this.logger.debug("Handling GET request");
                         this.handleGet(request, response);
-                        this.logger.debug("Finished Handling GET request. Setting status 200.");
-                        response.headers.status = 200;
                         break;
                     case 'POST':
                         this.logger.debug("Handling POST request");
@@ -69,9 +67,7 @@
             } catch(e) {
                 this.logger.exception(e);
                 this.handleError(request, response, "Caught Exception in Servlet handler", e);
-            }/*finally{
-                $$Web.render(request, response);
-            }*/
+            }
         },
         /**
          * Describe what this method does

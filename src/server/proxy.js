@@ -50,15 +50,13 @@
                         response.headers = {};
                     },
                     success: function(text){
-                        _this.logger.debug("Got response for proxy.");
+                        _this.logger.debug("Got response for proxy \n %s.", text);
                         response.body = text;
-                        _this.logger.debug("Setting Response Status 200.");
-                        response.headers.status = 200;
                     },
                     error: function(xhr, status, e){
                         _this.logger.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
                         if(e){_this.logger.exception(e);}
-                        response.headers.status = 500;
+                        response.body = xhr.responseText;
                     },
                     complete: function(xhr, status){
                         _this.logger.debug("Proxy Request Complete, Copying response headers");

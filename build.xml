@@ -6,7 +6,7 @@
     <property name="PROJECT_TITLE"            value="jquery.claypool" />
     <property name="BUILD_MAJOR"              value="1" />
     <property name="BUILD_MINOR"              value="0" />
-    <property name="BUILD_ID"                 value="rc11" />
+    <property name="BUILD_ID"                 value="rc13" />
     
     <property description="Java Jars" name="JAVA_LIB_DIR" location="WEB-INF/lib" />
     <property description="Rhino JS Engine" name="RHINO_JAR" location="${JAVA_LIB_DIR}/js.jar" />

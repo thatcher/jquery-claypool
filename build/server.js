@@ -70,8 +70,6 @@ Claypool.Server={
                     case 'GET':
                         this.logger.debug("Handling GET request");
                         this.handleGet(request, response);
-                        this.logger.debug("Finished Handling GET request. Setting status 200.");
-                        response.headers.status = 200;
                         break;
                     case 'POST':
                         this.logger.debug("Handling POST request");
@@ -100,9 +98,7 @@ Claypool.Server={
             } catch(e) {
                 this.logger.exception(e);
                 this.handleError(request, response, "Caught Exception in Servlet handler", e);
-            }/*finally{
-                $$Web.render(request, response);
-            }*/
+            }
         },
         /**
          * Describe what this method does
@@ -465,15 +461,13 @@ Claypool.Server={
                         response.headers = {};
                     },
                     success: function(text){
-                        _this.logger.debug("Got response for proxy.");
+                        _this.logger.debug("Got response for proxy \n %s.", text);
                         response.body = text;
-                        _this.logger.debug("Setting Response Status 200.");
-                        response.headers.status = 200;
                     },
                     error: function(xhr, status, e){
                         _this.logger.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
                         if(e){_this.logger.exception(e);}
-                        response.headers.status = 500;
+                        response.body = xhr.responseText;
                     },
                     complete: function(xhr, status){
                         _this.logger.debug("Proxy Request Complete, Copying response headers");

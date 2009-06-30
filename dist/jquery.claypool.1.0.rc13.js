@@ -4132,6 +4132,7 @@ Claypool.Server={
                 write: function(str){response.body = str; return this;},
                 append: function(str){response.body += str;return this;}
             });
+            response.headers.status = 200;
             try{
                 switch(request.method.toUpperCase()){
                     case 'GET':

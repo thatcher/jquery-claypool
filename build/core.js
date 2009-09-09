@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool 1.0.rc13 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.rc20 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -11,8 +11,8 @@ var Claypool={
 	    //because we log in core we need a safe way to null logging
 	    //if the real Claypool.Logging isnt present.  This is the safety.
 	},
-	extend : function(t, $class){
-	    $class.apply(t,[]);
+	extend : function(t, $class, args){
+	    $class.apply(t,args||[]);
     }
 };
 
@@ -786,8 +786,8 @@ var Claypool={
              //an environment is set or defined by calling
              //$.env('defaults', 'client.dev')
              if(arguments.length == 2){
-                 //env is flat so deep extension isnt necessary
-                 env = $.extend( env||{}, 
+                 //env is not necessarily flat so deep extension may be necessary
+                 env = $.extend( true, env||{}, 
                      $.config('env.'+arguments[0]),
                      $.config('env.'+arguments[1]));
                  return env;

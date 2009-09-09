@@ -138,8 +138,8 @@
              //an environment is set or defined by calling
              //$.env('defaults', 'client.dev')
              if(arguments.length == 2){
-                 //env is flat so deep extension isnt necessary
-                 env = $.extend( env||{}, 
+                 //env is not necessarily flat so deep extension may be necessary
+                 env = $.extend( true, env||{}, 
                      $.config('env.'+arguments[0]),
                      $.config('env.'+arguments[1]));
                  return env;

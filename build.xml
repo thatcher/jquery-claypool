@@ -6,7 +6,7 @@
     <property name="PROJECT_TITLE"            value="jquery.claypool" />
     <property name="BUILD_MAJOR"              value="1" />
     <property name="BUILD_MINOR"              value="0" />
-    <property name="BUILD_ID"                 value="rc13" />
+    <property name="BUILD_ID"                 value="rc20" />
     
     <property description="Java Jars" name="JAVA_LIB_DIR" location="WEB-INF/lib" />
     <property description="Rhino JS Engine" name="RHINO_JAR" location="${JAVA_LIB_DIR}/js.jar" />
@@ -29,11 +29,14 @@
     <property name="CLAYPOOL_APPLICATION"   	location="${SRC_DIR}/application" />
     <property name="CLAYPOOL_IOC"   			location="${SRC_DIR}/ioc" />
     <property name="CLAYPOOL_MVC"   			location="${SRC_DIR}/mvc" />
+    <property name="CLAYPOOL_MODELS"   			location="${SRC_DIR}/models" />
     <property name="CLAYPOOL_AOP"   			location="${SRC_DIR}/aop" />
     <property name="CLAYPOOL_SERVER"   			location="${SRC_DIR}/server" />
     <property name="CLAYPOOL_TEST"   			location="${SRC_DIR}/test" />
     <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js" />
     <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.min.js" />
+    <property name="CLAYPOOL_LATEST"   			location="${DIST_DIR}/${PROJECT_TITLE}.js" />
+    <property name="CLAYPOOL_LATEST_MIN"   		location="${DIST_DIR}/${PROJECT_TITLE}.min.js" />
     
     <!-- Plugin File Names for Distribution -->
     
@@ -136,6 +139,22 @@
         </java>
         <echo message="${CLAYPOOL_MVC} built." />
         
+        <!-- MODELS -->
+        <echo message="Building ${CLAYPOOL_MODELS}" />
+        <concat destfile="${BUILD_DIR}/models.js">
+            <fileset dir="${CLAYPOOL_MODELS}" includes="namespace.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="model.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="query.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="client.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="restclient.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="factory.js" />
+            <fileset dir="${CLAYPOOL_MODELS}" includes="plugin.js" />
+        </concat>
+        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
+            <arg value="${BUILD_DIR}/models.js" />
+        </java>
+        <echo message="${CLAYPOOL_MVC} built." />
+        
     	<!-- AOP -->
         <echo message="Building ${CLAYPOOL_AOP}" />
         <concat destfile="${BUILD_DIR}/aop.js">
@@ -156,9 +175,8 @@
         <concat destfile="${BUILD_DIR}/server.js">
             <fileset dir="${CLAYPOOL_SERVER}" includes="namespace.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="servlet.js" />
-            <fileset dir="${CLAYPOOL_SERVER}" includes="scaffold.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="rest.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="proxy.js" />
-            <fileset dir="${CLAYPOOL_SERVER}" includes="e4x.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="console.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="error.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="plugin.js" />
@@ -169,21 +187,9 @@
         <echo message="${CLAYPOOL_SERVER} built." />
         
     	
-    	<!-- TEST (MoonUnit)-->
-        <echo message="Building ${CLAYPOOL_TEST}" />
-        <concat destfile="${BUILD_DIR}/munit.js">
-            <fileset dir="${CLAYPOOL_TEST}" includes="namespace.js" />
-            <fileset dir="${CLAYPOOL_TEST}" includes="test.js" />
-            <fileset dir="${CLAYPOOL_TEST}" includes="runner.js" />
-            <fileset dir="${CLAYPOOL_TEST}" includes="error.js" />
-            <fileset dir="${CLAYPOOL_TEST}" includes="plugin.js" />
-        </concat>
-        <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
-            <arg value="${BUILD_DIR}/munit.js" />
-        </java>
-        <echo message="${CLAYPOOL_TEST} built." />
+    	<!-- TEST (MoonUnit) DEPRECATED Prefer jQunit and jqunit-spec plugin-->
         
-    	<!-- ALL -->
+    	<!-- ALL CORE -->
         <echo message="Building ${CLAYPOOL_ALL}" />
         <mkdir dir="${DIST_DIR}" />
         <concat destfile="${CLAYPOOL_ALL}">
@@ -193,11 +199,13 @@
             <fileset dir="${BUILD_DIR}" includes="aop.js" />
             <fileset dir="${BUILD_DIR}" includes="ioc.js" />
             <fileset dir="${BUILD_DIR}" includes="mvc.js" />
+            <fileset dir="${BUILD_DIR}" includes="models.js" />
             <fileset dir="${BUILD_DIR}" includes="server.js" />
 			<!-- DEPRECATED as of 1.0.rc7 
             <fileset dir="${BUILD_DIR}" includes="munit.js" />
 			-->
         </concat>
+        <copy file='${CLAYPOOL_ALL}' tofile='${CLAYPOOL_LATEST}'/> 
         <echo message="${CLAYPOOL_ALL} built." />
     </target>
 
@@ -215,6 +223,7 @@
                 <pathelement location="${RHINO_JAR}"/>
             </classpath>
         </java>
+        <copy file='${CLAYPOOL_ALL_MIN}' tofile='${CLAYPOOL_LATEST_MIN}'/> 
         <echo message="Finished Compressing Distibution" />
     </target>
 </project>

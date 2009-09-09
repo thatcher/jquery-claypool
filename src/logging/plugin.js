@@ -10,14 +10,13 @@
 	/**
 	 * @constructor
 	 */
-    //TODO : what is the useful static plugin that could be derived from Claypool.Logging?
 	$.extend($, {
 	    logger  : function(name){
 	        return $$Log.getLogger(name);
 	    }
 	});
 	
-	var $log;// = $.logger("jQuery");
+	var $log;
 	
 	$.extend($, {
 	    debug  : function(){

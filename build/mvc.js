@@ -13,11 +13,11 @@ Claypool.MVC = {
  */
 };
 
-(function($, $Log, $$MVC){
+(function($){
     
     $.manage("Claypool.MVC.Container", "claypool:MVC");
     
-})(  jQuery, Claypool, Claypool.MVC );
+})(  jQuery);
 
 
 /**
@@ -292,9 +292,12 @@ Claypool.MVC = {
                 return retVal;
             };
             if(this.event){
-                /**This is a specific event hijax so we bind once and dont think twice  */
-                $(target).bind(this.event+"."+this.eventNamespace, _hijax);
-                _this.logger.debug("Binding event %s to hijax controller on target", this.event, target);
+                $(this.event.split('|')).each(function(){
+                    /**This is a specific event hijax so we bind once and dont think twice  */
+                    $(target).bind(this+"."+_this.eventNamespace, _hijax);
+                    _this.logger.debug("Binding event %s to hijax controller on target", this, target);
+                    
+                });
             }else{     
                 /**
                 *   This is a '(m)any' event hijax so we need to bind based on each routed endpoints event.
@@ -722,7 +725,7 @@ Claypool.MVC = {
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'blur',
+        event           : 'blur|focus',
         strategy        : 'all',
         routerKeys      : 'ids',
         hijaxKey        : 'input',
@@ -747,6 +750,16 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        }
+    }).router( "hijax:image-rollover",{
+        selector        : 'img',
+        event           : 'mouseover|mouseout',
+        strategy        : 'all',
+        routerKeys      : 'urls',
+        hijaxKey        : 'image',
+        eventNamespace  : "Claypool:MVC:HijaxImageRolloverController",
+        target       : function(event){ 
+            return event.target.src;
         }
     });
     

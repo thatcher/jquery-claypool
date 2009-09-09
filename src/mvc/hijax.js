@@ -209,9 +209,12 @@
                 return retVal;
             };
             if(this.event){
-                /**This is a specific event hijax so we bind once and dont think twice  */
-                $(target).bind(this.event+"."+this.eventNamespace, _hijax);
-                _this.logger.debug("Binding event %s to hijax controller on target", this.event, target);
+                $(this.event.split('|')).each(function(){
+                    /**This is a specific event hijax so we bind once and dont think twice  */
+                    $(target).bind(this+"."+_this.eventNamespace, _hijax);
+                    _this.logger.debug("Binding event %s to hijax controller on target", this, target);
+                    
+                });
             }else{     
                 /**
                 *   This is a '(m)any' event hijax so we need to bind based on each routed endpoints event.

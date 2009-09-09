@@ -103,7 +103,9 @@
                 return new $$Log.SysOutAppender(options);
             }
         }catch(e){
-            /**Since the console isn't available, see if print() is and fall back to it**/
+            //Since the console and print arent available use a null implementation.
+            //Thanks to Brandon Smith for finding this bug!
+            throw e;
         }
         return this;
     };

@@ -189,227 +189,274 @@ Claypool.Server={
     
 })(  jQuery, Claypool, Claypool.Server );
 
-
-
 /**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
+ * @author thatcher
  */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.ReSTScaffold = function(options){
+(function($, $$, $Web){
+    
+    var log;
+    
+    $Web.RestServlet = function(db, options){
         $$.extend(this, $$Web.Servlet);
-        $.extend( true, this, options);
-        this.logger = $.logger("Claypool.Server.ReSTScaffold");
-        this.Model  = $.$(options.model);
+        log = $.logger('Claypool.Server.RestServlet');
+        //they must provide a object which implements
+        //the methods js2json and json2js
+        //we include jsPath's json plugin as a default implementation
+        //when present
+        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
+            jsPath.js2json:options.js2json;
+        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
+            jsPath.json2js:options.json2js;
+        $.extend(true, this, options);
+        //implementations are expected to pass the correct
+        //options to correctly initialize the db connection
+        //with the following call
+        this.db = db;
+        //finally they must provide an implementation for the
+        //js2query method if they wish to support the Query 
+        //convenience methods and not just native query strings
     };
     
-    $.extend($$Web.ReSTScaffold.prototype,
-        $$Web.Servlet.prototype,{
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handleGet:function(request, response){
-            var instance, id$format, 
-                _this = this, p = request.requestURL;
-            if(p){
-                id$format = p.match(/(\d+)\.(\w+)$/);
-                if(id$format){
-                    //Find an existing record
-                    this.logger.debug("Getting Instance %", id$format[1]);
-                    instance = new this.Model(Number(id$format[1]));
-                    response.body = this.Model.serialize(instance, id$format[2]);
-                    response.headers["Content-Type"] =
-                        "text/"+id$format[2];
+    $.extend($Web.RestServlet.prototype, 
+            $Web.Servlet.prototype,{
+        handleGet: function(request, response){
+            var domain = response.params('domain'),
+                id = response.params('id'),
+                ids,
+                select;
+            log.debug("Handling GET for %s %s", domain, id);
+            if(!domain && !id){
+                //response is an array of all domain names
+                this.db.get({
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
+                });
+            }else if(domain && !id){
+                log.debug("Handling GET for %s %s", domain, request.params);
+                for(var param in request.parameters){
+                    log.debug('param[%s]=%s', param, request.parameters[param]);
+                }
+                if(request.parameters&&('id' in request.parameters)){
+                    log.debug("LIST OF ITEMS!!!");
+                    //response is batch get of items by id
+                    ids = request.parameters.id.split(',');
+                    select = 'select * from `'+domain+'` where itemName() in (\''+
+                        ids.join("','")+
+                    '\')';
+                    log.debug("%s",select);
+                    this.db.find({
+                        select: select,
+                        async: false,
+                        success: function(result){
+                            response.headers.status = 200;
+                            response.body = this.js2json(
+                                $.extend(result, response.params())
+                            );
+                        },
+                        error: function(xhr, status, e){
+                            handleError(xhr,status, e, response);
+                        }
+                    });
                 }else{
-                    id$format = p.match(/(\w+)$/);
-                    if(id$format){
-                        p.replace(/(\w+)$/, function(url, action){
-                            _this.logger.debug("using custom action : %s", action);
-                            if($.isFunction(_this[action])){
-                                _this[action](request, response);
-                            }
-                            return action;
-                        });
-                        return response;
-                    }else{
-                        //the search is a good catch-all for a get
-                        this.search(request,response);
-                    }
+                    log.debug("LIST OF ITEM NAMES!!!", domain, id);
+                    //response is list of item names for the domain
+                    this.db.find({
+                        select: "select itemName() from `"+domain+"`",
+                        async: false,
+                        success: function(result){
+                            response.headers.status = 200;
+                            response.body = this.js2json(
+                                $.extend(result, response.params())
+                            );
+                        },
+                        error: function(xhr, status, e){
+                            handleError(xhr,status, e, response);
+                        }
+                    });
                 }
-                this.chooseView(request, response);
+            }else if(domain && id && id!='metadata'){
+                //response is the record
+                this.db.get({
+                    domain: domain,
+                    item: id,
+                    async: false,
+                    dataType:'text',
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
+                });
+            }else if(domain && id && id == 'metadata'){
+                this.db.metadata({
+                    domain: domain,
+                    item: id,
+                    async: false,
+                    dataType:'text',
+                    success:function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    }
+                });
             }
-            return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        search: function(request, response){
-            this.logger.debug("Searching for records.");
-            var searchTerms =  request.parameters.searchTerms||'*',
-                itemsPerPage = Number(request.parameters.itemsPerPage||40),
-                startIndex =   Number(request.parameters.startIndex||0), 
-                offsetIndex =  Number(request.parameters.offsetIndex||0),
-                startPage =    Number(request.parameters.startPage||0),
-                language = "en-US",
-                inputEncoding = "utf-8",
-                outputEncoding = "utf-8",
-                results = [],
-                filter,
-                i;
-            for (var param in request.parameters ){
-                this.logger.debug("checking for filter % ", param);
-                for(i=0;i<this.Model._meta.fields.length;i++){
-                    if(this.Model._meta.fields[i].fieldName == param){
-                        this.logger.debug("adding filter % = ? (%)", param, request.parameters[param]);
-                        filter = filter? filter.filter(param + " = ?", request.parameters[param]):
-                            this.Model.filter(param + " = ?", request.parameters[param]);
+        handlePost: function(request, response){
+            var domain = response.params('domain'),
+                id = response.params('id'),
+                item,
+                items,
+                query;
+            log.debug("Handling POST for %s %s", domain, id).
+                debug("Reading POST body %s", request.body);
+            
+            if(domain && id){
+                //create a new record(s)
+                item = this.json2js(request.body);
+                //single object
+                this.db.save({
+                    domain: domain,
+                    item:id,
+                    attributes:item,
+                    async: false,
+                    replace: ('update' in request.parameters)?false:true,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
                     }
+                });
+            }else if(domain && !id){
+                items = this.json2js(request.body);
+                //array of objects (bulk save)
+    			this.db.save({
+                    domain: domain,
+                    items: items,
+                    async: false,
+                    replace: ('update' in request.parameters)?false:true,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr, status, e, response);
+                    }
+                });
+            }else if(!domain && !id){
+                //is is a general query string or a json
+                //serialization used to build a query
+                //dynamically - use the content-type
+                //header
+                query = request.body;
+                if(request.contentType.match('application/json')){
+                    query = js2query(this.json2js(query));
                 }
-            }
-            filter = filter ? filter : this.Model.all();
-            if(searchTerms == "*"){
-                results =   filter.
-                            limit(itemsPerPage).
-                            offset((startPage*itemsPerPage)+offsetIndex+startIndex).
-                            toArray();
-                for(i=0;i<results.length;i++){
-                    results[i] = this.Model.serialize(results[i]);
-                }
-                this.logger.debug("Found %s results from search.", results.length);
-                response.m({
-                    xmlns$opensearch    : "http://a9.com/-/spec/opensearch/1.1/",
-                    searchTerms         : searchTerms,
-                    startPage           : startPage,
-                    totalResults        : results.length,
-                    startIndex          : startIndex,
-                    itemsPerPage        : itemsPerPage,
-                    results             : results
+                log.debug('executing query \n%s', query);
+                this.db.find({
+                    select:query,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(result);
+                        log.debug('resultset %s', response.body);
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
                 });
             }
             
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handlePost: function(request, response){
-            var instance, newuser, id$format, p = request.requestURL,
-                _this = this;
-            this.logger.debug("ReSTService POST: \n%s", request.body);
-            if(p){
-                if(p.match(/(\d+)\.(\w+)$/)){
-                    id$format = p.match(/(\d+)\.(\w+)$/);
-                    //Update an existing record
-                    this.logger.debug("Updating Instance %", id$format[1]);
-                    instance = this.Model(Number(id$format[1]));
-                    //UPDATE
-                    newinstance = this.Model.deserialize(request.body, id$format[2]);
-                    newinstance = new this.Model(newinstance);
-                    newinstance.setPkValue(instance.getPkValue());
-                    this.Model.transaction(function(){
-                        instance.remove();
-                        newinstance.save();
-                    });
-                    response.body = newinstance.getPkValue();
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }else if(p.match(/(new)\.(\w+)$/)){
-                    id$format = p.match(/(new)\.(\w+)$/);
-                    this.logger.debug("Saving New Instance (formatted as %s) \n%s ", id$format[2], request.body);
-                    newinstance = this.Model.deserialize(request.body, id$format[2]);
-                    newinstance = new this.Model(newinstance);
-                    this.logger.debug("Deserialized new instance %s ", newinstance);
-                    //SAVE
-                    newinstance.save();
-                    response.body = newinstance.getPkValue();
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }else if(p.match(/search$/)){
-                    this.search(request,response);
-                    this.chooseView(request, response);
-                }else {
-                    p.replace(/(\w+)$/, function(url, action){
-                        _this.logger.debug("using custom action : %s", action);
-                        if($.isFunction(_this[action])){
-                            _this[action](request, response);
-                        }
-                        return action;
-                    });
-                }
+        handlePut: function(request, response){
+            var domain = response.params('domain'),
+                id = response.params('id');
+            log.debug("Handling PUT for %s %s", domain, id);
+            if(domain && !id){
+                //create a new domain
+                this.db.create({
+                    domain: domain,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
+                });
             }
-            this.logger.debug("POST RESPONSE \n %s", response.body);
-            return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
         handleDelete: function(request, response){
-            var instance, id$format, p = request.requestURL;
-            if(p){
-                id$format = p.match(/(\d+)\.(\w+)$/);
-                if(id$format){
-                    //Delete an existing record
-                    this.logger.debug("Deleting Instance %", id$format[1]);
-                    instance = this.Model.find(id$format[1]);
-                    instance.remove();
-                    response.body = "";
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }
+            var domain = response.params('domain'),
+                id = response.params('id');
+            log.debug("Handling DELETE for %s %s", domain, id);
+
+            if(domain && id){
+                //delete an item
+                this.db.remove({
+                    domain: domain,
+                    item:id,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
+                });
+            }else if(domain && !id){
+                //delete a domain
+    			this.db.destroy({
+                    domain: domain,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(xhr, status, e){
+                        handleError(xhr,status, e, response);
+                    }
+                });
             }
-            return response;
-        },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        chooseView:function(request, response){
-            var p = request.requestURL;
-            if(p.match(/atom$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "application/atom+xml";
-                response.v('.atom');
-            }else if(p.match(/xml$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/xml";
-                response.v('.xml');
-            }else if(p.match(/xhtml$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/html";
-                response.v('.xhtml');
-            }else{
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/json";
-                response.v('.json');
-            }
-            response.render();
         }
     });
     
-})(  jQuery, Claypool, Claypool.Server );
+    var handleError = function(xhr, status, e, response){
+        log.error('failed. %s', status).
+            error('response text:\n\n%s', xhr.responseText).
+            exception(e);
+        response.headers.status = xhr.responseHeaders.status;
+        response.body = xhr.responseText;
+    };
+    
+    
+})(jQuery, Claypool, Claypool.Server);
 
 /**
  * Descibe this class
@@ -418,6 +465,7 @@ Claypool.Server={
  * @requires OtherClassName
  */
 (function($, $$, $$Web){
+    var log;
     /**
      * @constructor
      */
@@ -425,164 +473,119 @@ Claypool.Server={
         $$.extend(this, $$Web.Servlet);
         this.rewriteMap = null;//Array of Objects providing url rewrites
         $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.WebProxyServlet");
+        log = $.logger("Claypool.Server.WebProxyServlet");
         this.router = new $$.Router();
         this.strategy = this.strategy||"first";
-        this.logger.debug("Compiling url rewrites %s.", this.rewriteMap);
+        log.debug("Compiling url rewrites %s.", this.rewriteMap);
         this.router.compile(this.rewriteMap, "urls");//, "rewrite");
     };
-    
     $.extend($$Web.WebProxyServlet.prototype, 
         $$Web.Servlet.prototype,{
         handleGet: function(request, response){
-            this.logger.debug("Handling proxy: %s", request.requestURI);
-            var _this = this;
-            var proxyURL = this.router[this.strategy||"all"]( request.requestURI );
-            request.headers["Claypool-Proxy"] = this.proxyHost||"127.0.0.1";
-			var params = {};
-			for (var prop in request.parameters){
-				this.logger.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
-				params[prop+'']=request.parameters[prop]+'';
-			}
+            var options = _proxy.route(request, this);
+            var proxyURL = options.proxyURL,
+                params   = options.params;
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
-                _this.logger.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
+                log.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
                 $.ajax({
                     type:"GET",
                     dataType:"text",
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend: function(xhr){
-                        _this.logger.debug("Copying Request headers for Proxied Request");
-                        for(var header in request.headers){
-                            _this.logger.debug("Setting proxied request header %s: %s",header, request.headers[header] );
-                            if(header == 'host'){continue;}
-                            xhr.setRequestHeader(header, request.headers[header]);
-                        }
-                        response.headers = {};
-                    },
-                    success: function(text){
-                        _this.logger.debug("Got response for proxy \n %s.", text);
-                        response.body = text;
-                    },
-                    error: function(xhr, status, e){
-                        _this.logger.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
-                        if(e){_this.logger.exception(e);}
-                        response.body = xhr.responseText;
-                    },
-                    complete: function(xhr, status){
-                        _this.logger.debug("Proxy Request Complete, Copying response headers");
-                        var proxyResponseHeaders = xhr.getAllResponseHeaders();
-                        var responseHeader;
-                        var responseHeaderMap;
-                        _this.logger.debug("Complete Proxy response header: \n %s" ,proxyResponseHeaders);
-                        proxyResponseHeaders = proxyResponseHeaders.split("\r\n");
-                        for(var i = 0; i < proxyResponseHeaders.length; i++){
-                            responseHeaderMap = proxyResponseHeaders[i].split(":");
-                            try{
-                                _this.logger.debug("setting response header %s %s", responseHeaderMap[0], responseHeaderMap.join(":"));
-                                response.headers[responseHeaderMap.shift()] = responseHeaderMap.join(":");
-                            }catch(e){
-                                _this.logger.warn("Unable to set a proxied response header");
-                                _this.logger.exception(e);
-                            }
-                        }
-                        response.headers["Claypool-Proxy"] = proxyURL[0].payload.rewrite;
-                        response.headers["Content-Encoding"] = proxyURL[0].payload.contentEncoding||"";
-                        if(proxyURL[0].payload.contentType){
-                            //override the content type
-                            response.headers["Content-Type"] = proxyURL[0].payload.contentType;
-                        }
-                    }
+                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    success:function(text){_proxy.success(response, text);},
+                    error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
+                    complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
                 });
-            }
-            return response;
-        }
-    });
-    
-})(  jQuery, Claypool, Claypool.Server );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.E4XServlet = function(options){
-        $$.extend(this,$$Web.Servlet);
-        $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.E4XServlet");
-    };
-    
-    $.extend($$Web.E4XServlet.prototype,
-        $$Web.Servlet.prototype, {
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handleGet: function(request, response){
-            var _this = this;
-            //for this service we use the a json string as the model
-            if(!typeof(response.m('postparams')) == "string"){
-                //no model has been set by a post
-                if($.isFunction($.js2json)){
-                    response.m("postparams", $.js2json(request.parameters));
-                }else{
-                    response.m("postparams","{}");
-                }
-            }
-            try{
-                this.logger.info("Loading E4X from url :\n%s", request.requestURI);
-                $.ajax({ 
-                    type:'GET',  
-                    url:(this.baseURI||"./")+request.requestURI, 
-                    dataType:"text/plain",
-                    async:false,
-                    success:function(text){
-                        _this.logger.info("Successfully retreived E4X :\n%s \n Evaluating with model %s",
-                            request.requestURI, response.m("postparams"));
-                        var e4x = eval("(function(){"+
-                            "var model = "+response.m("postparams")+";"+
-                            "return new XMLList(<>"+text+"</>);"+
-                        "})();");
-                        response.body = e4x.toString();
-                        response.headers["Content-Type"] = "text/html";
-                        response.headers.status = 200;
-                        _this.logger.info("Finished Evaluating E4X :\n%s", request.requestURI);
-                    },
-                    error:function(xhr, status, e){
-                        _this.logger.info("Error retreiving E4X :\n%s", request.requestURI);
-                        response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
-                        response.headers["Content-Type"] = "text/html";
-                        response.headers.status = 200;
-                    }
-                });
-            }catch(e){
-                this.logger.error("Error evaluating. \n\n%s", request.requestURI).
-                    exception(e);
-                response.body = e.toString();
             }
             return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handlePost: function(request, response){
-            response.m("postparams",String(request.body));//should be a json string
-            return this.handleGet(request,response);
+        handlePost:function(request, response){
+            var options = _proxy.route(request, this);
+            var proxyURL = options.proxyURL,
+                params   = options.params;
+            if(proxyURL && proxyURL.length && proxyURL.length > 0){
+                log.debug("Proxying post request to: %s", proxyURL[0].payload.rewrite);
+                $.ajax({
+                    type:"POST",
+                    dataType:"text",
+                    async:false,
+                    data:params,
+                    url:proxyURL[0].payload.rewrite+'',
+                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    success:function(text){_proxy.success(response, text);},
+                    error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
+                    complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
+                });
+            }
+            return response;
         }
     });
+    
+    
+    var _proxy = {
+        route:function(request, options){
+            log.debug("Handling proxy: %s", request.requestURI);
+            var proxyURL = options.router[options.strategy||"all"]( request.requestURI );
+            request.headers["Claypool-Proxy"] = options.proxyHost||"127.0.0.1";
+			var params = {};
+			for (var prop in request.parameters){
+				log.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
+				params[prop+'']=request.parameters[prop]+'';
+			}
+            var body = (request.body&&request.body.length)?request.body:'';
+            return {
+                proxyURL:proxyURL,
+                params:params,
+                body:body
+            };
+        },
+        beforeSend: function(request, response, xhr){
+            log.debug("Copying Request headers for Proxied Request");
+            for(var header in request.headers){
+                log.debug("Setting proxied request header %s: %s",header, request.headers[header] );
+                xhr.setRequestHeader(header, request.headers[header]);
+            }
+            response.headers = {};
+        },
+        success: function(response, text){
+            log.debug("Got response for proxy \n %s.", text);
+            response.body = text+'';
+        },
+        error: function(response, xhr, status, e){
+            log.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
+            if(e){log.exception(e);}
+            response.body = xhr.responseText+'';
+        },
+        complete: function(response, proxyURL, xhr, status){
+            log.debug("Proxy Request Complete, Copying response headers");
+            var proxyResponseHeaders = xhr.getAllResponseHeaders();
+            var responseHeader;
+            var responseHeaderMap;
+            log.debug("Complete Proxy response header: \n %s" ,proxyResponseHeaders);
+            proxyResponseHeaders = proxyResponseHeaders.split("\r\n");
+            for(var i = 0; i < proxyResponseHeaders.length; i++){
+                responseHeaderMap = proxyResponseHeaders[i].split(":");
+                try{
+                    log.debug("setting response header %s %s", responseHeaderMap[0], responseHeaderMap.join(":"));
+                    response.headers[responseHeaderMap.shift()] = responseHeaderMap.join(":");
+                }catch(e){
+                    log.warn("Unable to set a proxied response header");
+                    log.exception(e);
+                }
+            }
+            log.debug('response status (%s)', xhr.status);
+            response.headers.status = Number(xhr.status);
+            response.headers["Claypool-Proxy"] = proxyURL[0].payload.rewrite+'';
+            response.headers["Content-Encoding"] = proxyURL[0].payload.contentEncoding||"";
+            response.headers["Transfer-Encoding"] = proxyURL[0].payload.transferEncoding||"";
+            if(proxyURL[0].payload.contentType){
+                //override the content type
+                response.headers["Content-Type"] = proxyURL[0].payload.contentType+'';
+            }
+        }
+    };
     
 })(  jQuery, Claypool, Claypool.Server );
 
@@ -715,7 +718,7 @@ Claypool.Server={
     var console;
     
     $.extend($, {
-        _ : function(command){
+        '>' : function(command){
             console = console || new $$Web.Console();
             console.run(command);
         },

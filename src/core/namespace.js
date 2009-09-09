@@ -11,8 +11,8 @@ var Claypool={
 	    //because we log in core we need a safe way to null logging
 	    //if the real Claypool.Logging isnt present.  This is the safety.
 	},
-	extend : function(t, $class){
-	    $class.apply(t,[]);
+	extend : function(t, $class, args){
+	    $class.apply(t,args||[]);
     }
 };
 

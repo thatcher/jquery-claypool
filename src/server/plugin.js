@@ -17,7 +17,7 @@
     var console;
     
     $.extend($, {
-        _ : function(command){
+        '>' : function(command){
             console = console || new $$Web.Console();
             console.run(command);
         },

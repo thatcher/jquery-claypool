@@ -1,6 +1,6 @@
-Claypool.MVC = {
+Claypool.Models = {
 /*
- * Claypool.MVC @VERSION@ - A Web 1.6180339... Javascript Application Framework
+ * Claypool.Models @VERSION@ - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -12,9 +12,3 @@ Claypool.MVC = {
  *
  */
 };
-
-(function($){
-    
-    $.manage("Claypool.MVC.Container", "claypool:MVC");
-    
-})(  jQuery);

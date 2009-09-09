@@ -72,7 +72,7 @@
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'blur',
+        event           : 'blur|focus',
         strategy        : 'all',
         routerKeys      : 'ids',
         hijaxKey        : 'input',
@@ -97,6 +97,16 @@
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        }
+    }).router( "hijax:image-rollover",{
+        selector        : 'img',
+        event           : 'mouseover|mouseout',
+        strategy        : 'all',
+        routerKeys      : 'urls',
+        hijaxKey        : 'image',
+        eventNamespace  : "Claypool:MVC:HijaxImageRolloverController",
+        target       : function(event){ 
+            return event.target.src;
         }
     });
     

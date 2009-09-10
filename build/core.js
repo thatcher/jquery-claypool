@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool 1.0.rc20 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.0 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)

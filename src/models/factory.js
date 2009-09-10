@@ -8,12 +8,12 @@
         options = options||{};
         log = log||$.logger('Claypool.Models.Factory');
         
-        var db,
+        var DB,
             dbconnection;
         
         //select the db client implementation
         //
-        // - 'rest' is enitirely abstract and is the most reusable accross databases
+        // - 'rest' is entirely abstract and is the most reusable accross databases
         //   since it requires no database specific implementations by the client.
         //   the rest server-side services would generally use the 'direct' db client then
         //   to service the rest clients requests
@@ -23,7 +23,7 @@
         //   dbconnection parameters which are used to initialize the local
         //   clients connection
         var dbclient = options&&options.dbclient?
-            options.db:$.env('dbclient');
+            options.dbclient:$.env('dbclient');
         if(!dbclient){
             dbclient = 'rest';
         }
@@ -32,19 +32,19 @@
             dbclient = new $M.RestClient(options);
         }else if(dbclient == 'direct'){
             //get the database implementation and connection information
-            db = options&&options.db?
+            DB = options&&options.db?
                     options.db:$.env('db');
             dbconnection = options&&options.dbconnection?
                     options.dbconnection:$.env('dbconnection');
-            log.debug("loading database implementation %s", db);
-            if(typeof(db)=='string'){
-                db = $.resolve(db);
+            log.debug("loading database implementation %s", DB);
+            if(typeof(DB)=='string'){
+                log.debug("resolving database implementation %s", DB);
+                DB = $.resolve(DB);
             }
-            if($.isFunction(db)){
-                //initalize the database connection
-                db(dbconnection);
-            }
-            dbclient = new $M.Client($.extend({db: db},options));
+            dbclient = new $M.Client($.extend({
+                //initialize the database connection
+                db: new DB(dbconnection)
+			},options));
         }
         return dbclient;
     };

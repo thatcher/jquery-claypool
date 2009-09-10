@@ -138,7 +138,7 @@
                        this.fields[field].type){
                         if(this.fields[field].type == 'json'){
                             //serializes a json blob
-                            serialized[field] = _.js2json(model[field]);
+                            serialized[field] = jsPath.js2json(model[field]);
                         }else if (this.fields[field].type == 'html'){
                             //serializes a dom html blob
                             serialized[field] = $('<div>').append( $(model[field]).clone() ).html();

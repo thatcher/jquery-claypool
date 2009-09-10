@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool 1.0.rc13 - A Web 1.6180339... Javascript Application Framework
+ * Claypool 1.0.0 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -11,8 +11,8 @@ var Claypool={
 	    //because we log in core we need a safe way to null logging
 	    //if the real Claypool.Logging isnt present.  This is the safety.
 	},
-	extend : function(t, $class){
-	    $class.apply(t,[]);
+	extend : function(t, $class, args){
+	    $class.apply(t,args||[]);
     }
 };
 
@@ -786,8 +786,8 @@ var Claypool={
              //an environment is set or defined by calling
              //$.env('defaults', 'client.dev')
              if(arguments.length == 2){
-                 //env is flat so deep extension isnt necessary
-                 env = $.extend( env||{}, 
+                 //env is not necessarily flat so deep extension may be necessary
+                 env = $.extend( true, env||{}, 
                      $.config('env.'+arguments[0]),
                      $.config('env.'+arguments[1]));
                  return env;
@@ -1158,7 +1158,9 @@ Claypool.Logging={
                 return new $$Log.SysOutAppender(options);
             }
         }catch(e){
-            /**Since the console isn't available, see if print() is and fall back to it**/
+            //Since the console and print arent available use a null implementation.
+            //Thanks to Brandon Smith for finding this bug!
+            throw e;
         }
         return this;
     };
@@ -1669,14 +1671,13 @@ Claypool.Logging={
 	/**
 	 * @constructor
 	 */
-    //TODO : what is the useful static plugin that could be derived from Claypool.Logging?
 	$.extend($, {
 	    logger  : function(name){
 	        return $$Log.getLogger(name);
 	    }
 	});
 	
-	var $log;// = $.logger("jQuery");
+	var $log;
 	
 	$.extend($, {
 	    debug  : function(){
@@ -3325,11 +3326,11 @@ Claypool.MVC = {
  */
 };
 
-(function($, $Log, $$MVC){
+(function($){
     
     $.manage("Claypool.MVC.Container", "claypool:MVC");
     
-})(  jQuery, Claypool, Claypool.MVC );
+})(  jQuery);
 
 
 /**
@@ -3604,9 +3605,12 @@ Claypool.MVC = {
                 return retVal;
             };
             if(this.event){
-                /**This is a specific event hijax so we bind once and dont think twice  */
-                $(target).bind(this.event+"."+this.eventNamespace, _hijax);
-                _this.logger.debug("Binding event %s to hijax controller on target", this.event, target);
+                $(this.event.split('|')).each(function(){
+                    /**This is a specific event hijax so we bind once and dont think twice  */
+                    $(target).bind(this+"."+_this.eventNamespace, _hijax);
+                    _this.logger.debug("Binding event %s to hijax controller on target", this, target);
+                    
+                });
             }else{     
                 /**
                 *   This is a '(m)any' event hijax so we need to bind based on each routed endpoints event.
@@ -4034,7 +4038,7 @@ Claypool.MVC = {
         }
     }).router( "hijax:input",{
         selector        : 'input',
-        event           : 'blur',
+        event           : 'blur|focus',
         strategy        : 'all',
         routerKeys      : 'ids',
         hijaxKey        : 'input',
@@ -4060,11 +4064,938 @@ Claypool.MVC = {
         target       : function(event){ 
             return event.type;
         }
+    }).router( "hijax:image-rollover",{
+        selector        : 'img',
+        event           : 'mouseover|mouseout',
+        strategy        : 'all',
+        routerKeys      : 'urls',
+        hijaxKey        : 'image',
+        eventNamespace  : "Claypool:MVC:HijaxImageRolloverController",
+        target       : function(event){ 
+            return event.target.src;
+        }
     });
     
     $.mvc_scanner = $$MVC.Factory.prototype;
 	
 })(  jQuery, Claypool, Claypool.MVC );
+Claypool.Models = {
+/*
+ * Claypool.Models @VERSION@ - A Web 1.6180339... Javascript Application Framework
+ *
+ * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
+ * Dual licensed under the MIT (MIT-LICENSE.txt)
+ * and GPL (GPL-LICENSE.txt) licenses.
+ *
+ * $Date: 2008-08-06 14:34:08 -0400 (Wed, 06 Aug 2008) $
+ * $Rev: 265 $
+ * 
+ *
+ */
+};
+/**
+ * @author thatcher
+ */
+
+
+(function($, $$, $M){
+    
+    /**
+     * @constructor
+     * @classDescription - Provides a common validation and serialization
+     *     deserialization routines
+     * @param {Object} name
+     * @param {Object} fields
+     * @param {Object} options
+     */
+    $M.Model = function(name, fields, options){
+        $.extend(true, this, $M.Factory(options));
+        $.extend(this, {
+            name: name,
+            fields: fields
+        });
+    };
+   
+    $.extend($M.Model.prototype, {
+        /**
+         * 
+         * @param {Object} options
+         */
+        validate:function(options){
+            var flash = [],
+                model = options.data,
+                i, j, 
+                batch,
+                id;
+            if(options.batch){
+                batch = {};
+                for(id in model){
+                    this.validate($.extend({},options,{
+                        data: model[id],
+                        batch:false,
+                        success:function(data){
+                            batch[id]=data;
+                        },
+                        error:function(data, _flash){
+                            flash.push(_flash);
+                        }
+                    }));
+                }
+                if(flash.length === 0){
+                    model = batch;
+                }
+            }else{
+                for(var field in this.fields){
+                    if(model[field] === undefined
+                    && this.fields[field].generate){
+                        //generate the field for them
+                        model[field]=this.fields[field].generate();
+                    }
+                    if(this.fields[field].not){
+                       //make sure no item in the list is equivalent
+                        for(i=0;i<this.fields[field].not.length;i++){
+                            if(model[field] instanceof Array){
+                                //handle an array of simple values
+                                for(j=0;j<model[field].length;j++){
+                                    if(model[field][j]===this.fields[field].not[i]){
+                                        //store the value and msg in flash
+                                        //to pass to the callback
+                                        flash[flash.length]={
+                                            index:j,
+                                            value:model[field][j],
+                                            msg:this.fields[field].msg
+                                        };          
+                                    }
+                                }
+                            }else{
+                                //handle simple values
+                                if(model[field]===this.fields[field].not[i]){
+                                    //store the value and msg in flash
+                                    //to pass to the callback
+                                    flash[flash.length]={
+                                        value:model[field],
+                                        msg:this.fields[field].msg
+                                    };          
+                                }
+                            }
+                        }       
+                    }
+                    if(this.fields[field].pattern ){
+                        if(model[field] instanceof Array){
+                            //handle array of simple values
+                            for(j=0;j<model[field].length;j++){
+                                if(!this.fields[field].pattern.test(model[field][j])){
+                                    //store the value and msg in flash
+                                    //to pass to the callback
+                                    flash[flash.length]={
+                                        index:j,
+                                        value:model[field][j],
+                                        msg:this.fields[field].msg
+                                    };        
+                                }
+                            }
+                        }else{
+                            //handle a simple type
+                            if(!this.fields[field].pattern.test(model[field])){
+                                //store the value and msg in flash
+                                //to pass to the callback
+                                flash[flash.length]={
+                                    value:model[field],
+                                    msg:this.fields[field].msg
+                                };        
+                            }
+                        }
+                    }
+                }  
+            }
+          
+            if(flash.length>0 &&
+                options.error && $.isFunction(options.error)){
+                options.error(model, flash);
+            }else{
+                if(options.success&&$.isFunction(options.success)){
+                    if(options.serialize){
+                        model = this.serialize(model);
+                    }
+                    options.success(model);
+                }
+            }
+            return this;
+        },
+    	serialize : function(model){
+            var serialized = {},
+                multi, 
+                i;
+            for(var field in model){
+                if((this.fields[field]!==undefined ||
+                   '__anything__' in this.fields) && !$.isFunction(model[field])){
+                    if(this.fields[field] && 
+                       this.fields[field].type){
+                        if(this.fields[field].type == 'json'){
+                            //serializes a json blob
+                            serialized[field] = jsPath.js2json(model[field]);
+                        }else if (this.fields[field].type == 'html'){
+                            //serializes a dom html blob
+                            serialized[field] = $('<div>').append( $(model[field]).clone() ).html();
+                        }else if (this.fields[field].type == 'xmllist'){
+                            //serializes a e4x xml blob
+                            serialized[field] = model[field].toString();
+                        }else if (this.fields[field].type == 'jsam'){
+                            //serializes as an array of jsam paths
+                            //requires jsPath plugin
+                            multi = jsPath('..*', model[field], {resultType:"JSAM", pathStyle:"DOT"});
+                            serialized[field] = [];
+                            for(i=0;i<multi.length;i++){
+                                serialized[field][i] = multi[i];
+                            }
+                        } 
+                    }else{
+                        serialized[field] = model[field];
+                    }
+                }
+            }
+            return serialized;
+        },
+        deserialize: function(model){
+            var deserialized;
+            return deserialized;
+        }
+        
+    });
+    
+    $.each([
+        /**create the domain (or table space)*/
+        'create',
+        /**deletes the domain (or table space)*/
+        'destroy',
+        /**retreives available metadata from the domain*/
+        'metadata',
+        /**overwrites specified fields (does not remove unspecied fields)*/
+        'save',
+        /**adds values to specified fields does not overwrite them*/
+        'add',
+        /**removes specified fields or the entire item if no fields are specified*/
+        'remove',
+        /** gets a list of domains if no domain is specified
+        gets a list of items in a domain if no item is specified
+        gets a specific list of items is an array of string if no fields are specified
+        gets a specific item if item is a string if no fields are specified
+        gets a specific set of fields if fields are specified
+        gets a specific set of items and set of fields if fields are specified*/
+        'get',
+        /**executes a query on the domain returning a list of items and/or the requested fields*/
+        'find',
+        /**returns a valid language specific query representing the query object*/
+        'js2query',
+        /**used to page through the results sets from find or large gets*/
+        'next',
+        'previous'
+    ], function(index, value){
+        $M.Model.prototype[value] = function(options){
+           throw new $$.MethodNotImplementedError();
+        };
+    });
+    
+})(  jQuery, Claypool, Claypool.Models);
+/**
+ * @author thatcher
+ */
+(function($,$$,$M){
+    
+	var log;
+	
+    $M.Query = function(options){
+        $.extend(true, this, options,{
+            context: '',
+            selectors:[],
+            expressions:[],
+            orderby:{ direction:'forward' },
+            limit:0,
+            startPage:0,
+            resultsPerPage: 20
+        });
+		log = $.logger('Claypool.Models.Query');
+    };
+    var $Q = $M.Query;
+   
+    $.extend($Q.prototype, {
+       /**
+        * Target Functions
+        * @param {Object} name
+        */
+       items: function(selector){
+           if(selector && (typeof selector == 'string')){
+               // if arg is string
+               // a select `selector` 
+               this.selectors.push(selector);
+           }else if(selector && selector.length && 
+                   (selector instanceof Array)){
+               // if selector is array
+               // a select (`selector[0]`, `selector[1]`, etc) 
+               $.merge(this.selectors,selector);
+           }else{
+               // if arg is not any of the above it is '*'
+               // a select `selector` 
+               this.selectors.push('*');
+           }
+           //chain all methods
+           return this;
+       },
+       names: function(){
+           //chain all methods
+           return this.items('itemName()');
+       },
+       count: function(){
+           //chain all methods
+           return this.items('count()');
+       },
+       /**
+        * Operator Functions
+        * @param {Object} name
+        */
+       is: function(value){
+           _compare(this,'=');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isnot: function(value){
+           _compare(this,'!=');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       islike: function(value){
+           _compare(this,'~');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isnotlike: function(value){
+           _compare(this,'!~');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isgt:function(value){
+           _compare(this,'>');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isgte:function(value){
+           _compare(this,'>=');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isbetween:function(values){
+           _compare(this,'><');
+           _value(this,values);
+           //chain all methods
+           return this;
+       },
+       islte: function(value){
+           _compare(this,'<=');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       islt:function(value){
+           _compare(this,'<');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isin: function(values){
+           _compare(this,'@');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       isnotin: function(values){
+           _compare(this,'!@');
+           _value(this,value);
+           //chain all methods
+           return this;
+       },
+       /**
+        * ResultSet Preparation Functions
+        * @param {Object} name
+        */
+       orderby: function(name){
+           _order(this,name);
+           //chain all methods
+           return this;
+       },
+       reverseorderby: function(name){
+           _order(this, name, 'reverse');
+           //chain all methods
+           return this;
+       },
+       limit: function(count){
+           this.limit = count;
+       },
+       //Pagination functions
+       page: function(i, resultsPerPage){
+           if(resultsPerPage){
+               this.count = resultsPerPage;
+           }
+           this.startPage = i;
+           //chain all methods
+           return this;
+       },
+       next: function(callback){
+           this.startPage++;
+           //chain all methods
+           return this;
+       },
+       previous:function(callback){
+           this.startPage--;
+           //chain all methods
+           return this;
+       }
+    });
+    
+   /**
+    * Expression Functions
+    * @param {Object} name
+    */
+    var sugar = ['','like','gt','gte','between','lte','lt'];
+    for(var i=0;i<sugar.length;i++){
+        $Q.prototype['where'+sugar[i]]=function(name){
+            _express(this, name, 'where', '');
+            return this;
+        };
+        $Q.prototype['wherenot'+sugar[i]]=function(name){
+            _express(this, name, 'where', 'not');
+            return this;
+        };
+        $Q.prototype['whereeither'+sugar[i]]=function(name){
+            _express(this, name, 'either', '');
+            return this;
+        };
+        $Q.prototype['whereneither'+sugar[i]]=function(name){
+            _express(this, name, 'either', 'not');
+            return this;
+        };
+        $Q.prototype['and'+sugar[i]]=function(name){
+            _express(this, name, 'and', '');
+            return this;
+        };
+        $Q.prototype['andnot'+sugar[i]]=function(name){
+            _express(this, name, 'and', 'not');
+            return this;
+        };
+        $Q.prototype['or'+sugar[i]]=function(name){
+            _express(this, name, 'or', '');
+            return this;
+        };
+        $Q.prototype['ornot'+sugar[i]]=function(name){
+            _express(this, name, 'or', 'not');
+            return this;
+        };
+    }
+    
+                           //this,string|object,and|or,like|gte|lte,not 
+    var _express = function(query, condition, logical, operator, negate){
+       var prop = null;
+       operator = operator?operator:'is';
+       
+       if(query && condition && logical &&
+                $.isFunction(query[logical])){
+           
+           if(logical == 'where'){
+               query.expressions = [];
+               logical = 'and';
+           }else if(logical == 'whereeither' || logical == 'whereneither'){
+               query.expressions = [];
+               logical = 'or';
+           }
+           if(typeof condition == 'string'){
+               //or `name` = ""
+               query.expressions.push({
+                   name:condition,
+                   type:logical
+               });
+           }else if(condition &&
+                 	typeof(condition) == 'object' && 
+                 	!(condition instanceof Array)){
+               // if condition is object
+               // where `a` = '1' or `b` = '2'  or `c` = '3'
+               for(prop in condition){
+                   if(typeof(condition[prop])=='string'){
+                       if(negate){
+                           query[logical](prop)['isnot'+operator](condition[prop]);
+                       }else{
+                           query[logical](prop)['isnot'+operator](condition[prop]);
+                       }
+                   }else if(operator===''&&//arrays only apply to equal/not equal operator
+                               condition[prop]&&
+                               condition[prop].length&&
+                               condition[prop] instanceof Array){
+                       if(negate){
+                           query[logical](prop).isnotin(condition[prop]);
+                       }else{
+                           query[logical](prop).isin(condition[prop]);
+                       }
+                   }
+               }
+           }
+       }
+   };
+   var _compare = function(query, symbol){
+       query.expressions[
+           query.expressions.length-1
+       ].operator=symbol;
+   };
+   var _value = function(query, value){
+       query.expressions[
+           query.expressions.length-1
+       ].value=value;
+   };
+   var _name = function(query, name){
+       query.expressions[
+           query.expressions.length-1
+       ].name=name;
+   };
+   var _order = function(query, name, direction){
+       query.orderby = {
+           name:name,
+           direction:(direction||'forward')
+       };
+   };
+   
+   /**
+    * scratch pad 
+    * 
+        var _;
+      
+        //select * from `artists` where `$name` = 'Vox Populi' 
+        //or $tags in ('alternative', 'rock') 
+        _ = new $Q();
+      
+        $('#artistsModel').find(
+           _.items('*').
+             where('$name').
+             is('Vox Populi').
+             or('$tags').
+             isin(['alternative', 'rock']),
+           function(results, pages){
+               //do something with results
+           }
+        );
+        //is equivalent to
+        _ = new $Q();
+        
+        $('#artistsModel').find(
+           _.items('*').
+             where({$name:'Vox Poluli'}).
+             or({'$tags':['alternative', 'rock']}),
+           function(results, pages){
+               //do something with results
+           }
+        );
+        
+        //select (`$name`, `$artistid`) from `artists` where `$tags` in ('alternative', 'rock')
+        _ = new $Q();
+        
+        $('#artistsModel').find(
+           _.items(['$name','$artistid']).
+             where({'$tags':['alternative', 'rock']}),
+           function(results, pages){
+               //do something with results
+           }
+        );
+       
+        //select (`$name`) from `artists` where `$tags` in ('alternative', 'rock')
+        _ = new $Q();
+        
+        $('#artistsModel').find(
+           _.items('$name').
+             where({'$tags':['alternative', 'rock']}),
+           function(results, pages){
+               //do something with results
+           }
+        );
+       
+       
+       //select (itemName()) from `artists` where `$name`="Vox Populi" 
+       // or `$label`="Nonrational"
+        _ = new $Q();
+        
+        $('#artistsModel').find(
+           _.names().
+             either({
+                 '$name':'Vox Populi',
+                 '$label':'Nonrational'
+             }),
+           function(results, pages){
+               //do something with results
+           }
+        );
+        
+       //select (itemName()) from `releases` where `$date` not null  
+       // orderby `$date`
+        _ = new $Q();
+        
+        $('#releasesModel').find(
+           _.names().
+             orderby('$date'),
+           function(results, pages){
+               //do something with results
+           }
+        );
+        
+       //select (count()) from `releases` where `$artist` = "Vox Populi"
+        _ = new $Q();
+        
+        $('#releasesModel').find(
+           _.count().
+             where('$artist').
+             is("Vox Populi"),
+           function(results, pages){
+               //do something with results
+           }
+        );
+   */
+   })(jQuery, Claypool, Claypool.Models);
+/**
+ * @author thatcher
+ */
+(function($,$$,$M){
+    
+    $M.Client = function(options){
+        $.extend(true, this, options);
+    };
+   
+    $.each(['create','destroy','metadata','save','add','remove','get','find','js2query','next','previous'], 
+        function(index, value){
+            $M.Client.prototype[value] = function(options){
+               this.db[value]($.extend(options,{
+                   domain:this.name
+               }));
+               return this;
+            };
+        }
+    );
+    
+})(jQuery, Claypool, Claypool.Models);
+/**
+ * @author thatcher
+ */
+(function($,$$,$M){
+    
+    var log;
+    
+    $M.RestClient = function(options){
+        //they must provide a object which implements
+        //the methods js2json and json2js
+        //we include jsPath's json plugin as a default implementation
+        //when present
+        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
+            jsPath.js2json:options.js2json;
+        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
+            jsPath.json2js:options.json2js;
+        $.extend(true, this, options);
+        this.resturl = $.env('resturl')?$.env('resturl'):'/rest/';
+		log = $.logger('Claypool.Models.RestClient');
+    };
+   
+   $.extend($M.RestClient.prototype, {
+       /**
+        *     create,
+        *         creates the domain for storage of items
+        *     destroy,
+        *         deletes the domain and all items in it
+        *     save,
+        *         save a single item or many items
+        *     remove, 
+        *     load 
+        *         - operates on id an optional object (id, object) 
+        */
+       create: function(options){
+           $.ajax($.extend({},options,{
+                type: 'PUT',
+                url: this.resturl+this.name+'/',
+                dataType:'json',
+                success: function(result){
+                    _success('created data domain (%s)', options.success, result);
+                },
+                error: function(xhr, status, e){
+                    _error('failed to create data domain', options.error, xhr, status, e);
+                }
+            }));
+            return this;
+       },
+       destroy: function(options){
+           $.ajax($.extend({},options,{
+                type: 'DELETE',
+                url: this.resturl+this.name+'/',
+                dataType:'json',
+                success: function(result){
+                    _success('destroyed data domain', options.success, result);
+                },
+                error: function(xhr, status, e){
+                    _error('failed to destroy data domain', options.error, xhr, status, e);
+                }
+            }));
+            return this;
+        },
+        save: function(options){
+            var id;
+            if(!options.batch&&options.id){
+
+                if(options.serialize){
+                   options.data = this.serialize(options.data);
+                }
+                $.ajax($.extend({},options,{
+                    type: 'POST',
+                    url: (this.resturl+this.name+'/'+options.id)+
+                            (options.add?'?add':''),
+                    data: this.js2json(options.data),
+                    contentType:'application/json',
+                    dataType:'json',
+                    processData:false,
+                    success: function(result){
+                        _success('saved data to domain', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('failed to save data to domain', options.error, xhr, status, e);
+                    }
+               }));
+            }else if(options.batch){
+                //process as a batch save
+                //batch is an object of objects, each
+                //property name corresponding to the id
+                //and each property value corresponding
+                //to the item to be saved
+				if(options.serialize){
+	                for(id in options.data){
+	                    options.data[id] = this.serialize(options.data[id]);
+	                }
+				}
+                
+                $.ajax($.extend({},options,{
+                    type: 'POST',
+                    url: (this.resturl+this.name +'/')+
+                            (options.add?'?add':''),
+                    data: this.js2json(options.data),
+                    contentType:'application/json',
+                    processData:false,
+                    dataType:'json',
+                    success: function(result){
+                        _success('saved batch data to domain', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('failed to save batch data to domain', options.error, xhr, status, e);
+                    }
+               }));
+           }
+            return this;
+       },
+       add:function(options){
+           //saves additional fields to the object.
+           this.save($.extend({},options,{add:true}));
+           return this;
+       },
+       remove: function(options){
+           
+           if(options.id){
+               $.ajax($.extend({},options,{
+                   type: 'DELETE',
+                   url: this.resturl+this.name+'/'+options.id,
+                   data:(options.data instanceof Array)?
+                           {data:options.data.join(',')}:
+                           (options.data instanceof Object)?
+                           options.data:
+                           null,
+                   dataType:'json',
+                   success: function(result){
+                       _success('removed item or item data from domain', options.success, result);
+                   },
+                   error: function(xhr, status, e){
+                       _error('failed to delete item or item data from domain', options.error, xhr, status, e);
+                   }
+               }));
+           }
+            return this;
+       },
+       get: function(options){
+           if(options.id && typeof options.id == 'string'){
+               $.ajax($.extend({},options,{
+                   type: 'GET',
+                   url: this.resturl+this.name+'/'+options.id,
+                   dataType:'json',
+                   success: function(result){
+                       _success('retrieved data by id from domain', options.success, result);
+                   },
+                   error: function(xhr, status, e){
+                       _error('failed to retrieved data by id from domain', options.error, xhr, status, e);
+                   }
+               }));
+           }else if(options.id&&options.id.length){
+               //batch get of items specified by array of id
+               $.ajax($.extend({},options,{
+                   type: 'GET',
+                   url: this.resturl+this.name+'/',
+                   data:{id:options.id.join(',')},
+                   dataType:'json',
+                   success: function(result){
+                       _success('successfully for data by ids from domain', options.success, result);
+                   },
+                   error: function(xhr, status, e){
+                       _error('failed to get data by ids from domain', options.error, xhr, status, e);
+                   }
+               }));
+           }else{
+                //get an array of items in the models domain
+                $.ajax($.extend({},options,{
+                    type: 'GET',
+                    url: this.resturl+this.name+'/',
+                    dataType:'json',
+                    success: function(result){
+                        _success('loaded list of ids from domain', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('failed to list ids from domain ', options.error, xhr, status, e);
+                    }
+                }));
+            }
+            return this;
+        },
+        find: function(options){
+            //allow language specific queries to be hand
+            //constructed and used here by simply passing 
+            //the query as a string.  the server will
+            //use content negotiation to determine whether
+            //to treat it as json serialized or a native query
+            if(options.select){
+                if(typeof options.select == 'object'){
+                    if(!(options.select instanceof Query)){
+                        //using shorthand object notation to define the query
+                        //so go ahead and create an internal Query object from
+                        //it.
+                        options.select = new Query(options.select);
+                    }
+                    //set the context for the query if its not a native
+                    //query string
+                    options.select.context = this.name;
+                }
+                $.ajax($.extend({},options,{
+                    type: 'POST',
+                    url: this.resturl,
+                    data: (typeof options.select == 'string')?
+                        options.select:this.js2json(options.select),
+                    contentType:(typeof options.select == 'string')?
+                        'text/plain':'application/json',
+                    processData:false,
+                    dataType:'json',
+                    success: function(result){
+                        _success('saved item to domain', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('failed to save item to domain', options.error, xhr, status, e);
+                    }
+                }));
+            }
+            return this;
+        },
+        next: function(options){
+            this.find(query.next(), callback);
+            return this;
+        },
+        previous: function(options){
+            this.find(query.previous(), callback);
+            return this;
+        }
+    });
+    
+    
+    var _success = function(msg, callback, result, pager){
+        log.debug('loaded list of items from domain: %s', result);
+        if(callback&&$.isFunction(callback)){
+            callback(result, pager);
+        }
+    };
+    
+    var _error = function(msg, callback, xhr, status, e){
+        log.error( msg+' %s-%s', xhr.status, status).
+            exception(e);
+        if(callback&&$.isFunction(callback)){
+            //second arg implies error condition occured
+            callback([{msg:msg}], true);
+        }
+    };
+    
+})(jQuery, Claypool, Claypool.Models);
+/**
+ * @author thatcher
+ */
+(function($,$$,$M){
+    var log;
+    //Factory is really just a static function
+    $M.Factory = function(options){
+        options = options||{};
+        log = log||$.logger('Claypool.Models.Factory');
+        
+        var DB,
+            dbconnection;
+        
+        //select the db client implementation
+        //
+        // - 'rest' is entirely abstract and is the most reusable accross databases
+        //   since it requires no database specific implementations by the client.
+        //   the rest server-side services would generally use the 'direct' db client then
+        //   to service the rest clients requests
+        //
+        // - 'direct' requires a reference to the database plugin but is otherwise
+        //   generic as well. the db implementation shares a set of
+        //   dbconnection parameters which are used to initialize the local
+        //   clients connection
+        var dbclient = options&&options.dbclient?
+            options.dbclient:$.env('dbclient');
+        if(!dbclient){
+            dbclient = 'rest';
+        }
+        log.debug("loading database client connection %s", dbclient);
+        if(dbclient=='rest'){
+            dbclient = new $M.RestClient(options);
+        }else if(dbclient == 'direct'){
+            //get the database implementation and connection information
+            DB = options&&options.db?
+                    options.db:$.env('db');
+            dbconnection = options&&options.dbconnection?
+                    options.dbconnection:$.env('dbconnection');
+            log.debug("loading database implementation %s", DB);
+            if(typeof(DB)=='string'){
+                log.debug("resolving database implementation %s", DB);
+                DB = $.resolve(DB);
+            }
+            dbclient = new $M.Client($.extend({
+                //initialize the database connection
+                db: new DB(dbconnection)
+			},options));
+        }
+        return dbclient;
+    };
+    
+})(jQuery, Claypool, Claypool.Models);
+/**
+ * @author thatcher
+ */
+(function($,$$,$M){
+    
+    $.extend($, {
+        model: function(name, fields, options){
+            return new $M.Model(name, fields, options);
+        },
+        query: function(options){
+            return new $M.Query(options);
+        }
+    });
+    
+})(jQuery, Claypool, Claypool.Models);
 
 Claypool.Server={
 /*
@@ -4256,227 +5187,283 @@ Claypool.Server={
     
 })(  jQuery, Claypool, Claypool.Server );
 
-
-
 /**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
+ * @author thatcher
  */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.ReSTScaffold = function(options){
-        $$.extend(this, $$Web.Servlet);
-        $.extend( true, this, options);
-        this.logger = $.logger("Claypool.Server.ReSTScaffold");
-        this.Model  = $.$(options.model);
+(function($, $$, $M, $Web){
+    
+    var log;
+    
+    $Web.RestServlet = function(options){
+        $$.extend(this, $Web.Servlet);
+        $.extend(true, this, $M.Factory(options));
+        log = $.logger('Claypool.Server.RestServlet');
+        //they must provide a object which implements
+        //the methods js2json and json2js
+        //we include jsPath's json plugin as a default implementation
+        //when present
+        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
+            jsPath.js2json:options.js2json;
+        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
+            jsPath.json2js:options.json2js;
     };
     
-    $.extend($$Web.ReSTScaffold.prototype,
-        $$Web.Servlet.prototype,{
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handleGet:function(request, response){
-            var instance, id$format, 
-                _this = this, p = request.requestURL;
-            if(p){
-                id$format = p.match(/(\d+)\.(\w+)$/);
-                if(id$format){
-                    //Find an existing record
-                    this.logger.debug("Getting Instance %", id$format[1]);
-                    instance = new this.Model(Number(id$format[1]));
-                    response.body = this.Model.serialize(instance, id$format[2]);
-                    response.headers["Content-Type"] =
-                        "text/"+id$format[2];
+    $.extend($Web.RestServlet.prototype, 
+            $Web.Servlet.prototype,{
+        handleGet: function(request, response){
+            var _this = this,
+			    domain = response.params('domain'),
+                id = response.params('id'),
+                ids,
+                select;
+            log.debug("Handling GET for %s %s", domain, id);
+            if(!domain && !id){
+                //response is an array of all domain names
+                this.db.get({
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
+            }else if(domain && !id){
+                log.debug("Handling GET for %s %s", domain, request.params);
+                for(var param in request.parameters){
+                    log.debug('param[%s]=%s', param, request.parameters[param]);
+                }
+                if(request.parameters&&('id' in request.parameters)){
+                    log.debug("LIST OF ITEMS!!!");
+                    //response is batch get of items by id
+                    ids = request.parameters.id.split(',');
+                    select = 'select * from `'+domain+'` where itemName() in (\''+
+                        ids.join("','")+
+                    '\')';
+                    log.debug("%s",select);
+                    this.db.find({
+                        select: select,
+                        async: false,
+                        success: function(result){
+                            response.headers.status = 200;
+                            response.body = _this.js2json(
+                                $.extend(result, response.params())
+                            );
+                        },
+	                    error: function(result){
+	                        handleError(result, response, _this);
+	                    }
+                    });
                 }else{
-                    id$format = p.match(/(\w+)$/);
-                    if(id$format){
-                        p.replace(/(\w+)$/, function(url, action){
-                            _this.logger.debug("using custom action : %s", action);
-                            if($.isFunction(_this[action])){
-                                _this[action](request, response);
-                            }
-                            return action;
-                        });
-                        return response;
-                    }else{
-                        //the search is a good catch-all for a get
-                        this.search(request,response);
-                    }
+                    log.debug("LIST OF ITEM NAMES!!!", domain, id);
+                    //response is list of item names for the domain
+                    this.db.find({
+                        select: "select itemName() from `"+domain+"`",
+                        async: false,
+                        success: function(result){
+                            response.headers.status = 200;
+                            response.body = _this.js2json(
+                                $.extend(result, response.params())
+                            );
+                        },
+	                    error: function(result){
+	                        handleError(result, response, _this);
+	                    }
+                    });
                 }
-                this.chooseView(request, response);
+            }else if(domain && id && id!='metadata'){
+                //response is the record
+                this.db.get({
+                    domain: domain,
+                    id: id,
+                    async: false,
+                    dataType:'text',
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
+            }else if(domain && id && id == 'metadata'){
+                this.db.metadata({
+                    domain: domain,
+                    id: id,
+                    async: false,
+                    dataType:'text',
+                    success:function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
             }
-            return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        search: function(request, response){
-            this.logger.debug("Searching for records.");
-            var searchTerms =  request.parameters.searchTerms||'*',
-                itemsPerPage = Number(request.parameters.itemsPerPage||40),
-                startIndex =   Number(request.parameters.startIndex||0), 
-                offsetIndex =  Number(request.parameters.offsetIndex||0),
-                startPage =    Number(request.parameters.startPage||0),
-                language = "en-US",
-                inputEncoding = "utf-8",
-                outputEncoding = "utf-8",
-                results = [],
-                filter,
-                i;
-            for (var param in request.parameters ){
-                this.logger.debug("checking for filter % ", param);
-                for(i=0;i<this.Model._meta.fields.length;i++){
-                    if(this.Model._meta.fields[i].fieldName == param){
-                        this.logger.debug("adding filter % = ? (%)", param, request.parameters[param]);
-                        filter = filter? filter.filter(param + " = ?", request.parameters[param]):
-                            this.Model.filter(param + " = ?", request.parameters[param]);
+        handlePost: function(request, response){
+            var _this = this,
+			    domain = response.params('domain'),
+                id = response.params('id'),
+                item,
+                items,
+                query;
+            log.debug("Handling POST for %s %s", domain, id).
+                debug("Reading POST body %s", request.body);
+            
+            if(domain && id){
+                //create a new record(s)
+                log.debug('saving single object', request.body);
+                item = this.json2js(request.body);
+                this.db.save({
+                    domain: domain,
+                    id:id,
+                    data:item,
+                    async: false,
+                    replace: ('update' in request.parameters)?false:true,
+                    success: function(result){
+                        var body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                        log.debug('response %s', body);
+                        response.headers.status = 200;
+                        response.body = body;
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
+                });
+            }else if(domain && !id){
+                log.debug('saving array of objects (bulk save)');
+                items = this.json2js(request.body);
+    			this.db.save({
+                    domain: domain,
+                    data: items,
+                    async: false,
+					batch: true,
+                    replace: ('update' in request.parameters)?false:true,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                        log.debug('resultset %s', response.body);
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
+            }else if(!domain && !id){
+                //is is a general query string or a json
+                //serialization used to build a query
+                //dynamically - use the content-type
+                //header
+                query = request.body;
+                if(request.contentType.match('application/json')){
+                    query = js2query(this.json2js(query));
                 }
-            }
-            filter = filter ? filter : this.Model.all();
-            if(searchTerms == "*"){
-                results =   filter.
-                            limit(itemsPerPage).
-                            offset((startPage*itemsPerPage)+offsetIndex+startIndex).
-                            toArray();
-                for(i=0;i<results.length;i++){
-                    results[i] = this.Model.serialize(results[i]);
-                }
-                this.logger.debug("Found %s results from search.", results.length);
-                response.m({
-                    xmlns$opensearch    : "http://a9.com/-/spec/opensearch/1.1/",
-                    searchTerms         : searchTerms,
-                    startPage           : startPage,
-                    totalResults        : results.length,
-                    startIndex          : startIndex,
-                    itemsPerPage        : itemsPerPage,
-                    results             : results
+                log.debug('executing query \n%s', query);
+                this.db.find({
+                    select:query,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                        log.debug('resultset %s', response.body);
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
                 });
             }
             
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handlePost: function(request, response){
-            var instance, newuser, id$format, p = request.requestURL,
-                _this = this;
-            this.logger.debug("ReSTService POST: \n%s", request.body);
-            if(p){
-                if(p.match(/(\d+)\.(\w+)$/)){
-                    id$format = p.match(/(\d+)\.(\w+)$/);
-                    //Update an existing record
-                    this.logger.debug("Updating Instance %", id$format[1]);
-                    instance = this.Model(Number(id$format[1]));
-                    //UPDATE
-                    newinstance = this.Model.deserialize(request.body, id$format[2]);
-                    newinstance = new this.Model(newinstance);
-                    newinstance.setPkValue(instance.getPkValue());
-                    this.Model.transaction(function(){
-                        instance.remove();
-                        newinstance.save();
-                    });
-                    response.body = newinstance.getPkValue();
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }else if(p.match(/(new)\.(\w+)$/)){
-                    id$format = p.match(/(new)\.(\w+)$/);
-                    this.logger.debug("Saving New Instance (formatted as %s) \n%s ", id$format[2], request.body);
-                    newinstance = this.Model.deserialize(request.body, id$format[2]);
-                    newinstance = new this.Model(newinstance);
-                    this.logger.debug("Deserialized new instance %s ", newinstance);
-                    //SAVE
-                    newinstance.save();
-                    response.body = newinstance.getPkValue();
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }else if(p.match(/search$/)){
-                    this.search(request,response);
-                    this.chooseView(request, response);
-                }else {
-                    p.replace(/(\w+)$/, function(url, action){
-                        _this.logger.debug("using custom action : %s", action);
-                        if($.isFunction(_this[action])){
-                            _this[action](request, response);
-                        }
-                        return action;
-                    });
-                }
+        handlePut: function(request, response){
+            var _this = this,
+			    domain = response.params('domain');
+            log.debug("Handling PUT for %s %s", domain);
+            if(domain){
+                //create a new domain
+                this.db.create({
+                    domain: domain,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
             }
-            this.logger.debug("POST RESPONSE \n %s", response.body);
-            return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
         handleDelete: function(request, response){
-            var instance, id$format, p = request.requestURL;
-            if(p){
-                id$format = p.match(/(\d+)\.(\w+)$/);
-                if(id$format){
-                    //Delete an existing record
-                    this.logger.debug("Deleting Instance %", id$format[1]);
-                    instance = this.Model.find(id$format[1]);
-                    instance.remove();
-                    response.body = "";
-                    response.headers.status = 200;
-                    response.headers["Content-Type"] = "text/plain";
-                }
+            var _this = this,
+			    domain = response.params('domain'),
+                id = response.params('id');
+            log.debug("Handling DELETE for %s %s", domain, id);
+
+            if(domain && id){
+                //delete an item
+                this.db.remove({
+                    domain: domain,
+                    id:id,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
+            }else if(domain && !id){
+                //delete a domain
+    			this.db.destroy({
+                    domain: domain,
+                    async: false,
+                    success: function(result){
+                        response.headers.status = 200;
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
+                    }
+                });
             }
-            return response;
-        },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        chooseView:function(request, response){
-            var p = request.requestURL;
-            if(p.match(/atom$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "application/atom+xml";
-                response.v('.atom');
-            }else if(p.match(/xml$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/xml";
-                response.v('.xml');
-            }else if(p.match(/xhtml$/)){
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/html";
-                response.v('.xhtml');
-            }else{
-                response.headers.status = 200;
-                response.headers["Content-Type"] = "text/json";
-                response.v('.json');
-            }
-            response.render();
         }
     });
     
-})(  jQuery, Claypool, Claypool.Server );
+    var handleError = function(result, response, servlet){
+        var body =  servlet.js2json(result);
+        log.error('failed. %s', body);
+        response.headers.status = result.$code?result.$code:500;
+        response.body = body?body:
+              "{'db$error':{"+
+                "'$code'  : 500,"+
+                "'$type'  : 'UnknownClaypoolWrapperError',"+
+                "'$msg'   : 'unknown error, check network'"+
+               "}}";
+    };
+    
+    
+})(jQuery, Claypool, Claypool.Models, Claypool.Server);
 
 /**
  * Descibe this class
@@ -4485,6 +5472,7 @@ Claypool.Server={
  * @requires OtherClassName
  */
 (function($, $$, $$Web){
+    var log;
     /**
      * @constructor
      */
@@ -4492,164 +5480,119 @@ Claypool.Server={
         $$.extend(this, $$Web.Servlet);
         this.rewriteMap = null;//Array of Objects providing url rewrites
         $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.WebProxyServlet");
+        log = $.logger("Claypool.Server.WebProxyServlet");
         this.router = new $$.Router();
         this.strategy = this.strategy||"first";
-        this.logger.debug("Compiling url rewrites %s.", this.rewriteMap);
+        log.debug("Compiling url rewrites %s.", this.rewriteMap);
         this.router.compile(this.rewriteMap, "urls");//, "rewrite");
     };
-    
     $.extend($$Web.WebProxyServlet.prototype, 
         $$Web.Servlet.prototype,{
         handleGet: function(request, response){
-            this.logger.debug("Handling proxy: %s", request.requestURI);
-            var _this = this;
-            var proxyURL = this.router[this.strategy||"all"]( request.requestURI );
-            request.headers["Claypool-Proxy"] = this.proxyHost||"127.0.0.1";
-			var params = {};
-			for (var prop in request.parameters){
-				this.logger.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
-				params[prop+'']=request.parameters[prop]+'';
-			}
+            var options = _proxy.route(request, this);
+            var proxyURL = options.proxyURL,
+                params   = options.params;
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
-                _this.logger.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
+                log.debug("Proxying get request to: %s", proxyURL[0].payload.rewrite);
                 $.ajax({
                     type:"GET",
                     dataType:"text",
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend: function(xhr){
-                        _this.logger.debug("Copying Request headers for Proxied Request");
-                        for(var header in request.headers){
-                            _this.logger.debug("Setting proxied request header %s: %s",header, request.headers[header] );
-                            if(header == 'host'){continue;}
-                            xhr.setRequestHeader(header, request.headers[header]);
-                        }
-                        response.headers = {};
-                    },
-                    success: function(text){
-                        _this.logger.debug("Got response for proxy \n %s.", text);
-                        response.body = text;
-                    },
-                    error: function(xhr, status, e){
-                        _this.logger.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
-                        if(e){_this.logger.exception(e);}
-                        response.body = xhr.responseText;
-                    },
-                    complete: function(xhr, status){
-                        _this.logger.debug("Proxy Request Complete, Copying response headers");
-                        var proxyResponseHeaders = xhr.getAllResponseHeaders();
-                        var responseHeader;
-                        var responseHeaderMap;
-                        _this.logger.debug("Complete Proxy response header: \n %s" ,proxyResponseHeaders);
-                        proxyResponseHeaders = proxyResponseHeaders.split("\r\n");
-                        for(var i = 0; i < proxyResponseHeaders.length; i++){
-                            responseHeaderMap = proxyResponseHeaders[i].split(":");
-                            try{
-                                _this.logger.debug("setting response header %s %s", responseHeaderMap[0], responseHeaderMap.join(":"));
-                                response.headers[responseHeaderMap.shift()] = responseHeaderMap.join(":");
-                            }catch(e){
-                                _this.logger.warn("Unable to set a proxied response header");
-                                _this.logger.exception(e);
-                            }
-                        }
-                        response.headers["Claypool-Proxy"] = proxyURL[0].payload.rewrite;
-                        response.headers["Content-Encoding"] = proxyURL[0].payload.contentEncoding||"";
-                        if(proxyURL[0].payload.contentType){
-                            //override the content type
-                            response.headers["Content-Type"] = proxyURL[0].payload.contentType;
-                        }
-                    }
+                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    success:function(text){_proxy.success(response, text);},
+                    error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
+                    complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
                 });
-            }
-            return response;
-        }
-    });
-    
-})(  jQuery, Claypool, Claypool.Server );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.E4XServlet = function(options){
-        $$.extend(this,$$Web.Servlet);
-        $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.E4XServlet");
-    };
-    
-    $.extend($$Web.E4XServlet.prototype,
-        $$Web.Servlet.prototype, {
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handleGet: function(request, response){
-            var _this = this;
-            //for this service we use the a json string as the model
-            if(!typeof(response.m('postparams')) == "string"){
-                //no model has been set by a post
-                if($.isFunction($.js2json)){
-                    response.m("postparams", $.js2json(request.parameters));
-                }else{
-                    response.m("postparams","{}");
-                }
-            }
-            try{
-                this.logger.info("Loading E4X from url :\n%s", request.requestURI);
-                $.ajax({ 
-                    type:'GET',  
-                    url:(this.baseURI||"./")+request.requestURI, 
-                    dataType:"text/plain",
-                    async:false,
-                    success:function(text){
-                        _this.logger.info("Successfully retreived E4X :\n%s \n Evaluating with model %s",
-                            request.requestURI, response.m("postparams"));
-                        var e4x = eval("(function(){"+
-                            "var model = "+response.m("postparams")+";"+
-                            "return new XMLList(<>"+text+"</>);"+
-                        "})();");
-                        response.body = e4x.toString();
-                        response.headers["Content-Type"] = "text/html";
-                        response.headers.status = 200;
-                        _this.logger.info("Finished Evaluating E4X :\n%s", request.requestURI);
-                    },
-                    error:function(xhr, status, e){
-                        _this.logger.info("Error retreiving E4X :\n%s", request.requestURI);
-                        response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
-                        response.headers["Content-Type"] = "text/html";
-                        response.headers.status = 200;
-                    }
-                });
-            }catch(e){
-                this.logger.error("Error evaluating. \n\n%s", request.requestURI).
-                    exception(e);
-                response.body = e.toString();
             }
             return response;
         },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handlePost: function(request, response){
-            response.m("postparams",String(request.body));//should be a json string
-            return this.handleGet(request,response);
+        handlePost:function(request, response){
+            var options = _proxy.route(request, this);
+            var proxyURL = options.proxyURL,
+                params   = options.params;
+            if(proxyURL && proxyURL.length && proxyURL.length > 0){
+                log.debug("Proxying post request to: %s", proxyURL[0].payload.rewrite);
+                $.ajax({
+                    type:"POST",
+                    dataType:"text",
+                    async:false,
+                    data:params,
+                    url:proxyURL[0].payload.rewrite+'',
+                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    success:function(text){_proxy.success(response, text);},
+                    error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
+                    complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
+                });
+            }
+            return response;
         }
     });
+    
+    
+    var _proxy = {
+        route:function(request, options){
+            log.debug("Handling proxy: %s", request.requestURI);
+            var proxyURL = options.router[options.strategy||"all"]( request.requestURI );
+            request.headers["Claypool-Proxy"] = options.proxyHost||"127.0.0.1";
+			var params = {};
+			for (var prop in request.parameters){
+				log.debug("request.parameters[%s]=%s", prop, request.parameters[prop]);
+				params[prop+'']=request.parameters[prop]+'';
+			}
+            var body = (request.body&&request.body.length)?request.body:'';
+            return {
+                proxyURL:proxyURL,
+                params:params,
+                body:body
+            };
+        },
+        beforeSend: function(request, response, xhr){
+            log.debug("Copying Request headers for Proxied Request");
+            for(var header in request.headers){
+                log.debug("Setting proxied request header %s: %s",header, request.headers[header] );
+                xhr.setRequestHeader(header, request.headers[header]);
+            }
+            response.headers = {};
+        },
+        success: function(response, text){
+            log.debug("Got response for proxy \n %s.", text);
+            response.body = text+'';
+        },
+        error: function(response, xhr, status, e){
+            log.error("Error proxying request. STATUS: %s", status?status:"UNKNOWN");
+            if(e){log.exception(e);}
+            response.body = xhr.responseText+'';
+        },
+        complete: function(response, proxyURL, xhr, status){
+            log.debug("Proxy Request Complete, Copying response headers");
+            var proxyResponseHeaders = xhr.getAllResponseHeaders();
+            var responseHeader;
+            var responseHeaderMap;
+            log.debug("Complete Proxy response header: \n %s" ,proxyResponseHeaders);
+            proxyResponseHeaders = proxyResponseHeaders.split("\r\n");
+            for(var i = 0; i < proxyResponseHeaders.length; i++){
+                responseHeaderMap = proxyResponseHeaders[i].split(":");
+                try{
+                    log.debug("setting response header %s %s", responseHeaderMap[0], responseHeaderMap.join(":"));
+                    response.headers[responseHeaderMap.shift()] = responseHeaderMap.join(":");
+                }catch(e){
+                    log.warn("Unable to set a proxied response header");
+                    log.exception(e);
+                }
+            }
+            log.debug('response status (%s)', xhr.status);
+            response.headers.status = Number(xhr.status);
+            response.headers["Claypool-Proxy"] = proxyURL[0].payload.rewrite+'';
+            response.headers["Content-Encoding"] = proxyURL[0].payload.contentEncoding||"";
+            response.headers["Transfer-Encoding"] = proxyURL[0].payload.transferEncoding||"";
+            if(proxyURL[0].payload.contentType){
+                //override the content type
+                response.headers["Content-Type"] = proxyURL[0].payload.contentType+'';
+            }
+        }
+    };
     
 })(  jQuery, Claypool, Claypool.Server );
 
@@ -4782,7 +5725,7 @@ Claypool.Server={
     var console;
     
     $.extend($, {
-        _ : function(command){
+        '>' : function(command){
             console = console || new $$Web.Console();
             console.run(command);
         },

@@ -3,6 +3,8 @@
  */
 (function($,$$,$M){
     
+	var log;
+	
     $M.Query = function(options){
         $.extend(true, this, options,{
             context: '',
@@ -13,6 +15,7 @@
             startPage:0,
             resultsPerPage: 20
         });
+		log = $.logger('Claypool.Models.Query');
     };
     var $Q = $M.Query;
    
@@ -41,11 +44,11 @@
        },
        names: function(){
            //chain all methods
-           return this.select('itemName()');
+           return this.items('itemName()');
        },
        count: function(){
            //chain all methods
-           return this.select('count()');
+           return this.items('count()');
        },
        /**
         * Operator Functions

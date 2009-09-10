@@ -2,12 +2,13 @@
 /**
  * @author thatcher
  */
-(function($, $$, $Web){
+(function($, $$, $M, $Web){
     
     var log;
     
-    $Web.RestServlet = function(db, options){
-        $$.extend(this, $$Web.Servlet);
+    $Web.RestServlet = function(options){
+        $$.extend(this, $Web.Servlet);
+        $.extend(true, this, $M.Factory(options));
         log = $.logger('Claypool.Server.RestServlet');
         //they must provide a object which implements
         //the methods js2json and json2js
@@ -17,20 +18,13 @@
             jsPath.js2json:options.js2json;
         this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
             jsPath.json2js:options.json2js;
-        $.extend(true, this, options);
-        //implementations are expected to pass the correct
-        //options to correctly initialize the db connection
-        //with the following call
-        this.db = db;
-        //finally they must provide an implementation for the
-        //js2query method if they wish to support the Query 
-        //convenience methods and not just native query strings
     };
     
     $.extend($Web.RestServlet.prototype, 
             $Web.Servlet.prototype,{
         handleGet: function(request, response){
-            var domain = response.params('domain'),
+            var _this = this,
+			    domain = response.params('domain'),
                 id = response.params('id'),
                 ids,
                 select;
@@ -41,12 +35,12 @@
                     async: false,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }else if(domain && !id){
@@ -67,13 +61,13 @@
                         async: false,
                         success: function(result){
                             response.headers.status = 200;
-                            response.body = this.js2json(
+                            response.body = _this.js2json(
                                 $.extend(result, response.params())
                             );
                         },
-                        error: function(xhr, status, e){
-                            handleError(xhr,status, e, response);
-                        }
+	                    error: function(result){
+	                        handleError(result, response, _this);
+	                    }
                     });
                 }else{
                     log.debug("LIST OF ITEM NAMES!!!", domain, id);
@@ -83,49 +77,53 @@
                         async: false,
                         success: function(result){
                             response.headers.status = 200;
-                            response.body = this.js2json(
+                            response.body = _this.js2json(
                                 $.extend(result, response.params())
                             );
                         },
-                        error: function(xhr, status, e){
-                            handleError(xhr,status, e, response);
-                        }
+	                    error: function(result){
+	                        handleError(result, response, _this);
+	                    }
                     });
                 }
             }else if(domain && id && id!='metadata'){
                 //response is the record
                 this.db.get({
                     domain: domain,
-                    item: id,
+                    id: id,
                     async: false,
                     dataType:'text',
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }else if(domain && id && id == 'metadata'){
                 this.db.metadata({
                     domain: domain,
-                    item: id,
+                    id: id,
                     async: false,
                     dataType:'text',
                     success:function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
+                    },
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }
         },
         handlePost: function(request, response){
-            var domain = response.params('domain'),
+            var _this = this,
+			    domain = response.params('domain'),
                 id = response.params('id'),
                 item,
                 items,
@@ -135,40 +133,44 @@
             
             if(domain && id){
                 //create a new record(s)
+                log.debug('saving single object', request.body);
                 item = this.json2js(request.body);
-                //single object
                 this.db.save({
                     domain: domain,
-                    item:id,
-                    attributes:item,
+                    id:id,
+                    data:item,
                     async: false,
                     replace: ('update' in request.parameters)?false:true,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = this.js2json(
+                        var body = _this.js2json(
                             $.extend(result, response.params())
                         );
+                        log.debug('response %s', body);
+                        response.headers.status = 200;
+                        response.body = body;
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }else if(domain && !id){
+                log.debug('saving array of objects (bulk save)');
                 items = this.json2js(request.body);
-                //array of objects (bulk save)
     			this.db.save({
                     domain: domain,
-                    items: items,
+                    data: items,
                     async: false,
+					batch: true,
                     replace: ('update' in request.parameters)?false:true,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
+                        log.debug('resultset %s', response.body);
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr, status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }else if(!domain && !id){
@@ -186,39 +188,42 @@
                     async: false,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(result);
+                        response.body = _this.js2json(
+                            $.extend(result, response.params())
+                        );
                         log.debug('resultset %s', response.body);
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }
             
         },
         handlePut: function(request, response){
-            var domain = response.params('domain'),
-                id = response.params('id');
-            log.debug("Handling PUT for %s %s", domain, id);
-            if(domain && !id){
+            var _this = this,
+			    domain = response.params('domain');
+            log.debug("Handling PUT for %s %s", domain);
+            if(domain){
                 //create a new domain
                 this.db.create({
                     domain: domain,
                     async: false,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }
         },
         handleDelete: function(request, response){
-            var domain = response.params('domain'),
+            var _this = this,
+			    domain = response.params('domain'),
                 id = response.params('id');
             log.debug("Handling DELETE for %s %s", domain, id);
 
@@ -226,16 +231,16 @@
                 //delete an item
                 this.db.remove({
                     domain: domain,
-                    item:id,
+                    id:id,
                     async: false,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }else if(domain && !id){
@@ -245,25 +250,29 @@
                     async: false,
                     success: function(result){
                         response.headers.status = 200;
-                        response.body = this.js2json(
+                        response.body = _this.js2json(
                             $.extend(result, response.params())
                         );
                     },
-                    error: function(xhr, status, e){
-                        handleError(xhr,status, e, response);
+                    error: function(result){
+                        handleError(result, response, _this);
                     }
                 });
             }
         }
     });
     
-    var handleError = function(xhr, status, e, response){
-        log.error('failed. %s', status).
-            error('response text:\n\n%s', xhr.responseText).
-            exception(e);
-        response.headers.status = xhr.responseHeaders.status;
-        response.body = xhr.responseText;
+    var handleError = function(result, response, servlet){
+        var body =  servlet.js2json(result);
+        log.error('failed. %s', body);
+        response.headers.status = result.$code?result.$code:500;
+        response.body = body?body:
+              "{'db$error':{"+
+                "'$code'  : 500,"+
+                "'$type'  : 'UnknownClaypoolWrapperError',"+
+                "'$msg'   : 'unknown error, check network'"+
+               "}}";
     };
     
     
-})(jQuery, Claypool, Claypool.Server);
+})(jQuery, Claypool, Claypool.Models, Claypool.Server);

@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool 1.0.0 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.0.1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -792,6 +792,11 @@ var Claypool={
                      $.config('env.'+arguments[1]));
                  return env;
              }else{
+                 if(arguments.length === 1 && !(typeof(arguments[0])=='string')){
+                    //a convenience method for defining environments
+					//like $.config('env',{});
+					return $.config('env', arguments[0]);
+                 }
                  return env[arguments[0]]||null;
              }
          }

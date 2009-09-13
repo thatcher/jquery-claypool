@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<!-- =============================================================== -->
+<!-- Configure the test-jndi webapp                                  -->
+<!-- =============================================================== -->
+<Configure id='wac' class="org.mortbay.jetty.webapp.WebAppContext">
+
+<!-- Ensure Jetty Plus features are enabled for this webapp                      -->
+  <Set name="configurationClasses">
+    <Array type="java.lang.String">
+      <Item>org.mortbay.jetty.webapp.WebInfConfiguration</Item>
+      <Item>org.mortbay.jetty.plus.webapp.EnvConfiguration</Item>
+      <Item>org.mortbay.jetty.plus.webapp.Configuration</Item>
+      <Item>org.mortbay.jetty.webapp.JettyWebXmlConfiguration</Item>
+      <Item>org.mortbay.jetty.webapp.TagLibConfiguration</Item>
+    </Array>
+  </Set>
+
+  <Set name="contextPath">/test-jndi</Set>
+  <Set name="war"><SystemProperty name="jetty.home" default="."/>/contexts/test-jndi.d</Set>
+  <Set name="extractWAR">false</Set>
+  <Set name="copyWebDir">false</Set>
+  <Set name="descriptor"><SystemProperty name="jetty.home" default="."/>/contexts/test-jndi.d/WEB-INF/instruction-web.xml</Set>
+
+
+
+<!-- Define a couple of system properties. These are jdbc and jta impl specific.  -->
+  <Call class="java.lang.System" name="setProperty">
+    <Arg>derby.system.home</Arg>
+    <Arg><SystemProperty name="java.io.tmpdir"/></Arg>
+  </Call>
+
+  <Call class="java.lang.System" name="setProperty">
+    <Arg>com.atomikos.icatch.file</Arg>
+    <Arg><SystemProperty name="jetty.home" default="."/>/contexts/test-jndi.d/WEB-INF/classes/jta.properties</Arg>
+  </Call>
+
+  <!-- Define an env entry with Server scope for java:comp/env                   -->
+  <New id="woggle"  class="org.mortbay.jetty.plus.naming.EnvEntry">   
+    <Arg><Property name='server'/></Arg>
+    <Arg>woggle</Arg>
+    <Arg type="java.lang.Integer">4000</Arg> 
+    <Arg type="boolean">false</Arg>
+  </New>
+
+  <!-- Define an env entry with webapp scope for java:comp/env                   -->
+  <New id="wiggle"  class="org.mortbay.jetty.plus.naming.EnvEntry">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>wiggle</Arg>
+    <Arg type="java.lang.Double">100</Arg>
+    <Arg type="boolean">true</Arg>
+  </New>
+
+ <!-- Mail Session setup                                          -->
+ <New id="xxxmail" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+     <Arg>mail/Session</Arg>
+     <Arg>
+       <New class="org.mortbay.naming.factories.MailSessionReference">
+         <Set name="user">CHANGE-ME</Set>
+         <Set name="password">CHANGE-ME</Set>
+         <Set name="properties">
+           <New class="java.util.Properties">
+             <Put name="mail.smtp.auth">false</Put> <!-- change to true if you want to authenticate -->
+             <Put name="mail.smtp.host">CHANGE-ME</Put>
+             <Put name="mail.from">CHANGE-ME</Put>
+             <Put name="mail.debug">true</Put>
+           </New>
+          </Set>
+       </New>
+     </Arg>
+ </New>
+
+  <!-- =============================================================== -->
+  <!-- Configuring Transactions and XA Datasources                     -->
+  <!-- Uncomment EITHER the setup for Atomikos OR for Jotm             -->
+  <!-- =============================================================== -->
+
+
+  <!-- Atomikos        
+  
+
+  <New id="tx" class="org.mortbay.jetty.plus.naming.Transaction">
+   <Arg>
+     <New class="com.atomikos.icatch.jta.UserTransactionImp"/>
+   </Arg>
+  </New>
+
+
+  
+
+
+  <New id="mydatasource" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource</Arg>
+    <Arg>
+     <New class="com.atomikos.jdbc.SimpleDataSourceBean"><Set name="xaDataSourceClassName">org.apache.derby.jdbc.EmbeddedXADataSource</Set><Set name="xaDataSourceProperties">databaseName=testdb;createDatabase=create</Set><Set name="UniqueResourceName">mydatasource</Set></New>
+    </Arg>
+   </New>
+
+
+  
+
+  <New id="mydatasource2" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource2</Arg>
+    <Arg>
+       <New class="com.atomikos.jdbc.SimpleDataSourceBean"><Set name="xaDataSourceClassName">org.apache.derby.jdbc.EmbeddedXADataSource</Set><Set name="xaDataSourceProperties">databaseName=testdb2;createDatabase=create</Set><Set name="UniqueResourceName">mydatasource2</Set></New>
+    </Arg>
+   </New>
+   END OF ATOMIKOS -->
+
+  <!-- JOTM
+  <New id="jotm" class="org.objectweb.jotm.Jotm"><Arg type="boolean">True</Arg><Arg type="boolean">False</Arg><Call id="ut" name="getUserTransaction"/><Call id="tm" name="getTransactionManager"/></New><Call name="setAttribute"><Arg>txmgr</Arg><Arg><Ref id="tm"/></Arg></Call><New class="org.mortbay.jetty.plus.naming.Resource"><Arg>javax.transaction.TransactionManager</Arg><Arg><Ref id="ut"/></Arg></New>
+
+  <New id="tx" class="org.mortbay.jetty.plus.naming.Transaction">
+   <Arg>
+     <Ref id="ut"/>
+   </Arg>
+  </New>
+
+
+  <New id="myxaResource" class="org.mortbay.jetty.plus.naming.Resource"><Arg><Ref id='wac'/></Arg><Arg>myxadatasource</Arg><Arg><New id="myxadatasource" class="org.enhydra.jdbc.standard.StandardXADataSource"><Set name="DriverName">org.apache.derby.jdbc.EmbeddedDriver</Set><Set name="Url">jdbc:derby:myderbyDB1;create=true</Set><Set name="User"></Set><Set name="Password"></Set><Set name="transactionManager"><Ref id="tm"/></Set></New></Arg></New><Ref id="myxaResource"><Get id="myxaNameInScope" name="jndiNameInScope"/></Ref>
+
+
+  <New id="mydatasource" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource</Arg>
+    <Arg>
+     <New class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"><Arg><Ref id="myxadatasource"/></Arg><Set name="DataSourceName"><Ref id="myxaNameInScope"/></Set></New>
+    </Arg>
+   </New>
+
+
+  <New id="myxa2Resource" class="org.mortbay.jetty.plus.naming.Resource"><Arg><Ref id='wac'/></Arg><Arg>myxadatasource2</Arg><Arg><New id="myxadatasource2" class="org.enhydra.jdbc.standard.StandardXADataSource"><Set name="DriverName">org.apache.derby.jdbc.EmbeddedDriver</Set><Set name="Url">jdbc:derby:myderbyDB2;create=true</Set><Set name="User"></Set><Set name="Password"></Set><Set name="transactionManager"><Ref id="tm"/></Set></New></Arg></New><Ref id="myxa2Resource"><Get id="myxa2NameInScope" name="jndiNameInScope"/></Ref>
+
+  <New id="mydatasource2" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource2</Arg>
+    <Arg>
+       <New class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"><Arg><Ref id="myxadatasource2"/></Arg><Set name="DataSourceName"><Ref id="myxa2NameInScope"/></Set></New>
+    </Arg>
+   </New>
+  END OF JOTM -->
+
+</Configure>

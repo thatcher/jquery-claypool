@@ -1,0 +1,16 @@
+{_:[
+    {
+        title:'jQuery Conf',
+        url:'http://events.jquery.com/jquery-conference-2009/',
+        date:'Sept 13th, 2009',
+        calendar:'09/13/2009',
+        location:'Microsoft Cambridge, Boston MA ',
+        image:'data/events/logo_jquery_53x53.jpg',
+        description:<>
+            <p> 
+                We'll be at jQuery Conf!  Look for us or let us
+				know if your coming too.
+            </p>
+        </>
+    }
+]}

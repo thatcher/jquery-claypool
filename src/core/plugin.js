@@ -144,6 +144,11 @@
                      $.config('env.'+arguments[1]));
                  return env;
              }else{
+                 if(arguments.length === 1 && !(typeof(arguments[0])=='string')){
+                    //a convenience method for defining environments
+					//like $.config('env',{});
+					return $.config('env', arguments[0]);
+                 }
                  return env[arguments[0]]||null;
              }
          }

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<Configure id='wac' class="org.mortbay.jetty.webapp.WebAppContext">
+
+  <!-- Add an EnvEntry only valid for this webapp               -->
+  <New id="gargle"  class="org.mortbay.jetty.plus.naming.EnvEntry">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>gargle</Arg>
+    <Arg type="java.lang.Double">100</Arg>
+    <Arg type="boolean">true</Arg>
+  </New>
+
+ <!-- Add an override for a global EnvEntry                           -->
+  <New id="wiggle"  class="org.mortbay.jetty.plus.naming.EnvEntry">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>wiggle</Arg>
+    <Arg type="java.lang.Double">55.0</Arg>
+    <Arg type="boolean">true</Arg>
+  </New>
+
+<!-- Add a mapping from name in web.xml to the environment -->
+  <New id="map1" class="org.mortbay.jetty.plus.naming.Link">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource1</Arg> <!-- name in web.xml -->
+    <Arg>jdbc/mydatasource</Arg>  <!-- name in environment -->
+  </New>
+
+  <!-- ==============================================================  -->
+  <!-- Add a DataSource only valid for this webapp                     -->
+  <!-- Uncomment one of the following options.                         -->
+  <!-- ==============================================================  -->
+
+  <!-- Atomikos datasource                                             
+
+  <New id="mydatasource99" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource99</Arg>
+    <Arg>
+     <New class="com.atomikos.jdbc.SimpleDataSourceBean"><Set name="xaDataSourceClassName">org.apache.derby.jdbc.EmbeddedXADataSource</Set><Set name="xaDataSourceProperties">databaseName=testdb99;createDatabase=create</Set><Set name="UniqueResourceName">mydatasource99</Set></New>
+    </Arg>
+   </New>
+  -->
+
+  <!-- JOTM datasource
+<Call id="tm" name="getAttribute"><Arg>txmgr</Arg></Call><New id="myxa99Resource" class="org.mortbay.jetty.plus.naming.Resource"><Arg><Ref id='wac'/></Arg><Arg>myxadatasource99</Arg><Arg><New id="myxadatasource99" class="org.enhydra.jdbc.standard.StandardXADataSource"><Set name="DriverName">org.apache.derby.jdbc.EmbeddedDriver</Set><Set name="Url">jdbc:derby:myderbyDB99;create=true</Set><Set name="User"></Set><Set name="Password"></Set><Set name="transactionManager"><Ref id="tm"/></Set></New></Arg></New><Ref id="myxa99Resource"><Get id="myxa99NameInScope" name="jndiNameInScope"/></Ref>
+  <New id="mydatasource99" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg><Ref id='wac'/></Arg>
+    <Arg>jdbc/mydatasource99</Arg>
+    <Arg>
+     <New id="mydatasource99" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"><Arg><Ref id="myxadatasource99"/></Arg><Set name="DataSourceName"><Ref id="myxa99NameInScope"/></Set></New>
+    </Arg>
+   </New>
+  -->
+
+
+</Configure>
+

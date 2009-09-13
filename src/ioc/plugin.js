@@ -8,9 +8,35 @@
  * @requires OtherClassName
  */
 (function($, $$, $$IoC){
+
 	/**
 	 * @constructor
 	 */
-    //TODO : what is the useful static plugin that could be derived fro Claypool.IoC?
+    $.extend($, {
+        scan  : function(){
+            var scanPaths,
+			    i;
+            if(arguments.length === 0){
+                return $.config('ioc');
+            }else{
+                scanPaths = [];
+                for(i = 0;i<arguments[0].length;i++){
+                    scanPaths.push({
+                        scan:arguments[0][i], 
+						factory:$$.MVC.Factory.prototype
+					}); 
+			    }
+				return $.config('ioc', scanPaths);
+				 
+            }
+        },
+		invert: function(){
+            if(arguments.length === 0){
+                return $.config('ioc');
+            }else{
+                return $.config('ioc', arguments[0]);
+            }
+        }
+    });
 	
 })(  jQuery, Claypool, Claypool.IoC );

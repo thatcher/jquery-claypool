@@ -3,5 +3,124 @@
     xmlns="http://java.sun.com/xml/ns/javaee" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <!-- Initializes the log4j container  
+        - jquery-claypool provides it's own pure javascript category logging
+        - framework, so modifying this servlet only affect the logging
+        - in any additional java you are leveraging.  In particular
+        - the rhino-for-webapps bridge (WEB-INF/lib/claypool.x.jar) 
+    -->
+    <servlet>
+        <servlet-name>log4j-init</servlet-name>
+        <servlet-class>claypool.server.Log4jInit</servlet-class>
+        <init-param>
+          <param-name>log4j-init-file</param-name>
+          <param-value>/WEB-INF/logging.conf</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!--
+       The rhino dispatcher determines the very basic
+       url patterns that are routed to jquery-claypool.
+       
+       You'll want to keep your css and images and static
+       content in general in places that won't be routed through
+       jquery-claypool.
+    -->
+    <servlet>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <servlet-class>claypool.server.Servlet</servlet-class>    
+        <init-param>
+          <param-name>script-base</param-name>
+          <param-value>/WEB-INF/</param-value>
+        </init-param> 
+        <init-param>
+          <param-name>shell</param-name>
+          <param-value>shell.js</param-value>
+        </init-param>   
+        <init-param>
+          <param-name>dispatch-function</param-name>
+          <param-value>ClaypoolServerHandler</param-value>
+        </init-param>  
+        <!-- Set to false for production releases -->
+        <init-param>
+          <param-name>active-reload</param-name>
+          <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>  
     
+    <!-- jsx urls are routed to the dynamic service -->
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/jsx/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/docs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/doc/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/support</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/events</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/news</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/releases</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/release/*</url-pattern> 
+    </servlet-mapping>
+    
+    <!-- Sessions are available but not required for this example -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
+    <!-- The index.jsp file simply re-routes to our jquery-claypool welcome page s-->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <!--
+        Don't forget jquery-claypool server-side is still built on
+        servlet containers so you have access to all the general
+        container configuration bells and whistles.
+        
+        Below we define a security constraint to prevent access to the 
+        web console servlet which basically allows us to execute arbitrary
+        javascript commands in the servers javascript shell context.
+    -->
+    <!--security-constraint>
+      <web-resource-collection>
+        <web-resource-name> Web Server Console </web-resource-name>
+        <url-pattern>/admin/*</url-pattern>
+      </web-resource-collection>
+      <auth-constraint>
+          <role-name>jquery-claypool-admin</role-name>
+      </auth-constraint>
+    </security-constraint>
+    <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>jquery-claypool server console</realm-name>
+    </login-config-->
 </web-app>

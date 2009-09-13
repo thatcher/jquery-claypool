@@ -1,0 +1,41 @@
+<HTML>
+  <HEAD>
+    <TITLE>Jetty JNDI Demo</TITLE>
+    <META http-equiv="Pragma" content="no-cache">
+    <META http-equiv="Cache-Control" content="no-cache,no-store">
+  </HEAD>
+<BODY>
+<A HREF="http://jetty.mortbay.org/jetty6"><IMG SRC="http://jetty.mortbay.org/jetty/images/jetty_banner.gif"></A>
+<P>
+<h1>Instructions to run the Jetty JNDI demo</h1>
+
+<p>
+If you are viewing this page, then you need to perform a couple of configuration tasks before the demo will be available. It is important that you follow the steps in the order given so that Jetty can hot-redeploy this demonstration webapp.
+</p>
+<p>
+First, make sure you read and follow the instructions in the $jetty.home/contexts/README-test-jndi.txt file.
+</p>
+
+<ol>
+  <li>Ensure that you have installed the jars for the transaction manager of your choice in $JETTY_HOME/lib/ext. This demo has been tested with <a href="http://jotm.objectweb.org/">JOTM</a> and <a href="http://www.atomikos.com">Atomikos</a>.</li>
+
+  <li>Ensure that you have installed the database of your choice - this demo assumes that you will use Derby. If you wish to use a different database, then you will
+  need to edit the $jetty.home/contexts/test-jndi.xml file and the $jetty.home/contexts/test-jndi.d/WEB-INF/jetty-env.xml files and replace the references to Derby with your chosen database.</li>
+
+  <li>Edit >$jetty.home/contexts/test-jndi.d/WEB-INF/jetty-env.xml and uncomment the transaction manager setup of your choice. Save the file.</li>
+
+  <li>Edit $jetty.home/contexts/test-jndi.xml and:
+
+    <ul>
+      <li>Uncomment the transaction manager setup of your choice, replacing any references to Derby if you are using a different database</li>
+      <li>If you want to use the mail-sending demonstration, change the smtp authentication information appropriately for your environment on the mail/Session Resource.</li>
+</p>
+
+      <li>Remove the line &lt;Set name="descriptor"&gt;&lt;SystemProperty name="jetty.home" default="."/&gt;/contexts/test-jndi.d/WEB-INF/instruction-web.xml&lt;/Set&gt;. </li>
+      <li>Save the file</li>
+    </ul>
+</ol>
+<p> This webapp should now be automatically hot redeployed and the demonstration will be available to you. If not, then you may need to stop and restart jetty.</p>
+
+</BODY>
+</HTML>

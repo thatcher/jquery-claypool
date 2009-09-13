@@ -1,58 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Claypool" default="default" basedir=".">
     <description>Builds, tests, and runs the project Claypool.</description>
-    
+    <tstamp/>
     <!-- BASIC PROJECT PROPERTIES TO HELP TRACK VERSION -->
-    <property name="PROJECT_TITLE"            value="jquery.claypool" />
-    <property name="BUILD_MAJOR"              value="1" />
-    <property name="BUILD_MINOR"              value="0" />
-    <property name="BUILD_ID"                 value="0" />
+    <property  file="build.properties"/>
     
-    <property description="Java Jars" name="JAVA_LIB_DIR" location="WEB-INF/lib" />
-    <property description="Rhino JS Engine" name="RHINO_JAR" location="${JAVA_LIB_DIR}/js.jar" />
-    <property description="JSLint Syntax Checker" name="JSLINT_JAR" location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" />
-    <property description="Javax Servlet API" name="SERVLET_JAR" location="../../lib/servlet-api.jar" />
-    <property description="Log4j Logging API" name="LOG4J_JAR" location="${JAVA_LIB_DIR}/log4j-1.2.15.jar" />
-    <property description="YUI Compressor" name="YUI_MIN_JAR" location="${JAVA_LIB_DIR}/yuicompressor-2.4.1.jar" />
+    <property  name="JAVA_LIB_DIR" 
+			   location="WEB-INF/lib" 
+			   description="Java Jars" />
+    <property  name="RHINO_JAR" 
+			   location="${JAVA_LIB_DIR}/js.jar" 
+			   description="Rhino JS Engine" />
+    <property  name="JSLINT_JAR" 
+			   location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" 
+			   description="JSLint Syntax Checker" />
+    <property  name="SERVLET_JAR" 
+			   location="../../lib/servlet-api.jar" 
+			   description="Javax Servlet API" />
+    <property  name="LOG4J_JAR" 
+			   location="${JAVA_LIB_DIR}/log4j-1.2.15.jar" 
+			   description="Log4j Logging API" />
+    <property  name="YUI_MIN_JAR" 
+			   location="${JAVA_LIB_DIR}/yuicompressor-2.4.1.jar" 
+			   description="YUI Compressor" />
 
-    <property name="PREFIX"         location="${basedir}/"                  description="Target parent folder for built files"   />
-    <property name="SRC_DIR"        location="${PREFIX}/src"                description="Folder for source files"  />
-    <property name="TEST_DIR"       location="${PREFIX}/test"               description="Folder for test target"  />
-    <property name="DIST_DIR"       location="${PREFIX}/dist"               description="Folder for concat and min target" />
-    <property name="BUILD_DIR"      location="${PREFIX}/build"              description="Folder for build artifacts" />
-    <property name="TOOLS_DIR"      location="${PREFIX}/tools"              description="Files for parsing etc."/>
-    <property name="LIB_DIR"        location="${PREFIX}/lib"                description="Folder for jquery and livequery libraries" />
+    <property  name="PREFIX"         
+	           location="${basedir}/"                  
+			   description="Target parent folder for built files"   />
+    <property  name="SRC_DIR"        
+	           location="${PREFIX}/src"                
+			   description="Folder for source files"  />
+    <property  name="TEST_DIR"       
+	           location="${PREFIX}/test"               
+			   description="Folder for test target"  />
+    <property  name="DIST_DIR"       
+	           location="${PREFIX}/dist"               
+			   description="Folder for concat and min target" />
+    <property  name="BUILD_DIR"      
+	           location="${PREFIX}/build"              
+			   description="Folder for build artifacts" />
+    <property  name="TOOLS_DIR"      
+	           location="${PREFIX}/tools"              
+			   description="Files for parsing etc."/>
+    <property  name="LIB_DIR"        
+	           location="${PREFIX}/lib"                
+			   description="Folder for jquery and livequery libraries" />
+    <property  name="PLUGIN_DIR"        
+               location="${PREFIX}/plugins"                
+               description="Folder for useful plugins to develop apps" />
 
+	
     <!-- Files names for distribution -->
-    <property name="CLAYPOOL_CORE"   			location="${SRC_DIR}/core" />
-    <property name="CLAYPOOL_LOGGING"   		location="${SRC_DIR}/logging" />
-    <property name="CLAYPOOL_APPLICATION"   	location="${SRC_DIR}/application" />
-    <property name="CLAYPOOL_IOC"   			location="${SRC_DIR}/ioc" />
-    <property name="CLAYPOOL_MVC"   			location="${SRC_DIR}/mvc" />
-    <property name="CLAYPOOL_MODELS"   			location="${SRC_DIR}/models" />
-    <property name="CLAYPOOL_AOP"   			location="${SRC_DIR}/aop" />
-    <property name="CLAYPOOL_SERVER"   			location="${SRC_DIR}/server" />
-    <property name="CLAYPOOL_TEST"   			location="${SRC_DIR}/test" />
-    <property name="CLAYPOOL_ALL"   			location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js" />
-    <property name="CLAYPOOL_ALL_MIN"   		location="${DIST_DIR}/${PROJECT_TITLE}.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.min.js" />
-    <property name="CLAYPOOL_LATEST"   			location="${DIST_DIR}/${PROJECT_TITLE}.js" />
-    <property name="CLAYPOOL_LATEST_MIN"   		location="${DIST_DIR}/${PROJECT_TITLE}.min.js" />
+    <property  name="CLAYPOOL_CORE"   			
+	           location="${SRC_DIR}/core" />
+    <property  name="CLAYPOOL_LOGGING"   		
+	           location="${SRC_DIR}/logging" />
+    <property  name="CLAYPOOL_APPLICATION"   	
+	           location="${SRC_DIR}/application" />
+    <property  name="CLAYPOOL_IOC"   			
+	           location="${SRC_DIR}/ioc" />
+    <property  name="CLAYPOOL_MVC"   			
+	           location="${SRC_DIR}/mvc" />
+    <property  name="CLAYPOOL_MODELS"   			
+	           location="${SRC_DIR}/models" />
+    <property  name="CLAYPOOL_AOP"   			
+	           location="${SRC_DIR}/aop" />
+    <property  name="CLAYPOOL_SERVER"   			
+	           location="${SRC_DIR}/server" />
+    <property  name="CLAYPOOL_TEST"   			
+	           location="${SRC_DIR}/test" />
+    <property  name="CLAYPOOL_ALL"   			
+	           location="${DIST_DIR}/${BUILD}.js" />
+    <property  name="CLAYPOOL_ALL_MIN"   		
+	           location="${DIST_DIR}/${BUILD}.min.js" />
+    <property  name="CLAYPOOL_LATEST"   			
+	           location="${DIST_DIR}/${PROJECT}.js" />
+    <property  name="CLAYPOOL_LATEST_MIN"   		
+	           location="${DIST_DIR}/${PROJECT}.min.js" />
+    <property  name="CLAYPOOL_LITE"               
+               location="${DIST_DIR}/${BUILD}-lite.js" />
+    <property  name="CLAYPOOL_LITE_MIN"           
+               location="${DIST_DIR}/${BUILD}-lite.min.js" />
+    <property  name="CLAYPOOL_LATEST_LITE"               
+               location="${DIST_DIR}/${PROJECT}-lite.js" />
+    <property  name="CLAYPOOL_LATEST_LITE_MIN"           
+               location="${DIST_DIR}/${PROJECT}-lite.min.js" />
     
     <!-- Plugin File Names for Distribution -->
+    <property  name="VENDOR_BASE"       
+	           location="${basedir}/../" />
+    <property  name="JQUERY_E4X"         
+	           location="${VENDOR_BASE}/jquery-e4x-templates/jquery.e4x.js" />
+    <property  name="JQUERY_JSON"        
+	           location="${VENDOR_BASE}/jquery-json/jquery.json.js" />
+    <property  name="JQUERY_JSPATH"      
+	           location="${VENDOR_BASE}/jquery-jspath/jquery.jspath.js" />
+    <property  name="JQUERY_LOREMIPSUM"  
+	           location="${VENDOR_BASE}/jquery-loremipsum/jquery.loremipsum.js" />
+    <property  name="JQUERY_OBJTREE"     
+	           location="${VENDOR_BASE}/jquery-objtree/jquery.objtree.js" />
+    <property  name="JQUERY_SDB"         
+	           location="${VENDOR_BASE}/jquery-sdb/jquery.sdb.js" />
+    <property  name="JQUERY_SDB_REST"    
+	           location="${VENDOR_BASE}/jquery-sdb/jquery.sdb.rest.js" />
+    <property  name="JQUERY_XSLT"        
+	           location="${VENDOR_BASE}/jquery-xslt/jquery.xslt.js" />
     
+	<!-- for server side -->
+    <property  name="CLAYPOOL_SERVER_JAR" 
+               location="${VENDOR_BASE}/rhino-for-webapps/dist/claypool.jar" 
+               description="Rhino For Webapps (Javascript Bridge)" />
+    <property  name="ENVJS_JAR" 
+               location="${VENDOR_BASE}/env-js/dist/env-js.jar" 
+               description="Rhino with jLine Console and Envjs Tools" />
+    <property  name="ENV_RHINO_JS" 
+               location="${VENDOR_BASE}/env-js/dist/env.rhino.js" 
+               description="Envjs for the Rhino Engine" />
+			   
     <!-- BUILD TARGETS -->
-    <target name="default" depends="lint, min"/>
+    <target name="default" 
+	        depends="lint, min"/>
     
-    <target name="all" depends="default"/>
+    <target name="all" 
+	        depends="default, vendor"/>
     
-    <target name="lint" depends="concat"/>
+    <target name="lint" 
+	        depends="concat"/>
     
+	<target name='vendor' 
+	        depends='plugins, server-jar'/>
+	
     <target name="clean">
         <delete dir="${DIST_DIR}" />
         <delete dir="${BUILD_DIR}" />
     </target>
     
-    <target name="concat" description="Main claypool build">
+    <target name="concat" 
+	        description="Main claypool build">
         <mkdir dir="${BUILD_DIR}" />
         
     	<!-- CORE -->
@@ -60,7 +144,7 @@
         <concat destfile="${BUILD_DIR}/core.js">
             <filterchain>    
                 <replacetokens>
-                    <token key="VERSION" value="${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+                    <token key="VERSION" value="${BUILD}"/>
                 </replacetokens>
             </filterchain>
             <fileset dir="${CLAYPOOL_CORE}" includes="namespace.js" />
@@ -201,17 +285,28 @@
             <fileset dir="${BUILD_DIR}" includes="mvc.js" />
             <fileset dir="${BUILD_DIR}" includes="models.js" />
             <fileset dir="${BUILD_DIR}" includes="server.js" />
-			<!-- DEPRECATED as of 1.0.rc7 
-            <fileset dir="${BUILD_DIR}" includes="munit.js" />
-			-->
         </concat>
-        <copy file='${CLAYPOOL_ALL}' tofile='${CLAYPOOL_LATEST}'/> 
+        <copy file='${CLAYPOOL_ALL}'    tofile='${CLAYPOOL_LATEST}'/> 
+        <copy file='${CLAYPOOL_LATEST}' todir='${LIB_DIR}'/> 
         <echo message="${CLAYPOOL_ALL} built." />
+		
+		<!-- LITE CORE -->
+        <echo message="Building ${CLAYPOOL_LITE}" />
+        <mkdir dir="${DIST_DIR}" />
+        <concat destfile="${CLAYPOOL_LITE}">
+            <fileset dir="${BUILD_DIR}" includes="core.js" />
+            <fileset dir="${BUILD_DIR}" includes="app.js" />
+            <fileset dir="${BUILD_DIR}" includes="aop.js" />
+            <fileset dir="${BUILD_DIR}" includes="ioc.js" />
+            <fileset dir="${BUILD_DIR}" includes="mvc.js" />
+        </concat>
+        <copy file='${CLAYPOOL_LITE}' tofile='${CLAYPOOL_LATEST_LITE}'/> 
+        <echo message="${CLAYPOOL_LITE} built." />
     </target>
 
     
     <target name="min" depends="concat" >
-        <echo message="Compressing Distibution" />
+        <echo message="Compressing Distibutions" />
         <java jar="${YUI_MIN_JAR}" fork="true">
             <arg value="--charset=utf8"/>
             <arg value="--line-break"/>
@@ -224,6 +319,38 @@
             </classpath>
         </java>
         <copy file='${CLAYPOOL_ALL_MIN}' tofile='${CLAYPOOL_LATEST_MIN}'/> 
+		
+		
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_LITE_MIN}"/>
+            <arg value="${CLAYPOOL_LITE}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        <copy file='${CLAYPOOL_LITE_MIN}' tofile='${CLAYPOOL_LATEST_LITE_MIN}'/> 
         <echo message="Finished Compressing Distibution" />
+    </target>
+	
+	<target name='plugins'>
+        <copy file='${JQUERY_E4X}'          todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_JSON}'         todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_JSPATH}'       todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_LOREMIPSUM}'   todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_OBJTREE}'      todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_SDB}'          todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_SDB_REST}'     todir='${PLUGIN_DIR}' /> 
+        <copy file='${JQUERY_XSLT}'         todir='${PLUGIN_DIR}' /> 
+    </target>
+	
+	
+    <target name='server-jar'>
+        <copy file='${CLAYPOOL_SERVER_JAR}' todir='${JAVA_LIB_DIR}' /> 
+        <copy file='${ENVJS_JAR}'           todir='${JAVA_LIB_DIR}' /> 
+        <copy file='${ENV_RHINO_JS}'        todir='${JAVA_LIB_DIR}' /> 
     </target>
 </project>

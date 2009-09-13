@@ -1,0 +1,45 @@
+{_:[
+/**************************************************\
+ * Releases Metadata *
+\**************************************************/
+    
+    /**************************************************\
+     * 1.0 rc Candidates *
+    \**************************************************/
+    {
+        id:'1.0.x',
+        name:'Latest Official',
+        description:<>
+            <p>
+                jQuery-Claypool spent most of the last 6 months in release
+				candidacy for 1.0, and we are happy to announce we feel
+				like it's api is very stable.  So here it is 1.0.x!
+            </p>
+			<p>
+			     The full zip/tarball comes with jetty and example applications
+				 you can use to help get you up and running in minutes.
+				 It's also ready to for deployment directly into Google
+				 Apps.
+			</p>
+		</>,
+       tar:'http://github.com/thatcher/jquery-claypool/tarball/master',
+       zip:'http://github.com/thatcher/jquery-claypool/zipball/master',
+       README:'http://github.com/thatcher/jquery-claypool/raw/master/README',
+       artifacts:[{
+           label:'jquery.claypool.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.js',
+           description:<><p>(requires jquery.livequery.js)</p></>
+       },{
+           label:'jquery.claypool-lite.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool-lite.js',
+           description:<><p>packaged with only the core client-side modules</p></>
+       }],
+       notes:[
+           'Integrates with Amazon SDB !',
+           'Reuse code on the client and server!',
+           'Ready to go for enterprise scale',
+           'Small and fast',
+           'Comes with jquery.loremipsum.js, jquery.e4x-templates.js, and more...'
+       ]
+    }
+]}

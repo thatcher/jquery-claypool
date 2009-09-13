@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="eng" dir="ltr">
+    <head profile="http://a9.com/-/spec/opensearch/1.1/">
+        <title>A Web 1.6180339... Example</title>
+        
+        <link rel="stylesheet" href="./css/jquery-ui/jquery-ui.css"     type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="./css/blueprint/screen.css"        type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="./css/blueprint/plugins/silksprite/sprites/sprite.css" 
+              type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="./css/blueprint/plugins/fancy-type/screen.css" 
+              type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="./css/blueprint/plugins/liquidgrid/liquid.css" 
+              type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="./css/blueprint/print.css"         type="text/css" media="print"/>    
+        <!--[if IE]><link rel="stylesheet" href="./css/blueprint/ie.css" type="text/css" media="screen, projection"/><![endif]-->
+        <style type="text/css">
+            body                       {padding:1%;text-align:left;}
+            #progressbar               {background-color:#DFDFDF;height:4px;}
+            #global-navigation ul      {margin-bottom:5px;}
+            #global-navigation li      {display:inline;}
+            #global-0 li               {margin-left:1%;}
+            #global-1 li               {margin:0 10px;}
+            #global-help               {margin-top:-10px;}
+            #global-help form          {float:left;margin-top:25px;}
+            #global-search-options     {display:inline;margin-top:2em;}
+            #global-search-options ul  {list-style-type:none;}
+            #global-search-options li  {line-height:1.1em;}
+            #tab-navigation            {float:right;}
+            #tab-navigation            {margin-top:15px;border-bottom:1px solid #DFDFDF;}
+            .pagination ul             {list-style:none;}
+            .pagination ul li          {display:inline;}
+        </style>    
+        <!--[if IE]>
+        <style type="text/css"> body    {line-height:1.2em;font-size:0.6em;} </style>    
+        <![endif]-->
+
+        <!--[if IE]><script src="./lib/firebug/firebug.jsx" type="text/javascript" ></script><![endif]-->
+        
+        
+    </head>
+    <body>
+        <div id="application" class="pitcher liquid-100 top" >
+            <div id="north-nav" class="top liqwid-100 ui-layout-north">
+                <div id="global-navigation" class="top liqwid-100">
+                    <ul id="global-0" class="glass liqwid-50">
+                        <li><strong>Template App</strong></li>
+                        <li><a href="/global/file.menu">File</a></li>
+                        <li><a href="/global/edit.menu">Edit</a></li>
+                        <li><a href="/global/view.menu">View</a></li>
+                    </ul>
+                    <ul id="global-1" class="tap">
+                        <li><strong>Resources</strong></li>|
+                        <li><a href="/global/source.menu">Source</a></li>|
+                        <li><a href="/global/groups.menu">Groups</a></li>|
+                        <li><a href="/global/docs.menu">Docs</a></li>|
+                    </ul>
+                </div>
+                <hr/>
+                <div id="global-help" >
+                    <div id="global-logo" class="glass">
+                        <img src="./images/claypool-medium.gif" />
+                    </div>
+                    <div id="global-search" class="salt-10">
+                        <form>
+                            <input type="text" size="32"></input>
+                            <input type="button" value="Search All"></input>
+                            <input type="button" value="Search This"></input>
+                        </form>
+                        <div id="global-search-options" class="glass">
+                            <ul>
+                                <li><a href="/search/advanced.find">Advanced</a></li>
+                                <li><a href="/search/recent.find">Recent</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <ul id="tab-navigation">
+                        <li><a href="#page-static">static</a></li>
+                        <li><a href="#page-dynamic">dynamic</a></li>
+                        <li><a href="#page-users">table</a></li>
+                        <li><a href="#page-3">d</a></li>
+                        <li><a href="#page-4">e</a></li>
+                        <li><a href="#page-5">f</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="vertical-navigation" class="clear first glass liqwid-20 ui-layout-west">
+                <div class="inc:./app/views/index/vertical-nav.e4x"> 
+                    This content will actually be overwritten by the server using
+                    jquery just like you would on the client.
+                </div>
+            </div>
+            <div id="pages" class="glass liqwid-70 border ui-layout-center" style="display:none;">
+                <div id="page-static" class="inc:./app/views/index/static.html">-</div>
+                <div id="page-dynamic" class="inc:./app/views/index/dynamic.e4x">-</div>
+                <div id="page-users" class="inc:./rest/users/all.xhtml">- </div>
+                <div id="page-3" class="tall-100">d</div>
+                <div id="page-4" class="tall-100">e</div>
+                <div id="page-5" class="tall-100">f</div>
+            </div>
+            <div id="info-panel" class="last glass liqwid-10 ui-layout-east ">
+                Error: this content should be replaced before you see it.
+            </div>
+            <hr/>
+            <div id="global-footer" class="liqwid-100 last ui-layout-south" style="text-align:center;">
+                <div><strong>a</strong></div>
+                <div><strong>a</strong></div>
+                <div><blockquote class="quiet">a</blockquote></div>
+                <div>
+                    <span>a</span>: 
+                    <a>a</a> | 
+                    <a>a</a> |
+                    <a>a</a> |
+                    <a>a</a>
+                </div>
+                <div>
+                    <span>a</span>
+                    <a>a</a> -
+                    <a>a</a> -
+                    <a>a</a> -
+                    <a>a</a> -
+                    <a>a</a> -
+                </div>
+            </div>
+        </div> 
+    </body>
+</html>

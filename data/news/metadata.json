@@ -1,0 +1,51 @@
+{_:[
+    
+    {
+        title:'Jetty Server Included!',
+        date:'-',
+        calendar:'09/01/2009',
+        description:<>
+                <img src='/images/star_inverting.jpg'/>
+            <p>
+            	 We are now shipping with the awesome 
+				 <a href='http://eclipse.org/jetty/'>jetty server</a>
+				 so you can get running in seconds!  Of course you can still
+				 just drop the project directly into the tomcat
+				 webapps folder too!
+            </p>
+        </>
+    },{
+        title:'Deploy Directly to the Cloud',
+        date:'-',
+        calendar:'09/01/2009',
+        description:<>
+                <img src='/images/star_inverting.jpg'/>
+            <p>
+            	Claypool is ready to go on Google Apps Engine with 
+				the push of a button.  Go from local development
+				to production faster than you can say 'Highly Scalable'
+            </p>
+        </>
+    },{
+        title:'New Site and finally an Official 1.0',
+        date:'-',
+        calendar:'09/01/2009',
+        description:<>
+                <img src='/images/star_inverting.jpg'/>
+            <p>
+            	<a href='http://www.claypooljs.com/releases'>1.0 is finally here</a> 
+            	and if you haven't noticed our flashy new website
+				is written entirely with jquery-claypool and is running
+				on Google Apps Engine.
+            </p>
+        </>
+    },{
+        title:_.titled(2,false),
+        date:'May 30th, 2009',
+        calendar:'05/30/2009',
+        description:<>
+            <p>{_.paragraph(1, false)}</p>
+            <p></p>
+        </>
+    }
+]}

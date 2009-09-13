@@ -13,7 +13,15 @@
 	$.extend($, {
 	    logger  : function(name){
 	        return $$Log.getLogger(name);
-	    }
+	    },
+		//careful, names are very similiar!
+        logging  : function(){
+            if(arguments.length === 0){
+                return $.config('logging');
+            }else{
+                return $.config('logging', arguments[0]);
+            }
+        }
 	});
 	
 	var $log;

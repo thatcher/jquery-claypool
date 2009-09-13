@@ -1,0 +1,128 @@
+/* -------------------------------------------------------------- 
+      
+   liquid.css
+   * Sets up an easy-to-use grid of 24 columns that stretch
+     to the window width or can also be fixed width.
+
+   Liquid grid work by:
+   * Ben Listwon
+   * David Bedingfield
+   * Andrei Michael Herasimchuk
+   Involution Studios, http://www.involutionstudios.com
+
+   -----
+
+   grid.css
+   * Sets up an easy-to-use grid of 24 columns.
+   
+   Based on work by:
+   * Nathan Borror     [playgroundblues.com]
+   * Jeff Croft        [jeffcroft.com]
+   * Christian Metts   [mintchaos.com]
+   * Khoi Vinh         [subtraction.com]
+
+   -----
+   
+   By default, the grid is 80% of window width, with 24 columns.
+
+   To make the grid fixed, simply change the .container width
+   property to a pixel value. e.g., 960px.
+   
+-------------------------------------------------------------- */
+
+/* A container should group your entire grid. */
+.pitcher {
+	min-width: 950px;
+	min-height: 550px;
+	width: 100%;
+	height: 96%;
+	margin: 0 auto;
+	/*overflow: hidden;*/
+}
+
+.glass{
+    float:left;
+    margin-right:0.5%;
+}
+
+/* Use these classes to set the width of a column. */
+.liqwid-10		{ width: 9.5%; }
+.liqwid-20		{ width: 19%; }
+.liqwid-30		{ width: 28.5%; }
+.liqwid-40		{ width: 38%; }
+.liqwid-50		{ width: 47.5%; }
+.liqwid-60		{ width: 57%; }
+.liqwid-70		{ width: 66.5%; }
+.liqwid-80	    { width: 76%; }
+.liqwid-90	    { width: 85.5%; }
+.liqwid-100	    { margin-right: 0; }
+
+.tall-10	{ height: 10%; }
+.tall-20	{ height: 20%; }
+.tall-30	{ height: 30%; }
+.tall-40	{ height: 40%; }
+.tall-50	{ height: 50%; }
+.tall-60	{ height: 60%; }
+.tall-70	{ height: 70%; }
+.tall-80    { height: 80%; }
+.tall-90	{ height: 90%; }
+.tall-100	{ height: 100%; margin-bottom: 0; }
+
+.liqwid-10>div, .liqwid-20>div, .liqwid-30>div, .liqwid-40>div, 
+.liqwid-50>div, .liqwid-60>div, .liqwid-70>div, .liqwid-80>div, 
+.liqwid-90>div, .liqwid-100>div {
+	margin: 0 0.833em 0 0;
+	overflow-x: hidden;
+}
+
+.tall-10>div, .tall-20>div, .tall-30>div, .tall-40>div, 
+.tall-50>div, .tall-60>div, .tall-70>div, .tall-80>div, 
+.tall-90>div, .tall-100>div {
+	margin: 0 0 0.833em 0;
+	/*overflow-y: hidden;*/
+}
+
+/* Add these to a column to append empty cols. */
+.chase-10   { padding-right: 10%; }
+.chase-20   { padding-right: 20%; }
+.chase-30   { padding-right: 30%; }
+.chase-40   { padding-right: 40%; }
+.chase-50   { padding-right: 50%; }
+.chase-60   { padding-right: 60%; }   
+.chase-70   { padding-right: 70%; }   
+.chase-80   { padding-right: 80%; }
+.chase-90   { padding-right: 90%; }
+.chase-100  { padding-right: 100%; }
+
+/* Add these to a column to prepend empty cols. */
+.salt-10   { padding-left: 10%; }
+.salt-20   { padding-left: 20%; }
+.salt-30   { padding-left: 30%; }  
+.salt-40   { padding-left: 40%; }   
+.salt-50   { padding-left: 50%; }  
+.salt-60   { padding-left: 60%; }  
+.salt-70   { padding-left: 70%; }  
+.salt-80   { padding-left: 80%; }  
+.salt-90   { padding-left: 90%; }  
+.salt-100  { padding-left: 100%; }  
+
+
+/* Use these classes on an element to push it into the 
+   next column, or to pull it into the previous column. */
+
+.spill-10  { margin-left: -3.333em; }
+.spill-20  { margin-left: -6.666em; }
+.spill-30  { margin-left: -10em; }
+.spill-40  { margin-left: -13.333em; }
+
+.tap-00  { margin: 0 0 0 1.5em; }
+.tap-10  { margin: 0 -3.333em 0 1.5em; }
+.tap-20  { margin: 0 -6.666em 0 1.5em; }
+.tap-30  { margin: 0 -10em 0 1.5em; }
+.tap-40  { margin: 0 -13.333em 0 1.5em; }
+.tap, .tap-00, .tap-10, .tap-20, .tap-30, .tap-40 { float: right; }
+
+.caps {
+    font-size:1em;
+    line-height:normal;
+}

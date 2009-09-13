@@ -1,0 +1,50 @@
+<HTML>
+  <HEAD>
+    <TITLE>Powered By Jetty</TITLE>
+    <META http-equiv="Pragma" content="no-cache">
+    <META http-equiv="Cache-Control" content="no-cache,no-store">
+  </HEAD>
+<BODY>
+<A HREF="http://jetty.mortbay.org/jetty6"><IMG SRC="http://jetty.mortbay.org/jetty/images/jetty_banner.gif"></A>
+<P>
+<h1>Jetty and JNDI</h1>
+
+<p>
+This example shows how to configure and lookup resources such as DataSources, a JTA transaction manager and a java.mail.Session in JNDI. The demo shows you how to perform a distributed transaction across two different databases, and how to send email.
+</p>
+
+<h2>Preparation</h2>
+<p>
+Follow the instructions in the README-test-jndi.txt file in $JETTY-HOME/contexts.
+<p>
+Now you can start the demo:
+<blockquote>
+<pre>
+  > java -jar start.jar
+</pre>
+</blockquote>
+</p>
+<p>If you want to use the Mail demonstration, you will need to edit the <code>$JETTY-HOME/contexts/test-jndi.xml</code> file and change the smtp authentication information and properties appropriately for your environment.
+</p>
+<h2>The Datasources/Transaction Demo</h2>
+<p>
+Click <code>Commit</code> to make a distributed update to 2 different databases, or <code>Rollback</code> to prevent the update from happening.
+</p>
+<form action="test" method="post">
+      <input type="radio" name="completion" value="commit" checked="true"> Commit<BR>
+      <input type="radio" name="completion" value="rollback"> Rollback<BR>
+      <P>
+      <button type="submit">Completion</button>
+</form>
+<h2> The Mail Demo </h2>
+
+
+<form action="test" method="post">
+    <p>Send a test email to:&nbsp;<input type="text" name="mailto" maxlength="30"/></p>
+    <p>From:&nbsp;<input type="text" name="mailfrom" maxlength="30"/></p>
+    <button type="submit">Send</button>
+<form>
+
+
+</BODY>
+</HTML>

@@ -751,7 +751,11 @@ Claypool.Server={
                 response.headers.status = 500;
                 response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
             }
-        }/*,
+        },
+		servlet: function(target){
+            $$.extend(target, $$Web.Servlet);
+        }
+		/*,
         //TODO this is deprecated
         render: function(request, response){
             $log.debug("Finished Handling global request : %s  response %o", request.requestURL, response);

@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>Jetty chat</title>
+    <script type="text/javascript" src="../concat?/js/behaviour.js&/js/ajax.js&/chat/chat.js"></script>
+    <link rel="stylesheet" type="text/css" href="chat.css"></link>
+</head>
+<body onunload="room.leave()">
+<h1>Jetty AJAX Chat</h1>
+Three really important things about this chat room demo:<ul>
+<li>It has really HORRID Styling.  Please feel free to donate a pretty css :-)</li>
+<li>It is written using js techniques provided by
+<a href="http://bennolan.com/behaviour/">Behaviour</a> and
+<li>It uses Jetty6 <a href="/javadoc/org/mortbay/util/ajax/Continuation.html">Continuations</a>. No threads 
+are used when waiting for async events (see below).
+</li>
+</ul>
+
+
+<div id="chatroom">
+ <div id="chat"></div><div id="members"></div>
+ <div id="input">
+   <div id="join" >
+     Username:&nbsp;<input id="username" type="text"/><input id="joinB" class="button" type="submit" name="join" value="Join"/>
+   </div>
+   <div id="joined" class="hidden">
+     Chat:&nbsp;<input id="phrase" type="text"></input>
+     <input id="sendB" class="button" type="submit" name="join" value="Send"/>
+     <input id="leaveB" class="button" type="submit" name="join" value="Leave"/>
+   </div>
+  </div>
+ </div>
+
+ <h3>How this works</h3>
+ This chat room is put together with html, javascript and a filter as follows:
+ <ul>
+ <li><p>The chat.html file provides the basic layout for the page, including this text and a bunch of
+ <code>div</code> elements that define the layout of the chat room.  This html will render well
+ without any javascript etc.</p></li>
+
+ <li><p>The chat.html file includes the default.js file, which simply includes
+ javascript library of <a href="http://bennolan.com/behaviour/">Behaviour</a>.
+
+ <li><p>The chat.html file includes the chat.js script which is the client side smarts of the chat room:</p>
+ <ul>
+         <li><p>Using Behaviour, the DOM model of chat.html is enhanced with onclick and onkeypress functions
+         to trigger the dynamic interations.</p>
+         </li>
+         <li><p>Using XHR, a long polling loop is started for events.</p></li>
+         <li><p>Using XHR, any chat entered is sent to the server.</p></li>
+ </ul>
+ </li>
+
+ <li><p>On the sever side, the ChatFilter is instantiated to filter requests to chat.html:</p>
+    <ul>
+            <li><p>The ChatFilter extends AjaxFilter, which identifies requests that are AJAX requests and
+            gives assistance with formatting the AJAX responses.  All other requests are passed normally.
+            </p></li>
+
+            <li><p>The ChatFilter provides methods for join, leave, chat and getEvents.  Most of these are
+            fairly straight forward and just manipulatet state and send the appopriate AJAX response.</p></li>
+
+            <li><p>The smarts are in the getEvents method.  This method is a poll from the client for any
+            events on the server for the given member.   If there were no events and the server simply
+            replied with an empty response, this poll would become a busy poll and consume CPU on both
+            client and server.</p>
+
+            <p>
+            To avoid this, normal AJAX servers will simply wait for a short period (eg. 30 seconds).
+            If an event occurs in this time, the response is sent immediately. If the period times out,
+            then an empty response is sent.  Either way the client will then poll again for more events.
+            </p>
+
+            <p>
+            But for servlets, this waiting for events, is done in the request handler, when a thread has
+            been allocated.  Thus it makes it very difficult to scale an AJAX server to thousands of users
+            as you will need thousands of threads - mostly idle waiting for events.
+            </p>
+
+            <p>
+            Thus Jetty 6 introduces <a href="/javadoc/org/mortbay/jetty/util/Continuation.html">Continuations</a>, which allows the handling of a servlet request to
+            be suspended until either a timeout occurs or an asynchronous event calls resume on the
+            continuation.  This allows threadless waiting and thus permits an AJAX server to scale without
+            consuming vaste numbers of threads.
+            </p>
+            </li>
+
+    </ul>
+
+ </li>
+
+
+
+
+
+
+</body>

@@ -675,7 +675,14 @@ Claypool.MVC = {
                 ]);
             });
             return this;
-	    }
+	    },
+        mvc  : function(){
+            if(arguments.length === 0){
+                return $.config('mvc');
+            }else{
+                return $.config('mvc', arguments[0]);
+            }
+        }
 	});
 	/*
      *   -   Model-View-Controller Patterns  -

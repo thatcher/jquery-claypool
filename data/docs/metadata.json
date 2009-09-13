@@ -1,0 +1,1183 @@
+{'_':[ 
+/**************************************************\
+ * Docs Metadata *
+\**************************************************/
+ 
+    
+    /**************************************************\
+     * Getting Started *
+    \**************************************************/
+    {
+        'id':'guide',
+        'version':'1.0.x',
+        'label':'Users Guide', 
+        'sections':[
+            'running',
+            'walking',
+            'crawling'
+        ],
+        'running':[{
+'name':'rhino',
+'description':<>
+    <p>
+        When running with generic rhino, you will only need the latest rhino,
+        (the rhino bundled with java 1.6 is not recent enough).  You will
+        also need to write a javascript file that is responsible loading
+        env.rhino.js, setting available options if any, and finally setting
+        <code>window.location</code><br/>
+        <br/>
+        <pre class='box'>
+        <code>.
+    env-js $ java -jar rhino/js.jar
+        </code>
+        </pre>
+        <br/>
+        <br/>
+        You should then see the javascript prompt... and you are ready to load 
+        env.rhino.js.
+    </p>
+    <p>
+       <strong style='color:red'>Warning...</strong> Envjs will not automatically
+       load and run the external javascript unless the script tags have the attribute
+       <code>type="text/envjs"</code>, but it will attempt to run embedded and inline
+       script.  To enable all external javascript files you only have to tell Envjs
+       to do so, however <em>remember that all javascript executed will have 
+       read/write access to your file system via ajax!</em>
+    </p>
+    <p>
+       <strong>Known limitations:</strong> If the local or remote html file
+       uses frames and you are executing javascript inside the frames, 
+       you will need to use the bundled env-js.jar instead of
+       the vanilla rhino (see below).
+    </p>
+    
+</>
+    },{
+'name':'frames',
+'description':<>
+    <p>
+        If your html application makes use of frames or iframes you will need
+        to use the conveniently rebundled rhino jar, <strong>dist/env-js.jar</strong>.
+        This simply enables and provides scope management routines to Envjs that
+        are otherwise transparent to you as an end user. 
+        
+        <pre class='box'>
+        <code>.
+    env-js $ java -jar dist/env-js.jar
+        </code>
+        </pre>
+    
+        You should then see the javascript prompt... and you are ready to load 
+        env.rhino.js.
+    </p>
+    
+</>
+    },{
+'name':'console',
+'description':<>
+    <p>
+        If you are familiar with the rhino console, you probably know it's
+        a bit coarse around the edges, as back arrow, delete, up arrow, etc.
+        only give you ugly characters added to the end of the line (ugh).
+    </p>
+    <p>
+       To help make the console experience feel much more like the firebug
+       console experience, we have prebundled 
+       <a href='http://jline.sourceforge.net/' target='_new'>JLine</a> 
+       with env-js.jar.  You can still use it with plain old rhino by simply 
+       appending it to your classpath. 
+       
+        <pre class='box'>
+        <code>.
+    env-js $ java -cp dist/env-js.jar  \
+        jline.ConsoleRunner org.mozilla.javascript.tools.envjs.Main
+        </code>
+        </pre>
+           
+        <strong>
+          If you are at home in the firebug console in your browser, 
+          you are ready load Envjs and feel right at home here!
+       </strong>
+    </p>
+    
+</>
+    },{
+'name':'embed',
+'description':<>
+    <p>
+        Many users have embedded Envjs as part of larger application frameworks
+        running with Rhino.  These practices are not currently well documented
+        or broadly uniform so we only mention them in passing here.
+    </p>
+    <p>
+        If you are interested in embedding Envjs with Rhino in a larger 
+        application, please post to our support list and we will try to help
+        address your specific requirements to help you get started!
+    </p>
+</>
+
+        }],'walking':[{
+        
+'name':'load',
+'description':<>
+    <p>
+        Load the proper env.js file for your platform. 
+        (Currently only rhino is supported, though our goal
+        is to support arbitrary javascript engines.)
+        
+        <pre class='box'>
+        <code>.
+    load('env.rhino.js'); //if in a Rhino script
+        </code>
+        </pre>
+    </p>
+      
+
+</>
+        },{
+'name':'configure',
+'description':<>
+    <p>
+        Optionally you can turn on/off settings by passing an options object. 
+        In this example we enable loading and execution of external javascript
+        files with the <code>scriptTypes</code> setting and enable DEBUG logging
+        levels.
+        
+        <pre class='box'>
+        <code>.
+    Envjs(&amp;#x7B;
+        logLevel: Envjs.DEBUG,
+        scriptTypes: &amp;#x7B;
+           'text/javascript': true
+        &#x7D;
+    &#x7D;);
+        </code>
+        </pre>
+    </p>
+    
+    
+</>
+    },{
+'name':'go',
+'description':<>
+    <p>
+        Tell env.js to load an HTML file that it should model:
+        <pre class='box'>
+        <code>.
+    window.location = "some/file.html";
+        </code>
+        </pre>
+    </p>
+    
+    
+    <p>
+       This can be accomplished equivalently with
+       
+        <pre class='box'>
+        <code>.
+    Envjs("some/file.html");
+        </code>
+        </pre>
+    </p>
+  
+    
+    <p>
+        The HTML application does not need to be local!
+    
+    
+        <pre class='box'>
+        <code>.
+    window.location = "http://example.com/some/file.html";
+        </code>
+        </pre>
+    </p>
+
+    <p>
+       or equivalently you can take care of settings and location using
+       a convience method.
+    
+        <pre class='box'>
+        <code>.
+    Envjs("some/file.html", &amp;#x7B;
+        logLevel: Envjs.DEBUG,
+        scriptTypes: &amp;#x7B;
+           'text/javascript': true
+        &#x7D;
+    &#x7D;);
+        </code>
+        </pre>
+    </p>
+    
+   </>
+   
+   }],'crawling':[{
+   
+'name':'hooks',
+'description':<>
+    <p>
+        Most javascript libraries provide a collection of unit tests that
+        run in the browser, and with a little tweeking Envjs can run these
+        tests in a 'headless' browser.  We use this internally as part of our
+        framework measurement for how well we are emulating the client-side
+        environment.
+    </p>            
+    <p>
+       In this example we provide a use case of how to run the jQuery QUnit
+       tests after checking out the latest jquery source code.  This entire 
+       example can be run with Envjs by executing the following command.
+        
+        <pre class='box'>
+        <code>.
+    env-js $ bin/test-jquery.sh
+        </code>    
+        </pre>     
+    </p>     
+    <p>
+       Aside from doing a little bash scripting magic to svn up, and copying
+       env.rhino.js and env-js.jar, Envjs doesn't do anything to modify the 
+       actual html application that runs the jQuery QUnit tests.  Instead we use 
+       hooks as follows:
+       
+        <pre class='box'>
+        <code>.
+load("build/runtest/env.js");
+
+(function($env)&amp;#x7B;
+    
+    $env("test/index.html", &amp;#x7B;
+        //let it load the script from the html
+        scriptTypes: &amp;#x7B;
+            "text/javascript"   :true
+        &#x7D;,
+        //afterScriptLoad is a powerful hook to let you
+        //modify globals or methods so Envjs can 'listen'
+        //to the scripts as they run
+        afterScriptLoad:&amp;#x7B;
+            'qunit/testrunner.js': function()&amp;#x7B;
+                //hook into qunit.log so we can get
+                //updates on the console about scripts
+                //as they run
+                var count = 0;
+                QUnit.log = function(result, message)&amp;#x7B;
+                    $env.log('(' + (count++) + ')[' + 
+                        ((!!result)?'PASS':'FAIL')+'] '+message);
+                &#x7D;;
+                //hook into qunit.done
+                QUnit.done = function(pass, fail)&amp;#x7B;
+                    //when the tests are done we write out the
+                    //resulting dom to a local file so we can see the 
+                    //tests results as reported by qunit
+                    $env.warn('Writing Results to File');
+                    //we dont want the scripts to run again when we 
+                    //open the file so we change the script type
+                    jQuery('script').each(function()&amp;#x7B;
+                        this.type = 'text/envjs';
+                    &#x7D;);
+                    $env.writeToFile(
+                        document.documentElement.xml, 
+                        $env.location('jqenv-'+Date.now()+'.html')
+                    );
+                &#x7D;;
+                
+                //modify some globals already defined by qunit
+                
+                
+                //jquery to run ajax tests locally
+                isLocal = false;
+                
+                //wrap qunit start and stop so we can prevent
+                //the tests from locking up if one throws an error
+                //while stop has been called
+                var unsafeStop = stop,
+                    unsafeStart = start,
+                    isStopped = null;
+                    
+                stop = function()&amp;#x7B;
+                    if(isStopped === null || !isStopped === false)&amp;#x7B;
+                        $env.log('PAUSING QUNIT');
+                        isStopped = true;
+                        unsafeStop(arguments);
+                    &#x7D;
+                &#x7D;;
+                start = function()&amp;#x7B;
+                    if(isStopped === null || isStopped === true )&amp;#x7B;
+                        $env.log('RESTARTING QUNIT');
+                        isStopped = false;
+                        unsafeStart(arguments);
+                    &#x7D;
+                &#x7D;;
+                
+                //we know some ajax calls will fail becuase
+                //we are not running against a running server
+                //for php files
+                var handleError = jQuery.handleError;
+                jQuery.handleError = function()&amp;#x7B;
+                    ok(false, 'Ajax may have failed while running locally');
+                    try&amp;#x7B;
+                        handleError(arguments);
+                    &#x7D;catch(e)&amp;#x7B;&#x7D;
+                    //allow tests to gracefully continue
+                    start();
+                &#x7D;;
+                
+                //allow unanticipated xhr error with no ajax.handleError 
+                //callback (eg jQuery.getScript) to exit gracefully
+                $env.onInterrupt = function()&amp;#x7B;
+                    $env.info('thread interupt: gracefully continuing test');
+                    start();
+                &#x7D;;
+                $env.onScriptLoadError = function(script)&amp;#x7B;
+                    Envjs.error("failed to load script \n"+script.text);    
+                    ok(false, 'Ajax may have failed to load '+
+                       'correct script while running locally');
+                    //allow tests to gracefully continue
+                    start();
+                &#x7D;;
+            &#x7D;
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(Envjs);
+        </code>    
+        </pre>     
+    </p>
+ </>
+    },{
+'name':'scripting',
+'description':<>      
+    <p>
+       You can also simply load the javascript libraries you want
+       to use and then script away just like you would in a browser. This
+       example shows how to use jquery to check you web pages for broken
+       links and could easy be integrated into a continous testing process.
+    
+        <pre class='box'>
+        <code>.
+    //load libraries
+    load('env.rhino.js');
+    load('jquery-1.3.2.js');
+    
+    //configure settings
+    Envjs(&amp;#x7B;
+       logLevel:Envjs.DEBUG
+    &#x7D;);
+    
+    //pick a html app to load
+    window.location = "http://test.example.com/some/file.html";
+    
+    //script away
+    $('a').each(function()&amp;#x7B;
+       //check all the non-local links
+       var url = $(this).attr('href'); 
+       if(!url.match('#'))&amp;#x7B;
+           var _this = this;
+           $.ajax(&amp;#x7B;
+              'type':'GET',
+              'url':url,
+              'async':false,
+              'success':function()&amp;#x7B;
+                 Envjs.debug('url was ok : '+url);
+              &#x7D;,
+              'error': function()&amp;#x7B;
+                 Envjs.error('url was broken! : '+url);
+              &#x7D;
+           &#x7D;);
+       &#x7D;
+    &#x7D;);
+        </code>
+        </pre>
+    </p> 
+    <p>
+        Of course other JavaScript frameworks have their own
+        methods of setup, but the general pattern is:
+        
+        <pre class='box'>
+        <code>.
+    // load env.js
+    // configure Envjs
+    // set window.location
+    // load and run your script
+        </code>
+        </pre>
+    </p>
+</>
+        }]
+    },
+    /**************************************************\
+     * API *
+    \**************************************************/
+     {
+        'id':'api',
+        'version':'1.0.x',
+        'label':'API', 
+        'sections':[
+            'options',
+            'hooks',
+            'platform'
+        ],
+        'options':
+     [{
+'name':'scriptTypes',
+'description':<>
+    <p>
+        <strong>
+            Sets the script types that Envjs will load and run as part
+            of the page loading process.
+        </strong><br/>
+        <span style='color:red;'>
+          Envjs will not load external javascript by default.  Please be aware
+          of the security implications before you allow arbitrary scripts
+          to run on your system.
+        </span><br/> 
+        <em>
+          (can be used to run some scripts in a server environment, or for
+           more general multi-pass treatments of documents)
+        </em><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'><br/>
+            "text/javascript"   :false,<br/>
+            "text/envjs"        :true
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        $env.scriptTypes : &amp;#x7B;
+            "text/javascript"   :true
+        &#x7D;
+    &#x7D;);
+    //this will now load and run all external javascript
+    //emulating browser behavior
+    window.location = 'http://www.w3c.org/';
+    ...</code></pre>
+</>   
+    },{
+'name':'logLevel',
+'description':<>
+    <p>
+        <strong>
+            Sets the verbosity of the log messages produced by Envjs
+        </strong><br/>
+        <span>
+            Allowed values are Envjs.NONE, Envjs.ERROR, Envjs.WARN,
+            Envjs.INFO, and Envjs.DEBUG 
+        </span><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+            Envjs.INFO
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        logLevel:Envjs.DEBUG
+    &#x7D;);
+    //you should see rather verbose logging in the console
+    //as the document loads.
+    window.location = 'http://www.w3c.org';
+    ...</code></pre>
+</>   
+    },{
+'name':'appCodeName',
+'description':<>
+     <p>
+        <strong>
+            Sets the value returned for
+            <code>window.navigator.appCodeName</code>
+        </strong><br/>
+        <span>For example, in Firefox this is 'Mozilla'.</span><br/> 
+        <em>(can be used to emulate different browsers)</em><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>"Envjs"</span>
+    </p>
+    
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        appCodeName:'Mozilla'
+    &#x7D;);
+    
+    window.location = 'http://localhost:8080/navigator.html'
+    //returns 'Mozilla'
+    window.navigator.appCodeName;
+        ...</code></pre>
+</>  
+    },{
+'name':'appName',
+'description':<>
+    <p>
+        <strong>
+            Sets the value returned for
+            <code>window.navigator.appName</code>
+        </strong><br/>
+        <span>in Firefox this is 'Gecko/20070309 Firefox/2.0.0.3'</span><br/> 
+        <em>(can be used to emulate different browsers)</em><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+        "Resig/20070309 BirdDog/0.0.0.1"
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        appCodeName:'Gecko/20070309 Firefox/2.0.0.3'
+    &#x7D;);
+    
+    window.location = 'http://localhost:8080/navigator.html'
+    //returns 'Gecko/20070309 Firefox/2.0.0.3'
+    window.navigator.appCodeName;
+    ...</code></pre>
+</>   
+    },{
+'name':'tmpdir',
+'description':<>
+    <p>
+        <strong>
+            Sets the directory Envjs will use to write temporary source
+            files for script tags with javascript inline.  This is 
+            required for the rhino debugger and will likely be deprecated
+            in the future unless explicitly using a debugger.
+        </strong><br/>
+        <span>
+          This is analagous to the process Firebug uses to provide the 
+          ability to see locally 'eval'uated script.
+        </span><br/> 
+        <em>(default implementation is rhino/java)</em><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+        java.lang.System.getProperty("java.io.tmpdir")
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        tmpdir:'/opt/tmp'
+    &#x7D;);
+    //you will find files loaded locally in 
+    ///opt/tmp (if it exists! else ?)
+    //though envjs will attempt to delete them 
+    //on shutdown of the jvm
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'os_name',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.appVersion</code>
+        </strong><br/>
+        <span>in Firefox on OSX this is '5.0 (Macintosh; en-US)'</span><br/> 
+        <em>(can be used to emulate different os)</em><br/>
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        java.lang.System.getProperty("os.name")
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        os_name:'Win 98'
+    &#x7D;);
+    //Not sure what the spectrum of values might be. 
+    //If you do, please let us know!
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'os_arch',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.platform</code>
+        </strong><br/>
+        <span>in Firefox on OSX this is 'MacIntel'</span><br/> 
+        <em>(can be used to emulate different os arch)</em><br/>
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        java.lang.System.getProperty("os.arch")
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        os_arch:'Pentium II (386)'
+    &#x7D;);
+    //Not sure what the spectrum of values might be. 
+    //If you do, please let us know!
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'os_version',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.userAgent</code>
+        </strong><br/>
+        <span>in Firefox on OSX this is 
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2"</span><br/> 
+        <em>(can be used to emulate different os)</em><br/>
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        java.lang.System.getProperty("os.version")
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        os_name:'Intel Mac OS X 10.1'
+    &#x7D;);
+    //Not sure what the spectrum of values might be. 
+    //If you do, please let us know!
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'lang',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.userAgent</code>
+        </strong><br/>
+        <span>in Firefox on OSX this is 
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2"
+        </span><br/> 
+        <em>(can be used to emulate different default lang)</em><br/>
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        java.lang.System.getProperty("user.lang")
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        os_name:'fr'
+    &#x7D;);
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'platform',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.platform</code>
+        </strong><br/>
+        <span>in Firefox on OSX this is 
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2"
+        </span><br/> 
+        <em>(can be used to emulate different os)</em><br/>
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        "Rhino"
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        platform:'MacIntel'
+    &#x7D;);
+    //Not sure what the spectrum of values might be. 
+    //If you do, please let us know!
+    window.location = 'http://localhost:8080/navigator.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'javaEnabled',
+'description':<>
+    <p>
+        <strong>
+             Sets value which is returned as part of
+            <code>window.navigator.javaEnabled</code>
+        </strong><br/>
+        <span>
+          in env.rhino.js this is set to true, though we may need to
+          give this some deeper consideration. 
+        </span><br/> 
+        <strong>default (rhino): </strong>
+        <span class='api-default-value'>
+        true
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        javaEnabled:false
+    &#x7D;);
+    //Not sure why you would want to do this
+    //returns false
+    window.navigator.javaEnabled;
+    ...</code></pre>
+</>   
+    }],//end api options
+    'hooks': [{
+'name':'beforeScriptLoad',
+'description':<>
+    <p>
+        <strong>
+            Uses regular expression matches on script src attributes
+            and allows you to specify a function to call before the
+            matching script is loaded.
+        </strong><br/>
+        <span>
+            Very useful for setting global values that will affect the 
+            setting of the script to be loaded next.
+        </span><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+            none
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+    //Haven't found a real life use-case but I'm sure someone will
+    ...</code></pre>
+</>   
+    },{
+'name':'afterScriptLoad',
+'description':<>
+    <p>
+        <strong>
+            Uses regular expression matches on script src attributes
+            and allows you to specify a function to call immediately 
+            after the matching script is loaded.
+        </strong><br/>
+        <span>
+            Very useful for modifying the previously loaded script,
+            for example, to attach a logger to a unit testing framework,
+            or hook some data mining up around existing functions.
+        </span><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+            none
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        afterScriptLoad:&amp;#x7B;
+            'qunit/testrunner.js': function()&amp;#x7B;
+                //hook into qunit.log
+                var count = 0;
+                QUnit.log = function(result, message)&amp;#x7B;
+                    Envjs.log('('+(count++)+')['+ 
+                        ((!!result)?'PASS':'FAIL')+']'+message);
+                &#x7D;;
+            &#x7D;
+        &#x7D;
+    &#x7D;);
+    //We'll now get messages from QUnit at the console!
+    window.location = 'jquery/tests/index.html'
+    ...</code></pre>
+</>   
+    },{
+'name':'onScriptLoadError',
+'description':<>
+    <p>
+        <strong>
+            Allows the user to define a single handler to be called if
+            a script tag throws an error when being evaluated for
+            the first time.
+        </strong><br/>
+        <span>
+            This is a global callback, not an event patterns so defining
+            it twice overrides the previous callback.
+        </span><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+            empty function 
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        Envjs.onScriptLoadError : function(script)&amp;#x7B;
+            Envjs.error("failed to load script \n"+script.text);    
+            ok(false, 'JSONP may have failed to '+
+                 'load correct script while running locally');
+            //allow tests to gracefully continue
+            start();
+        &#x7D;
+    &#x7D;);
+    //we use this here to safely continue running the scripts
+    //even though we expect this script load to fail
+    ...</code></pre>
+</>   
+    },{
+'name':'onInterrupt',
+'description':<>
+    <p>
+        <strong>
+            Allows the user to define a single handler to be called when
+            the Envjs.timer routine is interupted.  Note that this is 
+            expected in most cases, such as setTimeout, and setInterval,
+            and even for Ajax, so remember onInterupt does not mean
+            an error necessarily occured.
+        </strong><br/>
+        <span>
+            This is a global callback, not an event patterns so defining
+            it twice overrides the previous callback.
+        </span><br/>
+        <strong>default: </strong>
+        <span class='api-default-value'>
+            empty function 
+        </span>
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        //allow unanticipated xhr error with no ajax.handleError 
+        //callback (eg jQuery.getScript) to exit gracefully
+        Envjs.onInterrupt = function()&amp;#x7B;
+            Envjs.info('thread interupt: gracefully continuing test');
+            start();
+        &#x7D;;
+    &#x7D;);
+    ...</code></pre>
+</>   
+    }],//end api hooks
+    'platform': [{
+'name':'log',
+'description':<>
+    <p>
+        <strong>
+            Allows the user to define a method to provide output. Expects
+            a string argument and returns nothing.
+        </strong><br/>
+        <span>
+            env.rhino.js provides an implementation that uses the global
+            Rhino print function.  If you prefer a different output
+            format or want to write logs to a file you can override this
+            function.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.log = function(string)&amp;#x7B;
+       //do something with the string
+       return;
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'location',
+'description':<>
+    <p>
+        <strong>
+            This function is used to resolve paths.  
+        </strong><br/>
+        <span>
+            If it is detected that the first argument already contains 
+            a protocol, eg file:, http:, or https:, the url is 
+            simply returned.
+        </span><br/>
+        <span>
+            If the first argument 'path' does not contain a protocol, 
+            and a second arg 'base' is detected, the first argument
+            is resolved relative to 'base' and the absolute url is returned
+        </span><br/>
+        <span>
+            If the first argument 'path' does not contain a protocol, 
+            and a second arg is not detected, the first argument
+            is resolved relative to the window.location.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.location = function(path, base)&amp;#x7B;
+       //create an absolute url including protocol
+       return absoluteUrl;
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'load',
+'description':<>
+    <p>
+        <strong>
+            This function is used to load and execute external javascript files.
+        </strong><br/>
+        <span>
+           In env.rhino.js, this function is the global Rhino load function.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.load = function(url)&amp;#x7B;
+       //load and execute the javascript from the url
+       return;
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'loadLocalScript',
+'description':<>
+    <p>
+        <strong>
+            This function contains the primary script loading strategy
+            for Envjs. 
+        </strong><br/>
+        <span>
+           It also contains the implementation of document.write which is
+           different during initial document parsing.
+        </span><br/>
+        <span>
+           It also contains the hooks for Envjs.beforeScriptLoad
+            and Envjs.afterScriptLoad.
+        </span><br/>
+        <span>
+           If you need to customize the script loading strategy, simply 
+           redefine this function.
+        </span><br/> 
+    </p>
+    <pre class='box'><code>...
+    Envjs.loadLocalScript = function(scriptElement, parser)&amp;#x7B;
+       //load and execute the javascript from the url
+       return;
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'timer',
+'description':<>
+    <p>
+        <strong>
+            This function implements the waiting strategy for functions
+            executed with setTimeout and setInterval.
+        </strong><br/>
+        <span>
+           It must synchronize the execution of the timed function
+           in the same scope at which setTimeout or setInterval was called.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.timer = function(fn, time)&amp;#x7B;
+      //creates a thread, waits the specified durations,
+      //joins the thread and executes the specified function
+      //in a synchronized wrapper
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'runAsync',
+'description':<>
+    <p>
+        <strong>
+            This function implements asychronous execution of functions.
+        </strong><br/>
+        <span>
+           It is used primarily by the XMLHttpRequest object to make 
+           network calls while scripts continue to run.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.runAsync = function(fn)&amp;#x7B;
+      //creates a thread and executes the specified function
+      //in a synchronized wrapper
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'loadFrame',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'globalize',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'setScope',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'getScope',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'configureScope',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'restoreScope',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'writeToFile',
+'description':<>
+    <p>
+        <strong>
+           Writes text to a file.
+        </strong><br/>
+        <span>
+           Used by the XMLHttpRequest when data is PUT to a local file.
+        </span><br/>
+        <span>
+           Useful to write resulting dom to a file after running
+           dhtml on a document.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.writeToFile = function(text, url)&amp;#x7B;
+      dumps the text to the specified url (should be a local file path)
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'writeToTempFile',
+'description':<>
+    <p>
+        <strong>
+           Writes text to a temporary file. The suffix parameter
+           allows idenification of the temporary files writen by Envjs.
+        </strong><br/>
+        <span>
+           Used prior to executing scripts embedded in html files so
+           they can be traced by debuggers.
+        </span><br/>
+        <span>
+           Envjs attempts to delete these files on exit.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.writeToTmpFile = function(text,suffix)&amp;#x7B;
+      dumps the text to a temporary file
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'deleteFile',
+'description':<>
+    <p>
+        <strong>
+          Deletes the file at the given url.
+        </strong><br/>
+        <span>
+           Used by XMLHttpRequest when a DELETE is called on a local file.
+        </span><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.deleteFile = function(url)&amp;#x7B;
+      //deletes the file at the given url
+    &#x7D;
+    ...</code></pre>
+</>   
+    },{
+'name':'connection',
+'description':<>
+    <p>
+        <strong>
+          Implements the details of making the connections for 
+          XMLHttpRequest
+        </strong><br/>
+    </p>
+    <pre class='box'><code>...
+    Envjs.connection = function(xhr, responseHandler, data)&amp;#x7B;
+      //makes a connection, posting or url encoding data, 
+      //and finally calling the response handler
+    &#x7D;
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'parseXML',
+'description':<>
+    <p>
+        This is used by the xpath and xslt functions, but is not
+        the same as the internal javascript xml parser (which is
+        aware of the browser document object).
+    </p>
+    <pre class='box'><code>...
+    Envjs.parseXML = function(xmlString)&amp;#x7B;
+        //returns platform specific dom document
+        return domDoc;
+    &#x7D;);
+    ...</code></pre>
+</>   
+    },{
+'name':'xpath',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'xslt',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    },{
+'name':'transform',
+'description':<>
+    <p>
+    TODO
+    </p>
+    <pre class='box'><code>...
+    Envjs(&amp;#x7B;
+        TODO
+    &#x7D;);
+        //TODO
+    ...</code></pre>
+</>   
+    }]//end platform 
+    }
+    
+]}

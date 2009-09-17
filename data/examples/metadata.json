@@ -1,0 +1,21 @@
+{_:[
+    
+    {
+        title:'An Online Quiz',
+		id:'quiz',
+        description:<>
+                <img src='/images/star_inverting.jpg'/>
+            <p>
+            	 Our 'hello world'. It's a good place to start looking for
+				 how we start to structure an app.
+            </p>
+        </>,
+		more: <>
+		    <p>
+			This little app demonstrates all the basics, though in the real
+			world, if this all you needed to do you probably wouldn't need,
+			or benifit much from jquery-claypool.  
+			</p>
+		</>
+    }
+]}

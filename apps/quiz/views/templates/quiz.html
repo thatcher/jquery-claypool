@@ -1,0 +1,33 @@
+{#template MAIN} 
+<div class="span-14" >
+    <div class="span-16">
+        <h2>Take the jquery-claypool quiz!</h2>
+        <p><em>
+        	Take a moment to answer these questions about <b>jquery-claypool</b>, 
+			see it in action, and learn about what it is and isn't.
+        </em></p>
+        <form action='example/score'>
+        	<em class='flash' style='color:red;'></em>
+        	<table>
+	            {#foreach $T.questions as question}
+        		<tr><td id='{$T.question.id}'
+						style='text-align:right;'>
+	        		<em>{$T.question.label}</em>
+				</td><td>
+					{#foreach $T.question.options as option}
+		        	<input 	name='question/{$T.question.id}' 
+							type='radio'  
+							value='{$T.option}'>{$T.option}</input>
+					{#/for}
+				</td></tr>
+				{#/for}
+				<tr><td style='text-align:right;'>
+					<b id='quiz_score' style='color:blue;'></b>
+				</td><td>
+					<input type='submit' value='score'/>
+				</td></tr>
+			</table>
+        </form>
+    </div>
+</div>
+{#/template MAIN}

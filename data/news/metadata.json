@@ -11,7 +11,7 @@
 				 <a href='http://eclipse.org/jetty/'>jetty server</a>
 				 so you can get running in seconds!  Of course you can still
 				 just drop the project directly into the tomcat
-				 webapps folder too!
+				 webapps folder too, or forget the server and go pure client.
             </p>
         </>
     },{

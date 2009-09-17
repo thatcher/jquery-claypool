@@ -1,9 +1,3 @@
-/**
- * Example @VERSION - 
- *
- * Copyright (c) 2008-2009 ClaypoolJS
- *
- */
 //  -   BOOT THE APP  -
 jQuery.noConflict();
 (function($){
@@ -13,9 +7,7 @@ jQuery.noConflict();
     
     //The environments are described in environments.js
     try{
-       $.env('defaults', "dev.server");
- 	   //$.env('defaults', "appengine.server");
-       
+ 	   $.env('defaults', "dev.client");
  	}catch(e){
  	   log.error("Environmental selection is invalid!").exception(e);
  	}
@@ -25,12 +17,6 @@ jQuery.noConflict();
         $.boot(function(){
           //you can do additional initialization here
             log.info("Successfully Initialized Application");
-            //preload all application data
-            $.$('#docsModel').get();
-            $.$('#releasesModel').get();
-            $.$('#newsModel').get();
-            $.$('#eventsModel').get();
-            $.$('#examplesModel').get();
         });
     });    
     

@@ -230,16 +230,13 @@ a:hover {
     text-align: left;
 }
 #docs ul li img{
-    border:2px dotted;
+    border:1px dotted;
     padding:1em;
     margin:0.5em 0.5em 0 0.5em;
 }
 #docs ul li a{
     text-decoration:none;
-}
-#docs ul li:hover{
-    padding:0px;
-    border:1px dashed;
+	padding:0px;
 }
 
 

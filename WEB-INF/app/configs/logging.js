@@ -10,9 +10,9 @@
    $.logging([
         { category:"Site",                       level:"INFO" },
         { category:"Site.Models",                level:"INFO" },
-        { category:"Site.Views",                 level:"INFO" },
-        { category:"Site.Controllers",           level:"INFO" },
-        { category:"Site.Service",               level:"INFO" },
+        { category:"Site.Views",                 level:"DEBUG" },
+        { category:"Site.Controllers",           level:"DEBUG" },
+        { category:"Site.Service",               level:"DEBUG" },
         { category:"Claypool",                   level:"WARN" },
         { category:"Claypool.Application",       level:"WARN" },
         { category:"Claypool.Server",            level:"INFO" },

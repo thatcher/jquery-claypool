@@ -1,0 +1,29 @@
+[{
+	'id':0,
+	'label':'jquery-claypool is a jquery plugin?',
+	'options':['true', 'false']
+},{
+	'id':1,
+	'label':'jquery-claypool is about 14K when minified and gzipped?',
+	'options':['true', 'false']
+},{
+	'id':2,
+	'label':'jquery-claypool has an MIT/GPL license?',
+	'options':['true', 'false']
+},{
+	'id':3,
+	'label':'jquery-claypool is a railable mvc framework?',
+	'options':['true', 'false']
+},{
+	'id':4,
+	'label':'jquery-claypool requires you to extend classes?',
+	'options':['true', 'false']
+},{
+	'id':5,
+	'label':'jquery-claypool requires you to use a particular model or template technology?',
+	'options':['true', 'false']
+},{
+	'id':6,
+	'label':'jquery-claypool fits nicely with jquery and jquery-ui?',
+	'options':['true', 'false']
+}] 

@@ -225,7 +225,7 @@
         var xml="", i;
         if ( typeof(tree) == "undefined" || tree == null ) {
             xml = '';
-        } else if ( typeof(tree) == "object" && tree.constructor == Array ) {
+        } else if ( typeof(tree) == "object" &&  tree.length  ) {
             for(i=0;i<tree.length;i++){
                 xml += '\n'+this.writeXML(tree[i]);
             }
@@ -257,7 +257,7 @@
             if ( key.charAt(0) != this.attr_prefix ) {
                 if ( typeof(val) == "undefined" || val == null ) {
                     elem[elem.length] = "<"+key+" />";
-                } else if ( typeof(val) == "object" && val.constructor == Array ) {
+                } else if ( typeof(val) == "object" && val.length ) {
                     elem[elem.length] = this.array_to_xml( key, val );
                 } else if ( typeof(val) == "object" ) {
                     elem[elem.length] = this.hash_to_xml( key, val );
@@ -269,7 +269,7 @@
                     //text node
                     if ( typeof(val) == "undefined" || val == null ) {
                         elem[elem.length] = " ";
-                    } else if ( typeof(val) == "object" && val.constructor == Array ) {
+                    } else if ( typeof(val) == "object" && val.length ) {
                          elem[elem.length] = this.writeXML(val);
                     } else if ( typeof(val) == "object" ) {
                         elem[elem.length] = this.hash_to_xml( key, val );

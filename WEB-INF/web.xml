@@ -80,6 +80,14 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/examples</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
+        <url-pattern>/example/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rhino-dispatcher</servlet-name>
         <url-pattern>/news</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

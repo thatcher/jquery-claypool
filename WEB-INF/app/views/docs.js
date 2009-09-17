@@ -17,7 +17,7 @@
         render : function(model){
             log.debug("Rendering HTML Response");
             var page = !model.id?'docs':
-                    (model.doc&&model.doc.id=='guide')?'guide':'api';
+                    (model.doc&&model.doc.id=='api')?'api':'guide';
             /* Thats so cool.*/
             this.write($.e4x(
                 "site/html/pages/"+page+".js",

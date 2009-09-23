@@ -136,9 +136,8 @@
                 <h2>Use it.</h2>
                 <p>
                     Claypool comes with a template project to get you rolling in minutes.
-                    <em>In fact you are currently using the <b>jquery-server-template</b> project and 
-                    you are currently using the <b>jquery-client-template</b> project</em>
-                    <a href="#examples/1/">Click here to see an example</a>
+                    In fact you are currently using the <b>jquery-server-template</b> project and 
+                    you can find some additional examples <a href={$.env('root')+'/docs'}>here</a>
                 </p>
             </div>
         </div>

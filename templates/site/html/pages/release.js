@@ -6,7 +6,7 @@
             <div class='first column span-5 colborder'>
                 <h4>{release.name}</h4>
                 <h5>
-                    <a href={$.env('root')+'doc/guide-'+release.id}>
+                    <a href={$.env('root')+'docs'}>
                         Getting Started
                     </a>
                 </h5>
@@ -16,7 +16,7 @@
                     </a>
                 </h5>
                 <em>Release</em><br/>
-                <span>Envjs {release.id}</span> 
+                <span>jQuery-Claypool {release.id}</span> 
             </div>
              
             <div id='cover' 
@@ -46,13 +46,16 @@
                  class='column span-9'>
                 <ol class='clear'>
                     {_('.*', release.artifacts).map(function(index, note){
-                        return {li:{$:[
-                            {a:{
-                                $href:this.url,
-                                $:this.label
-                            }},
-                            _.e4x(this.description)
-                        ]}};
+                        return {li:{
+                            $class:'small quiet',
+                            $style:'margin-bottom:0',
+                            $:[
+                                {a:{
+                                    $href:this.url,
+                                    $:this.label
+                                }},
+                                _.e4x(this.description)
+                            ]}};
                     }).e4x()}
                     
                 </ol>
@@ -60,7 +63,7 @@
             
             <div id='description' class='column span-22'>
                 <div class='column span-18 push-3'>
-                    {release.description}
+                    {_.e4x(release.description)}
                     <div class='column'>
                         <h5>
                             <a href={release.README} target='_blank'>
@@ -75,14 +78,14 @@
                             }).e4x()}
                         </ul>
                     </div>
-                    <div class='column'>
+                    <!--div class='column'>
                         <strong>jQuery 1.3.2</strong>
                         <img src={'http://chart.apis.google.com/chart'+
                              '?chs=150x75'+
                              '&cht=gom'+
                              '&chd=t:95'+
                              '&chl=1348 of 1420'}/>
-                    </div>
+                    </div-->
                         
                 </div>
             </div>

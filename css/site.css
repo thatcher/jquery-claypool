@@ -281,9 +281,10 @@ a:hover {
     text-align:center;
 }
 #doc .box{
-    padding:0;
+    padding:10px;
     overflow-x:auto;
 	background-color:#FEE;
+    border:5px solid #DDDDDD;
 }
 #doc div ul{
     margin-right:0;

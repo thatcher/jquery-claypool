@@ -32,13 +32,42 @@
        },{
            label:'jquery.claypool-lite.js',
            url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool-lite.js',
-           description:<><p>packaged with only the core client-side modules</p></>
+           description:<><p>packaged with only the core client-side modules (core/app, logging, ioc, mvc)</p></>
+       },{
+           label:'jquery.claypool.app.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.app.js',
+           description:<><p>common base code for all other modules.</p></>
+       },{
+           label:'jquery.claypool.logging.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.logging.js',
+           description:<><p>Category logging framework (requires jquery.claypool.app.js)</p></>
+       },{
+           label:'jquery.claypool.ioc.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.ioc.js',
+           description:<><p>Inversion of control framework (requires jquery.claypool.app.js)</p></>
+       },{
+           label:'jquery.claypool.mvc.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.mvc.js',
+           description:<><p>MVC Framework (Requires app and ioc)</p></>
+       },{
+           label:'jquery.claypool.aop.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.aop.js',
+           description:<><p>Aspect / Filter Framework (Requires app and ioc)</p></>
+       },{
+           label:'jquery.claypool.models.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.models.js',
+           description:<><p>Rest Framework (Requires app)</p></>
+       },{
+           label:'jquery.claypool.server.js',
+           url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.core.js',
+           description:<><p>Server-side Framework (Requires app, ioc, mvc)</p></>
        }],
        notes:[
-           'Integrates with Amazon SDB !',
-           'Reuse code on the client and server!',
-           'Ready to go for enterprise scale',
            'Small and fast',
+           'Reuse code on the client and server!',
+           'Railable for project ease and maintainence.',
+           'Simple Rest Framework Integrates with Amazon SDB.',
+           'Ready to go for deployment on the cloud',
            'Comes with jquery.loremipsum.js, jquery.e4x-templates.js, and more...'
        ]
     }

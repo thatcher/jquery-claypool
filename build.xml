@@ -69,6 +69,40 @@
 	           location="${SRC_DIR}/server" />
     <property  name="CLAYPOOL_TEST"   			
 	           location="${SRC_DIR}/test" />
+               
+    <!-- Individual Files -->
+    <property  name="CLAYPOOL_MODULE_APP"          
+               location="${DIST_DIR}/${PROJECT}.app.js" />
+    <property  name="CLAYPOOL_MODULE_LOGGING"          
+               location="${DIST_DIR}/${PROJECT}.logging.js" />
+    <property  name="CLAYPOOL_MODULE_IOC"          
+               location="${DIST_DIR}/${PROJECT}.ioc.js" />
+    <property  name="CLAYPOOL_MODULE_MVC"          
+               location="${DIST_DIR}/${PROJECT}.mvc.js" />
+    <property  name="CLAYPOOL_MODULE_AOP"          
+               location="${DIST_DIR}/${PROJECT}.aop.js" />
+    <property  name="CLAYPOOL_MODULE_MODELS"          
+               location="${DIST_DIR}/${PROJECT}.models.js" />
+    <property  name="CLAYPOOL_MODULE_SERVER"          
+               location="${DIST_DIR}/${PROJECT}.server.js" />
+               
+    <!-- Individual Minified Files -->
+    <property  name="CLAYPOOL_MODULE_APP_MIN"          
+               location="${DIST_DIR}/${PROJECT}.app.min.js" />
+    <property  name="CLAYPOOL_MODULE_LOGGING_MIN"          
+               location="${DIST_DIR}/${PROJECT}.logging.min.js" />
+    <property  name="CLAYPOOL_MODULE_IOC_MIN"          
+               location="${DIST_DIR}/${PROJECT}.ioc.min.js" />
+    <property  name="CLAYPOOL_MODULE_MVC_MIN"          
+               location="${DIST_DIR}/${PROJECT}.mvc.min.js" />
+    <property  name="CLAYPOOL_MODULE_AOP_MIN"          
+               location="${DIST_DIR}/${PROJECT}.aop.min.js" />
+    <property  name="CLAYPOOL_MODULE_MODELS_MIN"          
+               location="${DIST_DIR}/${PROJECT}.models.min.js" />
+    <property  name="CLAYPOOL_MODULE_SERVER_MIN"          
+               location="${DIST_DIR}/${PROJECT}.server.min.js" />
+    
+    <!-- BUNDLES -->           
     <property  name="CLAYPOOL_ALL"   			
 	           location="${DIST_DIR}/${BUILD}.js" />
     <property  name="CLAYPOOL_ALL_MIN"   		
@@ -273,9 +307,35 @@
     	
     	<!-- TEST (MoonUnit) DEPRECATED Prefer jQunit and jqunit-spec plugin-->
         
+        <mkdir dir="${DIST_DIR}" />
+        
+        <!-- INDIVIDUAL MODULES -->
+        <echo message="Building ${CLAYPOOL_MODULE_APP}" />
+        <concat destfile="${CLAYPOOL_MODULE_APP}">
+            <fileset dir="${BUILD_DIR}" includes="core.js" />
+            <fileset dir="${BUILD_DIR}" includes="app.js" />
+        </concat>
+        <echo message="Building ${CLAYPOOL_MODULE_LOGGING}" />
+        <copy file='${BUILD_DIR}/logging.js' 
+              tofile='${CLAYPOOL_MODULE_LOGGING}'/> 
+        <echo message="Building ${CLAYPOOL_MODULE_LOGGING}" />
+        <copy file='${BUILD_DIR}/ioc.js' 
+              tofile='${CLAYPOOL_MODULE_IOC}'/> 
+        <echo message="Building ${CLAYPOOL_MODULE_MVC}" />
+        <copy file='${BUILD_DIR}/mvc.js' 
+              tofile='${CLAYPOOL_MODULE_MVC}'/> 
+        <echo message="Building ${CLAYPOOL_MODULE_AOP}" />
+        <copy file='${BUILD_DIR}/aop.js' 
+              tofile='${CLAYPOOL_MODULE_AOP}'/> 
+        <echo message="Building ${CLAYPOOL_MODULE_MODELS}" />
+        <copy file='${BUILD_DIR}/models.js' 
+              tofile='${CLAYPOOL_MODULE_MODELS}'/> 
+        <echo message="Building ${CLAYPOOL_MODULE_SERVER}" />
+        <copy file='${BUILD_DIR}/server.js' 
+              tofile='${CLAYPOOL_MODULE_SERVER}'/> 
+        
     	<!-- ALL CORE -->
         <echo message="Building ${CLAYPOOL_ALL}" />
-        <mkdir dir="${DIST_DIR}" />
         <concat destfile="${CLAYPOOL_ALL}">
             <fileset dir="${BUILD_DIR}" includes="core.js" />
             <fileset dir="${BUILD_DIR}" includes="logging.js" />
@@ -292,9 +352,9 @@
 		
 		<!-- LITE CORE -->
         <echo message="Building ${CLAYPOOL_LITE}" />
-        <mkdir dir="${DIST_DIR}" />
         <concat destfile="${CLAYPOOL_LITE}">
             <fileset dir="${BUILD_DIR}" includes="core.js" />
+            <fileset dir="${BUILD_DIR}" includes="logging.js" />
             <fileset dir="${BUILD_DIR}" includes="app.js" />
             <fileset dir="${BUILD_DIR}" includes="aop.js" />
             <fileset dir="${BUILD_DIR}" includes="ioc.js" />
@@ -333,6 +393,92 @@
             </classpath>
         </java>
         <copy file='${CLAYPOOL_LITE_MIN}' tofile='${CLAYPOOL_LATEST_LITE_MIN}'/> 
+        
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_APP_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_APP}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_LOGGING_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_LOGGING}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_IOC_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_IOC}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_MVC_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_MVC}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_AOP_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_AOP}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_MODELS_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_MODELS}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
+        
+        <java jar="${YUI_MIN_JAR}" fork="true">
+            <arg value="--charset=utf8"/>
+            <arg value="--line-break"/>
+            <arg value="8000"/>
+            <arg value="-o"/>
+            <arg value="${CLAYPOOL_MODULE_SERVER_MIN}"/>
+            <arg value="${CLAYPOOL_MODULE_SERVER}" />
+            <classpath>
+                <pathelement location="${RHINO_JAR}"/>
+            </classpath>
+        </java>
         <echo message="Finished Compressing Distibution" />
     </target>
 	

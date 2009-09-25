@@ -33,12 +33,6 @@
         { category:"Example.Views",         level:"DEBUG" },
         { category:"Example.Controllers",   level:"DEBUG" },
         { category:"Claypool",              level:"INFO"  },
-        { category:"Claypool.Application",  level:"INFO" },
-        { category:"Claypool.Server",       level:"INFO" },
-        { category:"Claypool.MVC",          level:"INFO" },
-        { category:"Claypool.IoC",          level:"INFO" },
-        { category:"Claypool.AOP",          level:"INFO" },
-        { category:"JStORM",                level:"INFO" },
         { category:"root",                  level:"WARN"  }
     ]);     
 	

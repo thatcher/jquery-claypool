@@ -17,5 +17,28 @@
 			or benifit much from jquery-claypool.  
 			</p>
 		</>
+    },
+    {
+        title:'Basics Tutorial Companion',
+        id:'tutorial',
+        description:<>
+                <img src='/images/star_inverting.jpg'/>
+            <p>
+                 Companion examples for our basics guide.  See the
+                 docs for more info.
+            </p>
+        </>,
+        more: <>
+            <p>
+            A 6 step tutorial demonstrating all the basic concepts you
+            need to start writing you first app with jquery-claypool.
+            </p>
+            <a href='../apps/tutorial/0/index.html'>step 0</a>| 
+            <a href='../apps/tutorial/1/index.html'>step 1</a>| 
+            <a href='../apps/tutorial/2/index.html'>step 2</a>| 
+            <a href='../apps/tutorial/3/index.html'>step 3</a>| 
+            <a href='../apps/tutorial/4/index.html'>step 4</a>| 
+            <a href='../apps/tutorial/5/index.html'>step 5</a> 
+        </>
     }
 ]}

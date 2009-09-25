@@ -6,12 +6,12 @@
  */
 (function($, $C){
     
-	var _,
+	var Quiz,
 	    log;
 	
     $C.Quiz = function(options){
         $.extend(true, this, options);
-		_ = $.$('#quizModel');
+		Quiz = $.$('#quizModel');
 		log = $.logger('Example.Controllers.Quiz');
     };
     $.extend($C.Quiz.prototype, {
@@ -19,13 +19,13 @@
 			var params = event.params();
 			log.debug('Handling event %s, id: %s', event.target, params.id);
 			event.v('.think').render(function(){
-				_.get('questions',function(questions){			
+				Quiz.get('questions',function(questions){			
 					event.
 						m({'questions':questions}).
 						v('.update').
 						render(function(){
 					  		//preload answers
-					  		_.get('answers');
+					  		Quiz.get('answers');
 						});  
 				});
 			});
@@ -37,7 +37,7 @@
 				total: 0
 			};
 			log.debug('Handling event %s', event.target);
-			_.get('answers',function(answers){		
+			Quiz.get('answers',function(answers){		
 				//do the scoring
 				responses = $('input[name*=question]:checked',event.target);
 				if(responses.length!=answers.length){

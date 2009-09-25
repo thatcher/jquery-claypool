@@ -88,8 +88,8 @@
     		return $.e4x(url, model, deep);
     	}
         
-        //replace {{_: and }}: with {"{ and }"} respectively so that
-        //we evalute truely dynamic content on the second pass
+        //DEPRECATED: replace {{_: and }}: with {"{ and }"} respectively 
+        //so that we evaluate dynamic content on the second pass
         //of the cached template
         if(!deep){
             text = text.replace(/(\{\{_\:|\}\}\:)/g, function(){
@@ -136,26 +136,32 @@
 			}
 			//now loop through the final remaining blocks
 			if(evaluated.elements().length() > 0){
-				compiled = evaluated.*[0].copy();
-				blocks = compiled..block;
-				delete evaluated;
-				for each(block in blocks){
-					id = block.@id. toString();
-					//step 2: check block
-					if(!blockMap[id]){
-						//step 2: deleting block 
-						delete block;
-					}
-					//step 2: replacing block
-					compiled..block.(@id == id)[0] = blockMap[id]||'';
-				}
+                compiled = evaluated.*[0].copy();
+                delete evaluated;
+                
+                blocks = compiled..block;
+                while(blocks.length() > 0){
+                    
+                    for each(block in blocks){
+                        id = block.@id. toString();
+                        //step 2: check block
+                        if(!blockMap[id]){
+                            //step 2: deleting block 
+                            delete block;
+                        }
+                        //step 2: replacing block
+                        compiled..block.(@id == id)[0] = blockMap[id]||'';
+                    }
+                    
+                    blocks = compiled..block;
+                }
 				
-				//finally replace each <e4x> element with it's children
-				for each(var e4x in compiled..e4x){
-					e4x = e4x.children();
-				}
-				
-				rendered = compiled.copy();
+                //finally replace each <e4x> element with it's children
+                for each(var e4x in compiled..e4x){
+                    e4x = e4x.children();
+                }
+                    
+				rendered = compiled.*.copy();
 				delete compiled;
 			}
 			

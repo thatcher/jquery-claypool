@@ -1,0 +1,56 @@
+{'_':[ 
+ 
+ {
+/**************************************************/
+    'id':'api_1.0.x_scanners',
+    'version':'1.0.x',
+    'location':'app/configs/config.js',
+    'label':'$.scan', 
+/**************************************************/
+    'usage':<>
+    <p>
+        {_.paragraph()} 
+        
+        <pre class='box'>
+        <code>.
+    {_.words(2, false)}
+        </code>
+        </pre>
+    
+        
+        {_.sentence()} 
+    </p>
+</>,
+/**************************************************/
+    'options':<>
+    <p>
+        {_.paragraph()} 
+        
+        <pre class='box'>
+        <code>.
+    {_.words(2, false)}
+        </code>
+        </pre>
+    
+        
+        {_.sentence()} 
+    </p>
+</>,
+/**************************************************/
+    'examples':<>
+    <p>
+        {_.paragraph()} 
+        
+        <pre class='box'>
+        <code>.
+    {_.words(2, false)}
+        </code>
+        </pre>
+    
+        
+        {_.sentence()} 
+    </p>
+</>
+/**************************************************/
+    
+]}

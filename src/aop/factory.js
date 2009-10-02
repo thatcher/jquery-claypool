@@ -77,20 +77,22 @@
                             *   flexible enough to allowa namespaced class, and in either case,
                             *   it's specified as a string so we have to resolve it
                             */
-                            if(aopconf.target.match(/\.\*^/)){
+                            if(aopconf.target.match(/\.\*$/)){
                                 //The string ends with '.*' which implies the target is every function
                                 //in the namespace.  hence we resolve the namespace, look for every
                                 //function and create a new filter for each function.
+                                this.logger.debug("Broad aspect target %s", aopconf.target);
                                 namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
                                 for(prop in namespace){
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
-                                        genconf = $.extend({
-                                            id : aopconf.id+$.createGUID(),
-                                            target : namespace[prop] 
-                                        }, aopconf );
-                                        this.logger.debug("Creating aspect id %s", genconf.id);
-                                        this.add(genconf.id);
+                                        genconf = $.extend({}, aopconf, {
+                                            id : aopconf.id+$.guid(),
+                                            target : namespace[prop]
+                                        });
+                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
+                                            aopconf.target, prop, genconf.id);
+                                        this.add(genconf.id, genconf);
                                         this.create(genconf.id);//this creates the aspect
                                     }
                                 }

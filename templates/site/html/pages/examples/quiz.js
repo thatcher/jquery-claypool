@@ -39,6 +39,11 @@
 	</block>
     
     <block id='example'>
+        <h5>
+            <a href='#examples/quiz/'>
+                Start Example
+            </a>
+        </h5>
         <div id='quiz' 
              class='column'>
                 <!-- quiz will go here -->

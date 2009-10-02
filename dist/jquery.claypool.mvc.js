@@ -684,6 +684,8 @@ Claypool.MVC = {
             }
         }
 	});
+    
+    $.routes = $.mvc;
 	/*
      *   -   Model-View-Controller Patterns  -
      *

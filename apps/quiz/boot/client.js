@@ -3,7 +3,7 @@ jQuery.noConflict();
 (function($){
     
     //A static logger for any initialization routines we might add here
-    var log = $.logger("Example");
+    var log = $.logger("Quiz");
     
     //The environments are described in environments.js
     try{

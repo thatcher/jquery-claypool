@@ -288,7 +288,7 @@ a:hover {
 }
 #doc div ul{
     margin-right:0;
-    list-style:none;
+    list-style-image:url(/images/star_inverting_bullet.jpg)
 }
 #doc div.first ul{
     margin-right:0;

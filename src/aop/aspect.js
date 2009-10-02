@@ -224,6 +224,7 @@
                     return function() {
                         var invocation = { object: this, args: arguments };
                         return _this.advice.apply(_this, [{ 
+                            object: invocation.object,
                             arguments:  invocation.args, 
                             proceed :   function() {
                                 var returnValue = cutline.apply(invocation.object, invocation.args);

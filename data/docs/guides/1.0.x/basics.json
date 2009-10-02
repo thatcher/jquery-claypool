@@ -1,0 +1,869 @@
+{'_':[ 
+ 
+    /**************************************************\
+     * Getting Started *
+    \**************************************************/
+    {
+        'id':'basics',
+        'version':'1.0.x',
+        'label':'Getting Started', 
+        'description':<>
+            <p>
+             <strong>
+             This guide is applicable to both the jquery-claypool client and server
+             application frameworks.
+             </strong>  
+             Where the two differ functionally the documentation will provide notes and
+             examples of usage in each environment.
+          </p>
+        </>,
+        'sections':[{
+    
+'name':'creating a new project',
+'description':<>
+    <p>
+      To follow along with this step create this folder structure
+     with a couple javascript files:
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \boot
+           - client.js
+         \configs
+           - config.js
+     \lib
+       - jquery.js
+       - jquery.claypool.js
+ - index.html
+</code></pre>
+   </p>
+</>,
+'subsections':[{  
+
+    'name':'scanning',
+    'description':<>
+       <p>
+    Scanning is a railable pattern that allows you to setup a project
+    with as little configuration as possible, and as you progress,
+    it saves you some of the redundency of configuration by making use 
+    of some simple conventions. The following shows all the configuration
+    we need to get going.
+<pre class='box'><code>/**   config.js   **/
+
+var Example = &amp;#x7B;
+    Models:&amp;#x7B;&#x7D;,
+    Views:&amp;#x7B;&#x7D;,
+    Controllers:&amp;#x7B;&#x7D;
+&#x7D;;
+
+(function($)&amp;#x7B;
+
+   $.scan([
+        "Example.Models", 
+        "Example.Views", 
+        "Example.Controllers"
+    ]);
+    
+&#x7D;)(jQuery);
+</code></pre>
+    This simply lets jquery-claypool know where it will eventually
+    look in the global namespace to find your application event handlers
+    etc.  The 'Example' object literal is basically how we'll organize and 
+    identify our application specific code. All you need to know for now 
+    is that claypool is lazy, and lets you be lazy too.
+   </p>
+</>
+
+    },{
+    
+    'name':'boot strapping',
+    'description':<>
+       <p>
+    Booting the application should be wrapped in the usual jquery ready.
+    We'll revisit the boot process a little later but for the purposes of
+    our little intro, this is good enough to get us going. 
+<pre class='box'><code>/**   client.js   **/
+
+jQuery.noConflict();
+(function($)&amp;#x7B;
+    
+    $(document).ready(function()&amp;#x7B;
+        $.boot();
+    &#x7D;);    
+    
+&#x7D;)(jQuery);  
+
+</code></pre>
+       At this point we can actually check that our app is working.  It won't
+       do anything but that's ok!  We didn't really talk about the html
+       but in case you need it, up to now it'll look like this:
+       
+<pre class='box'><code>/**   index.html   **/
+
+&lt;html xmlns="http://www.w3.org/1999/xhtml">
+    &lt;head>
+        &lt;title>First jQuery-Claypool App&lt;/title>
+        
+        &lt;script src="lib/jquery.js"            type="text/javascript">&lt;/script>
+        &lt;script src="lib/jquery.claypool.js"   type="text/javascript">&lt;/script>
+        &lt;script src="app/configs/config.js"    type="text/javascript">&lt;/script> 
+        &lt;script src="app/boot/client"          type="text/javascript">&lt;/script> 
+    
+    &lt;/head>
+    &lt;body>
+        &lt;div>Hello World!&lt;/div>
+    &lt;/body>
+&lt;/html>
+
+</code></pre>
+
+    <strong style='color:red;'>
+        Note: so far everything we've done is the same whether we are going to 
+        run this application on the client or on the server.
+    </strong>
+       </p>
+    </>
+    }]
+
+},{
+
+'name':'adding a route',
+'description':<>
+    <p>
+        <strong>
+        Routes are basically where we return to each time we 
+        want to add a feature.
+        </strong>
+        It's also the first place you'll look when you want to find out where
+        you need to look to find something in your application code.
+        Routers are a common framework pattern to provide a consistent layer of 
+        delegation and a clear mapping of events to application controllers.
+  </p>
+</>,
+'subsections':[{    
+    'name':'basic paginator',
+    'description':<>
+       <p>
+           To get started we just need to decide on a feature.  For this example
+           we are going to add a 'paginator', which is really just a list of
+           links.<br/>
+           Here our html: 
+<pre class='box'><code> /** pagination markup **/
+&lt;div id='pages'>
+    &lt;a href='#example/page/1'>1&lt;/a> | 
+    &lt;a href='#example/page/2'>2&lt;/a> | 
+    &lt;a href='#example/page/3'>3&lt;/a> | 
+    &lt;a href='#example/page/4'>4&lt;/a> | 
+    &lt;a href='#example/page/5'>5&lt;/a>  
+&lt;/div>
+</code> </pre>
+            Now we need to create the file we will use, by convention, to
+            store all of our application event bindings.  This is called
+            <strong>app/config/routes.js</strong>.
+
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \configs
+           - routes.js
+</code></pre>
+           And here is our first router :
+<pre class='box'><code> /** routes.js **/
+(function($)&amp;#x7B;
+   
+   $.mvc(&amp;#x7B;
+        "hijax:a" : [&amp;#x7B;
+            id:"#example-hash-routes",
+            active:false,
+            filter:"[href*=#example]",
+            hijaxMap:
+               [&amp;#x7B;urls:"page/|:id|$",   controller:"#pagesController"&#x7D;]
+        &#x7D;]
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+</code> </pre>
+
+           You'll evetually be able to read routers like a book, but for now this
+           one loosely translates to <em>Capture all clicks of links whose href starts with
+           '#example' and send the ones that end with 'page/abc123' to the
+           event handler known as '#pageController'.</em>  Of course we need to write that
+           controller still, so let's do that next.
+       </p>
+    </>
+    }]
+
+},{
+
+'name':'lazy event handling',
+'description':<>
+    <p>
+        As we create our first simple event handler, try to keep a couple
+        key concepts in mind. <ol><li> First, it looks like a normal event handler,
+        uses simple prototype patterns, but has its own closure. The closure
+        will come in handy very soon aside from it's basic ability to provide
+        shorthand names for jQuery and Example.Controllers ($ and $C 
+        respectively).  </li><li> Second, notice that we never create an 
+        instance of the event handler.  jquery-claypool will create a single 
+        instance the first time the event needs to be routed to that controller,
+        and will reuse that instance thereafter.</li></ol>
+  </p>
+</>,
+'subsections':[{ 
+    'name':'writing your first event handler',
+    'description':<>
+       <p>
+           You are about to create your first application event handler, or 
+           <em>controller</em>.  First we need a new folder and file. (Don't 
+           forget to add the additional script tag to your index.html) 
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \controllers
+           - pages.js
+</code></pre>
+           And here is our controller:
+<pre class='box'><code>/*  pages.js  */
+(function($, $C)&amp;#x7B;
+    
+    
+    $C.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+    &#x7D;;
+    
+    $.extend($C.Pages.prototype, &amp;#x7B;
+        handle:function(event)&amp;#x7B;
+            var id = event.params('id');
+            alert('page '+id);
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Controllers);
+</code></pre>
+            
+       </p>
+       And now when you reload your page you should be able to click on
+       any of the numbered links we just added and get an aler message
+       displaying the number you just clicked on.  We'll talk more later
+       about regular expressions in routes and how those become event 
+       params.
+    </>
+    }]
+
+},{
+
+'name':'adding some logging',
+'description':<>
+    <p>
+        Adding alerts to event handlers to see if they are getting triggered
+        correctly is about as useful long-term as adding console.log statements
+        that you comment in and out everytime you want to see the event in your
+        console.
+  </p>
+  <p>
+        A much better approach is 'instrumented logging' which allows you
+        to leave the log statements in your code, and turn them on or
+        off from a single external location.  As you start adding features to
+        projects and accidently break some old feature, you will find it
+        much faster to just <em>turn up</em> logging for a moment to see where
+        the flow breaks, instead of walking through the code in a debugger.  You
+        may still need a debugger eventually, but isolating where something is breaking
+        is much faster with category logging.
+  </p>
+</>,
+'subsections':[{      
+    'name':'keeping it private',
+    'description':<>
+        <p>
+            It's actually very easy to add logging and we are already going to
+            take advantage of that closure we created for our event handler,
+            aka our first controller.  We are simply going to use the very common
+            privacy pattern:
+<pre class='box'><code>/*  pages.js a la logging  */
+(function($, $C)&amp;#x7B;
+    
+    var log;
+    
+    $C.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Controllers.Pages');
+    &#x7D;;
+    
+    $.extend($C.Pages.prototype, &amp;#x7B;
+        handle:function(event)&amp;#x7B;
+            var id = event.params('id');
+            log.debug('got page %s', id);
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Controllers);
+</code></pre>
+            
+            All we did was declare a var 'log' at the top of the anonymous scope,
+            and then initialized the variable inside the controllers constructor.
+            This means only this controller will ever have access to it's logger. 
+            <br/><br/>
+            For now just go with the idea that a logger is created with 
+            <strong>$.logger</strong> using the name of the class it belongs to.
+            <br/><br/>
+            Also notice we replace the alert in the event handler and use a 
+            sprintf-style message.  This prevents logging statements from ever being
+            constructed when logging is turned off (more on that in the intermediate
+            guide) so leaving the logging in your code has near-zero net impact
+            on performance.
+        </p>
+    </>
+    },{      
+    'name':'tuning the instrumentation',
+    'description':<>
+        <p>
+            before we actually get any messages from the logging system,
+            we have to turn it on.  To do this we'll create a file just
+            for logging configuration so we always know where to look for it.
+            (Don't forget to include this new file to your index.html)
+            
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \configs
+           - logging.js
+</code></pre>
+            
+            And now here is what we'll put in that file:
+
+<pre class='box'><code> /** logging.js **/
+(function($)&amp;#x7B;
+   
+   $.logging([
+        &amp;#x7B; category:"Example",               level:"INFO" &#x7D;,
+        &amp;#x7B; category:"Example.Models",        level:"DEBUG" &#x7D;,
+        &amp;#x7B; category:"Example.Views",         level:"DEBUG" &#x7D;,
+        &amp;#x7B; category:"Example.Controllers",   level:"DEBUG" &#x7D;,
+        &amp;#x7B; category:"Claypool",              level:"INFO"  &#x7D;,
+        &amp;#x7B; category:"Claypool.MVC",          level:"INFO" &#x7D;,
+        &amp;#x7B; category:"root",                  level:"WARN"  &#x7D;
+    ]);
+    
+&#x7D;)(jQuery);
+</code> </pre>
+
+            Logging categories are hierarchical, and the 'root' category is
+            a special catch-all.  Basically if a logger is created with a 
+            category name Example.Controllers.Pages, but no exact match is configured,
+            it will use the closest match, in this case, 'Example.Controllers'.
+            <br/><br/>
+            You should now be able to open up your firebug console and see the
+            messages. Dont be surprised if you see more, jquery-claypool is fully
+            instrumented with logging too, so you can peer under the hood when 
+            you need or want too.<strong>Note, this is all true for server-side 
+            jquery-claypool as well, but messages are written to the server 
+            logs.</strong>
+        </p>
+    </>
+    }]
+    
+},{
+
+'name':'updating the page',
+'description':<>
+    <p>
+        <em>The primary role of the controller is to create a basket of  
+        state, sometimes modifying it in the process.</em> Like any event
+        handler it may get some of that state from the event itself, 
+        use ajax (via a 'model') or inspect the dom.  
+    </p>
+    <p>
+        The 'view' is where we draw a little line in the sand, and pass all
+        that information we gathered in the controller over the fence.  The
+        controller doesn't care what is done with that infomation, and likewise 
+        the view doesn't care how the controller got the data.  <em>The views
+        job is to simply make use of the data to update the page as the end
+        user sees it.</em>
+    </p>
+</>,
+'subsections':[{ 
+    'name':'some loremipsum',
+    'description':<>
+       <p>
+           To get us started on rendering something useful we're going to 'fake'
+           some information (don't forget to include it in your index.html).
+           Here is how we will modify our pages controller 
+<pre class='box'><code>/* controllers/pages.js */
+(function($, $C)&amp;#x7B;
+    
+    var log;
+    
+    $C.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Controllers.Pages');
+    &#x7D;;
+    
+    $.extend($C.Pages.prototype, &amp;#x7B;
+        handle:function(event)&amp;#x7B;
+            var id = event.params('id');
+            log.debug('got id %s', id);
+            event.m(&amp;#x7B;
+                index:id,
+                title:$.titled(3, false),
+                description:$.paragraphs(3, false).join('\n')
+            &#x7D;).render();
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Controllers);
+</code></pre>
+        With that, we are ready to create our first view.
+       </p>
+    </>
+    },{ 
+    'name':'a point of view',
+    'description':<>
+       <p>
+           Views and Controllers are, generally, closely related, and that 
+           relationship is analogous to a Client and Server relationship.  
+           The server exposes data to the client, what the client does with it
+           is of little concern to the server.  Likewise the controller
+           doesnt concern itself with what the view does.
+           <br/>
+           <br/>
+           We'll need to create a new file for our first view.
+           (Don't forget to include this new file to your index.html)
+            
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \views
+           - pages.js
+</code></pre>
+            
+            And here is our new markup:
+
+<pre class='box'><code> /** pagination markup **/
+&lt;body>
+    &lt;div>Hello World!&lt;/div>
+    &lt;div id='pages'>
+        &lt;a href='#example/page/1'>1&lt;/a> | 
+        &lt;a href='#example/page/2'>2&lt;/a> | 
+        &lt;a href='#example/page/3'>3&lt;/a> | 
+        &lt;a href='#example/page/4'>4&lt;/a> | 
+        &lt;a href='#example/page/5'>5&lt;/a>
+        &lt;h2 id='title'>title&lt;/h2> 
+        &lt;h4>Page (&lt;span id='index'>?&lt;/span>)&lt;/h4>
+        &lt;p id='description'>
+            description
+        &lt;/p>
+    &lt;/div>
+&lt;/body>
+</code> </pre>
+
+        Finally here is a simple view that uses some jQuery dhtml magic
+        to update the screen:
+
+<pre class='box'><code>/*  views/pages.js  */
+(function($, $V)&amp;#x7B;
+    
+    var log;
+    
+    $V.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Views.Pages');
+    &#x7D;;
+    
+    $.extend($V.Pages.prototype, &amp;#x7B;
+        update:function(model)&amp;#x7B;
+            log.debug('updating page %s', model.index);
+            $('#index').text(model.index);
+            $('#title', this).text(model.title);
+            $('#description', this).text(model.description);
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Views);
+</code></pre>
+        
+        Note that when we use use the jQuery function $() we provide a context 
+        object in several cases, eg $(selector, this).  We can do this because
+        jquery-claypool will automatically bind the view to an element with the 
+        same id if it exists (eg Views.Pages -> #pages).
+       </p>
+    </>
+    }]
+    
+},{
+
+'name':'gathering data',
+'description':<>
+    <p>
+        In this step we will use some simple AJAX routines to load data
+        for our app.
+    </p>
+    <p>
+        In larger apps it tends to be very helpful to consolidate your
+        AJAX routines to an object usually refered to as a <em>Model</em>.
+        The Model just provides a convenient place to isolate validatation routines,
+        and network abstractions for retreiving data from the server or some 
+        restful network storage.
+    </p>
+</>,
+'subsections':[{    
+    'name':'just ajax',
+    'description':<>
+       <p>
+           We'll need to create a new file for our first view.
+           (Don't forget to include this new file to your index.html)
+            
+           <br/>
+           <br/>
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \models
+           - pages.js
+</code></pre>
+           Here is our Model which retreives 'pages' in a json format from 
+           the server. 
+
+<pre class='box'><code>/* models/pages.js*/           
+(function($, $M)&amp;#x7B;
+    
+    var log;
+    
+    $M.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Models.Pages');
+    &#x7D;;
+    
+    $.extend($M.Pages.prototype, &amp;#x7B;
+        get:function(id, options)&amp;#x7B;
+            log.debug('getting page %s', id);
+                $.ajax(&amp;#x7B;
+                    url:'./data/'+id+'.json',
+                    dataType:'json',
+                    success:function(page)&amp;#x7B;
+                        log.debug('got page %s', id);
+                        if(options &amp;&amp; options.success )&amp;#x7B;
+                            options.success(page);
+                        &#x7D;
+                    &#x7D;
+                &#x7D;);
+            &#x7D;
+            return this;
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Models);
+</code></pre>
+
+And we can replace the lorem ipsum now in our controller:
+
+<pre class='box'><code>/* controllers/pages.js */
+
+(function($, $C)&amp;#x7B;
+    
+    var log,
+        Pages;
+    
+    $C.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Controllers.Pages');
+        Pages = $.$('#pagesModel');
+    &#x7D;;
+    
+    $.extend($C.Pages.prototype, &amp;#x7B;
+        handle:function(event)&amp;#x7B;
+            var id = event.params('id');
+            log.debug('got id %s', id);
+            Pages.get(id,&amp;#x7B;
+                success: function(page)&amp;#x7B;
+                    event.m(&amp;#x7B;
+                        index:id,
+                        title:page.title,
+                        description:page.description
+                    &#x7D;).render();
+                &#x7D;
+            &#x7D;);
+               
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Controllers);
+
+</code></pre>
+
+One thing you may have noticed was the jQuery plugin method $.$, or jQuery.$, this
+is one of the most powerful tools jquery-claypool provides as a framework tool, and
+it is used internally as well as provided to the end-user.  Any application managed
+instance is available via $.$, and if it hasn't been created yet jquery-claypool
+creates it for you.
+
+       </p>
+    </>
+    },{    
+    'name':'cache only',
+    'description':<>
+       <p>
+           Without getting fancy we are going to demonstrate one reason it's
+           nice to seperate the model.  Without modifying the controller which
+           uses the model, we can add a simple caching mechanism so we don't
+           repeat AJAX calls we don't have too. 
+
+<pre class='box'><code>/* models/pages.js */
+
+(function($, $M)&amp;#x7B;
+    
+    var log,
+        cache;
+    
+    $M.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Models.Pages');
+        cache = &amp;#x7B;&#x7D;;
+    &#x7D;;
+    
+    $.extend($M.Pages.prototype, &amp;#x7B;
+        get:function(id, options)&amp;#x7B;
+            log.debug('getting page %s', id);
+            if(!cache[id])&amp;#x7B;
+                $.ajax(&amp;#x7B;
+                    url:'./data/'+id+'.json',
+                    dataType:'json',
+                    success:function(page)&amp;#x7B;
+                        log.debug('got page %s', id);
+                        cache[id] = page;
+                        if(options &amp;&amp; options.success )&amp;#x7B;
+                            options.success(page);
+                        &#x7D;
+                    &#x7D;,
+                    error:function(xhr,status,e)&amp;#x7B;
+                        log.error('error getting page %s', id).
+                            exception(e);
+                        if(options &amp;&amp; options.error)&amp;#x7B;
+                            options.error(&amp;#x7B;
+                                status: status,
+                                msg: 'network error'+e
+                            &#x7D;);
+                        &#x7D;
+                    &#x7D;
+                &#x7D;);
+            &#x7D;else&amp;#x7B;
+                log.debug('got cached page %s', id);
+                if(options &amp;&amp; options.success)&amp;#x7B;
+                    options.success(cache[id]);
+                &#x7D;
+            &#x7D;
+            return this;
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Models);
+</code></pre>
+
+       </p>
+    </>
+    }]
+    
+},{
+
+'name':'working well with others',
+'description':<>
+    <p>jQuery-Claypool provides a very simple and powerful framework for managing
+    environments.  <em>Environments are defined and used in order to isolate all 
+    application specific settings that may vary depending on where the application
+    is being used.</em>  Common examples include development, testing, QA, and 
+    production environments.</p>
+</>,
+'subsections':[{   
+    'name':'defining environments',
+    'description':<>
+        <p>
+           We'll need to create a new file for our first view.
+           (Don't forget to include this new file in your index.html)
+           
+<pre class='box'><code>/*  example project  */
+ \example
+     \app
+         \configs
+           - environments.js
+</code></pre>
+
+            For the purposes of our example we are going to assume that
+            the url for accessing our data may vary across environments
+            so we will create a setting for it.  Here is the contents of 
+            environments.js:
+
+
+<pre class='box'><code>/*  configs/environments.js  */
+
+(function($)&amp;#x7B; 
+    
+   $.env(&amp;#x7B;
+        defaults:&amp;#x7B;
+            version:'0.0.0'
+        &#x7D;,
+        dev:&amp;#x7B;
+            client:&amp;#x7B;
+                pages:'/apps/tutorial/5/data/'
+            &#x7D;
+        &#x7D;,
+        test:&amp;#x7B;
+            client:&amp;#x7B;
+                pages:'/jquery-claypool/apps/tutorial/5/data/'
+            &#x7D;    
+        &#x7D;,
+        qa:&amp;#x7B;
+            client:&amp;#x7B;
+                pages:'/jquery-claypool-qa/apps/tutorial/5/data/'
+            &#x7D;
+        &#x7D;,
+        prod:&amp;#x7B;
+            client:&amp;#x7B;
+                pages:'/data/'
+            &#x7D;
+        &#x7D;
+    &#x7D;);     
+    
+&#x7D;)(jQuery);
+    
+</code></pre>
+
+        </p>
+    </>
+    },{   
+    'name':'selecting environments',
+    'description':<>
+        <p>
+            All we need to do now to take advantage of our environmental settings
+            is choose one.  Changing environments should allows only require a one line
+            change in one file.
+            
+<pre class='box'><code>/* boot/client.js */
+
+jQuery.noConflict();
+(function($)&amp;#x7B;
+    
+    //A static logger for any initialization routines we might add here
+    var log = $.logger("Example");
+    
+    //The environments are described in environments.js
+    try&amp;#x7B;
+       $.env('defaults', "dev.client");
+    &#x7D;catch(e)&amp;#x7B;
+       log.error("Environmental selection is invalid!").exception(e);
+    &#x7D;
+    
+    $(document).ready(function()&amp;#x7B;
+        $.boot();
+    &#x7D;);    
+    
+&#x7D;)(jQuery);  
+
+</code></pre>
+
+            And finally our model can be updated to take advantage of the new
+            flexibility granted to us via environments. Note our <strong>url</strong>
+            property of the $.ajax call uses $.env to access the new setting without 
+            any knowledge of which environment was selected at boot time.
+            
+<pre class='box'><code>/* models/pages.js */
+
+(function($, $M)&amp;#x7B;
+    
+    var log,
+        cache;
+    
+    $M.Pages = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+        log = $.logger('Example.Models.Pages');
+        cache = &amp;#x7B;&#x7D;;
+    &#x7D;;
+    
+    $.extend($M.Pages.prototype, &amp;#x7B;
+        get:function(id, options)&amp;#x7B;
+            log.debug('getting page %s', id);
+            if(!cache[id])&amp;#x7B;
+                $.ajax(&amp;#x7B;
+                    url:$.env('pages')+id+'.json',
+                    dataType:'json',
+                    success:function(page)&amp;#x7B;
+                        log.debug('got page %s', id);
+                        cache[id] = page;
+                        if(options &amp;&amp; options.success )&amp;#x7B;
+                            options.success(page);
+                        &#x7D;
+                    &#x7D;,
+                    error:function(xhr,status,e)&amp;#x7B;
+                        log.error('error getting page %s', id).
+                            exception(e);
+                        if(options &amp;&amp; options.error)&amp;#x7B;
+                            options.error(&amp;#x7B;
+                                status: status,
+                                msg: 'network error'+e
+                            &#x7D;);
+                        &#x7D;
+                    &#x7D;
+                &#x7D;);
+            &#x7D;else&amp;#x7B;
+                log.debug('got cached page %s', id);
+                if(options &amp;&amp; options.success)&amp;#x7B;
+                    options.success(cache[id]);
+                &#x7D;
+            &#x7D;
+            return this;
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Models);
+</code></pre>
+
+        </p>
+    </>
+    }]
+
+},{
+
+'name':'whats next',
+'description':<>
+    <p>
+        So far we've covered some high level concepts and that should be enough
+        to get you started.  There is much more to learn though so your project 
+        can take advantage of every feature you need without reinventing it.
+    </p>
+</>,
+'subsections':[{
+    'name':'intermediate topics',
+    'description':<>
+       <p>
+           <a href='#'>Intermediate topics</a> include:
+           <ul>
+               <li>Route your heart out</li>
+               <li>Re: Modeling</li>
+               <li>Template technologies.</li>
+               <li>Control Flow with event.m().v().c()</li>
+               <li>Application Filters</li>
+               <li>Services are Server-Side Event Handlers</li>
+           </ul>
+       </p>
+    </>
+    },{
+    'name':'advanced topics',
+    'description':<>
+       <p>
+           <a href='#'>Advanced topics</a> include:
+           <ul>
+               <li>Writing Routers</li>
+               <li>Backending to SDB</li>
+               <li>Deploying to the Cloud</li>
+               <li>Recycling, or Javascript in the Ether</li>
+               <li>Framework Extension Points</li>
+               <li>Inversion of Control</li>
+               <li>The Claypool Proxy Server</li>
+           </ul>
+       </p>
+    </>
+    }]
+
+}]//end sections
+
+}
+    
+]}

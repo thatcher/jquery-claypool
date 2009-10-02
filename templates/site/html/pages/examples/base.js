@@ -3,11 +3,6 @@
         <h3><a href={$.env('root')+'examples'}>&lt; examples</a></h3>
         <div class='first column span-5 colborder'>
             <h4>{example.title}</h4>
-            <h5>
-                <a href='#examples/quiz/'>
-                    Start Example
-                </a>
-            </h5>
             <em>Example</em><br/>
             <span>( {example.id} )</span> 
         </div>

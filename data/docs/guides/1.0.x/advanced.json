@@ -1,0 +1,204 @@
+{'_':[ 
+ 
+ 
+/**************************************************\
+ * Getting Fancy *
+\**************************************************/
+{
+        'id':'advanced',
+        'version':'1.0.x',
+        'label':'Getting Fancy', 
+        'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+        </>,
+        'sections':[{
+    
+'name':'creating a new project',
+'subsections':[{  
+
+    'name':'scanning',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+
+    },{
+    
+    'name':'boot strapping',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+
+},{
+
+'name':'adding a route',
+'subsections':[{    
+    'name':'basic paginator',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+     </>
+    }]
+
+},{
+
+'name':'lazy event handling',
+'subsections':[{ 
+    'name':'writing your first event handler',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+
+},{
+
+'name':'adding some logging',
+'subsections':[{      
+    'name':'loremipsum',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+    
+},{
+
+'name':'updating the page',
+'subsections':[{ 
+    'name':'loremipsum',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+    
+},{
+
+'name':'gathering data',
+'subsections':[{    
+    'name':'loremipsum',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+    
+},{
+
+'name':'setting an environment',
+'subsections':[{   
+    'name':'think',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+
+},{
+
+'name':'dhtml and templates',
+'subsections':[{    
+    'name':'loremipsum',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+    
+},{
+
+'name':'advanced topics',
+'subsections':[{
+    'name':'loremipsum',
+    'description':<>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+    }]
+
+}]//end sections
+
+}
+    
+]}

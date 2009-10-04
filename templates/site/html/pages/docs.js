@@ -8,42 +8,36 @@
                     Client <a href={$.env('root')+'examples'}>Examples</a>
                 </h3>
 	            <div class='first column span-11 colborder '>
+                    <h2 style='text-align:right;'>
+                        <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                        Guides
+                    </h2>
 	                <ul>
-	                    {_('.*', docs).map(function(index){
-	                        return  (index%2===0)?{li:{
+	                    {_('.*', docs[0].guides).map(function(index, value){
+	                        return {li:{
 	                            a:{
-	                                $href:$.env('root')+'doc/'+this.id+'-'+this.version,
-	                                $:[
-	                                    {strong:this.label},
-	                                    {em:this.version},
-	                                    {img:{
-	                                        $src:$.env('root')+'images/star_inverting.jpg',
-	                                        $alt:this.label
-	                                    }}
-	                                ]
+	                                $href:$.env('root')+'doc/guides/'+docs[0].version+'/'+value,
+	                                $:[{strong:value}]
 	                            }
-	                        }} : {};
+	                        }};
 	                    }).e4x()}
 	                </ul>
 	            </div>
 			    <div class='last column  span-10'>
-	                <ul>
-	                    {_('.*', docs).map(function(index){
-	                        return (index%2===1)?{li:{
-	                            a:{
-	                                $href:$.env('root')+'doc/'+this.id+'-'+this.version,
-	                                $:[
-	                                    {img:{
-	                                        $src:$.env('root')+'images/star_inverting.jpg',
-	                                        $alt:this.label
-	                                    }},
-	                                    {strong:this.label},
-	                                    {em:this.version}
-	                                ]
-	                            }
-	                        }} : {};
-	                    }).e4x()}
-	                </ul>
+                    <h2 style='text-align:left;'>
+                        API
+                        <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    </h2>
+                    <ul>
+                        {_('.*', docs[0].apis).map(function(index, value){
+                            return {li:{
+                                a:{
+                                    $href:$.env('root')+'doc/apis/'+docs[0].version+'/'+value,
+                                    $:[{strong:value}]
+                                }
+                            }};
+                        }).e4x()}
+                    </ul>
 	            </div>
 				<div class='clear' 
 				     style='padding-top:20px;'>

@@ -7,51 +7,90 @@
                     &lt; documentation
                 </a>
             </h3>
-			<div class='column span-4 colborder'>
-			{_('.*', doc.sections).map(function(){
-                return {div:{$:[
-				    {h4:this.name},
-				    {ul:{$:
-					    _('.*',this.subsections).map(function(){
-                            return {li:{
-                                a:{
-                                    $:this.name,
-									$href:'#'+this.name.replace(' ','_') 
-							     }
-						    }};
-                        })
-					}}
-				]}};
-            }).e4x()}
-			</div>
+			<div class='column span-5'>
+                <h4>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    Guides
+                </h4>
+                <ul>
+                    {_('.*', docs[0].guides).map(function(index, value){
+                        return {li:
+                        (id.match(value))?
+                            ({strong:value}):
+                            ({a:{
+                                $href:$.env('root')+'doc/guides/'+docs[0].version+'/'+value,
+                                $:[{strong:value}]
+                            }})
+                        };
+                    }).e4x()}
+                </ul>
+                
+    			{_('.*', doc.sections).map(function(){
+                    return {div:{$:[
+    				    {h4:{
+                            img:{ 
+                                $src:$.env('root')+'images/star_inverting.jpg',
+                                $height: '20px'
+                            },
+                            a:{
+                                $:this.name,
+                                $href:'#'+this.name.replace(' ','_') 
+                            }
+                        }},
+    				    {ul:{
+                            $class:'subsections',
+                            $:
+    					    _('.*',this.subsections).map(function(){
+                                return {li:{
+                                    a:{
+                                        $:this.name,
+    									$href:'#'+this.name.replace(' ','_') 
+    							     }
+    						    }};
+                            })
+    					}}
+    				]}};
+                }).e4x()}
+                
+            </div>
             <div class='first column span-13'>
-            <hr/>
-            {_('.*', doc.sections).map(function(){
-                return {div:{$:[
-                    {h2:{
-                        img:{
-						  $src:$.env('root')+('images/star_inverting.jpg'),
-						  $height:'30px'
-						},
-						$:this.name
-					}},
-					_.e4x(this.description),
-                    {ul:{$:
-						_('.*',this.subsections).map(function(){
-		            return {li:{$:[
-	                            {hr:{$id:this.name.replace(' ','_')}},
-	                            {h3:{$:this.name }},
-	                            _.e4x(this.description)
-	                        ]}};
-		                })
-                    }}
-                ]}};
-            }).e4x()}
+                <h2 class='api_label'>
+                    {doc.label + ' ' + doc.version}
+                </h2>
+                <p>
+                    <strong>
+                        This guide is applicable to both the jquery-claypool 
+                        client and server application frameworks.
+                    </strong>  
+                    Where the two differ functionally the documentation will 
+                    provide notes and examples of usage in each environment.
+                </p>
+                <hr/>
+                {_('.*', doc.sections).map(function(){
+                    return {div:{
+                        $id:this.name.replace(' ','_'),
+                        $:[
+                        {h2:{
+                            img:{
+    						  $src:$.env('root')+('images/star_inverting.jpg'),
+    						  $height:'30px'
+    						},
+    						$:this.name
+    					}},
+    					_.e4x(this.description),
+                        {ul:{$:
+    						_('.*',this.subsections).map(function(){
+    		            return {li:{$:[
+    	                            {hr:{$id:this.name.replace(' ','_')}},
+    	                            {h3:{$:this.name }},
+    	                            _.e4x(this.description)
+    	                        ]}};
+    		                })
+                        }}
+                    ]}};
+                }).e4x()}
             </div>
             <div class='last column span-4'>
-                <h4>
-                    <strong>{doc.label + ' ' + doc.version}</strong>
-                </h4>
                 <img src={$.env('root')+'images/star_inverting.jpg'} 
                      alt={doc.label} />
                 <strong>releases</strong>
@@ -70,7 +109,21 @@
                         ]}};
                     }).e4x()}
                 </ul>
-                {_.e4x(doc.description)}
+                
+                <h4>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    API
+                </h4>
+                <ul>
+                    {_('.*', docs[0].apis).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+'/'+value,
+                                $:[{strong:value}]
+                            }
+                        }};
+                    }).e4x()}
+                </ul>
             </div>
         </div>
     </block> 

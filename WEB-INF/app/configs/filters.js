@@ -16,9 +16,10 @@
             advice    : function(invocation){
                 log = log||$.logger('Site.Filters.ContentNegotiation');
                 log.debug('Intercepted call to render');
-                var model = invocation.arguments[0];
+                var model = invocation.arguments[0],
+                    view = invocation.object;
                 if(model.parameters && model.parameters.fo == 'json'){
-                    invocation.object.write(_.json(model, null, '\t'));
+                    view.write(_.json(model, null, '\t'));
                     //do not proceed
                 }else{
                     invocation.proceed();

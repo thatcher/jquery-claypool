@@ -24,5 +24,6 @@
               { urls :"/release/<:id(.*):>", controller:"#releasesService"}]
         }]   
     });
+    
 	
 })(jQuery);

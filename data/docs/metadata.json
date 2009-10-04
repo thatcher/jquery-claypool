@@ -10,7 +10,7 @@
      ],
      'apis':[
         'scanners',
-        'routers',
+        'routes',
         'events',
         'controllers',
         'booting',

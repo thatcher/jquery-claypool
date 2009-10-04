@@ -1,203 +1,56 @@
-{'_':[ 
+{'_':{
 
-/**************************************************\
- * Getting Rolling *
-\**************************************************/
-{
-        'id':'intermediate',
-        'version':'1.0.x',
-        'label':'Getting Rolling', 
-        'description':<>
-            <p>
-                {_.paragraph()} 
-                <pre class='box'>
-                <code>.
-            {_.words(2, false)}
-                </code>
-                </pre>
-                {_.sentence()} 
-            </p>
-        </>,
-        'sections':[{
+    /**************************************************\
+     * Getting Rolling *
+    \**************************************************/
     
-'name':'creating a new project',
-'subsections':[{  
-
-    'name':'scanning',
+    'id':'intermediate',
+    'version':'1.0.x',
+    'label':'Getting Rolling',
     'description':<>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-
-    },{
+         <strong>
+         This guide is applicable to both the jquery-claypool client and server
+         application frameworks.
+         </strong>  
+         Where the two differ functionally the documentation will provide notes and
+         examples of usage in each environment.
+      </p>
+    </>,
+    'sections':[{
     
-    'name':'boot strapping',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
+        'name':'coming soon',
+        'subsections':[{  
 
-},{
-
-'name':'adding a route',
-'subsections':[{    
-    'name':'basic paginator',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-     </>
-    }]
-
-},{
-
-'name':'lazy event handling',
-'subsections':[{ 
-    'name':'writing your first event handler',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-
-},{
-
-'name':'adding some logging',
-'subsections':[{      
-    'name':'loremipsum',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
+            'name':'abc123',
+            'description':<>
+                <p>
+                    {_.paragraph()} 
+                    <pre class='box'>
+                    <code>.
+                {_.words(2, false)}
+                    </code>
+                    </pre>
+                    {_.sentence()} 
+                </p>
+            </>
+        
+            },{
     
-},{
+            'name':'abc123',
+            'description':<>
+                <p>
+                    {_.paragraph()} 
+                    <pre class='box'>
+                    <code>.
+                {_.words(2, false)}
+                    </code>
+                    </pre>
+                    {_.sentence()} 
+                </p>
+            </>
+        }]
 
-'name':'updating the page',
-'subsections':[{ 
-    'name':'loremipsum',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-    
-},{
+    }]//end sections
 
-'name':'gathering data',
-'subsections':[{    
-    'name':'loremipsum',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-    
-},{
-
-'name':'setting an environment',
-'subsections':[{   
-    'name':'think',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-
-},{
-
-'name':'dhtml and templates',
-'subsections':[{    
-    'name':'loremipsum',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-    
-},{
-
-'name':'advanced topics',
-'subsections':[{
-    'name':'loremipsum',
-    'description':<>
-        <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
-    }]
-
-}]//end sections
-
-}
-    
-]}
+}}

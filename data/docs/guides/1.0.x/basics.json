@@ -1,4 +1,4 @@
-{'_':[ 
+{'_':
  
     /**************************************************\
      * Getting Started *
@@ -7,16 +7,6 @@
         'id':'basics',
         'version':'1.0.x',
         'label':'Getting Started', 
-        'description':<>
-            <p>
-             <strong>
-             This guide is applicable to both the jquery-claypool client and server
-             application frameworks.
-             </strong>  
-             Where the two differ functionally the documentation will provide notes and
-             examples of usage in each environment.
-          </p>
-        </>,
         'sections':[{
     
 'name':'creating a new project',
@@ -833,7 +823,7 @@ jQuery.noConflict();
     'name':'intermediate topics',
     'description':<>
        <p>
-           <a href='#'>Intermediate topics</a> include:
+           <a href='intermediate'>Intermediate topics</a> include:
            <ul>
                <li>Route your heart out</li>
                <li>Re: Modeling</li>
@@ -848,7 +838,7 @@ jQuery.noConflict();
     'name':'advanced topics',
     'description':<>
        <p>
-           <a href='#'>Advanced topics</a> include:
+           <a href='advanced'>Advanced topics</a> include:
            <ul>
                <li>Writing Routers</li>
                <li>Backending to SDB</li>
@@ -866,4 +856,4 @@ jQuery.noConflict();
 
 }
     
-]}
+}

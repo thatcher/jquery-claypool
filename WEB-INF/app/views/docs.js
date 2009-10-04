@@ -16,11 +16,11 @@
         
         render : function(model){
             log.debug("Rendering HTML Response");
-            var page = !model.id?'docs':
-                    (model.doc&&model.doc.id=='api')?'api':'guide';
-            /* Thats so cool.*/
+            var page = !model.id?
+                'docs':model.id.match('api')?
+                    'api':'guide';
             this.write($.e4x(
-                "site/html/pages/"+page+".js",
+                "site/html/pages/"+page+".js?"+(model.id?model.id:''),
                 model, 
                 true
             ));

@@ -25,17 +25,13 @@
                 release = [],
                 i;
             if(id){
+                log.debug("Getting %s", id);
                 //find the docs based on the id passed
-                for(i=0;i<docs.length;i++){
-                    if((docs[i].id+'-'+docs[i].version) == id){
-                        doc = docs[i];
-                        log.debug('found doc %s', id);
-                        break;
-                    }
-                }
+                doc = $.$('#docsModel').get(id);
                 response.
                     m({
                         id:id,
+                        docs:docs,
                         doc:doc,
                         releases:releases
                     }).

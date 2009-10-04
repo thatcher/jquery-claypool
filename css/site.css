@@ -32,8 +32,6 @@ a:hover {
 #main {
     border-top:1px solid #CCC;
     margin-top:-40px; 	
-    padding-left: 3em;
-    padding-right: 2em;
 	margin-bottom:30px;
 }
 
@@ -269,6 +267,13 @@ a:hover {
 	color:#999;
 	padding:5px;
 }
+#doc h2.api_label{
+    border:none;
+    font-size:2em;
+    color:#000;
+    padding:5px;
+    margin-top:-2em;
+}
 #doc p {
     margin:1em;
     padding:1em;
@@ -288,7 +293,7 @@ a:hover {
 }
 #doc div ul{
     margin-right:0;
-    list-style-image:url(/images/star_inverting_bullet.jpg)
+    list-style:none;
 }
 #doc div.first ul{
     margin-right:0;
@@ -301,10 +306,29 @@ a:hover {
     border-bottom:1px dashed;
 }
 
-#doc h3  a{
+#doc h3 a{
     border-bottom:none;
     text-decoration:none;
     font-weight:normal;
+}
+#doc h4{
+    margin-bottom:5px;
+}
+#doc h4 a{
+    border-bottom:none;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:0.9em;
+    color:#999;
+    margin-bottom:5px;
+}
+#doc h4 a:hover{
+    color:#125B7E;
+}
+#doc ul.subsections{
+    margin-left:30px;
+    font-size:0.9em;
+    margin-bottom:5px;
 }
 
 

@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.2 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.0.5 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -4056,9 +4056,19 @@ Claypool.MVC = {
             return this;
 	    },
         mvc  : function(){
+            var prop, config;
             if(arguments.length === 0){
                 return $.config('mvc');
             }else{
+                config = $.config('mvc');
+                //because mvc routes are named arrays, the relavant
+                //array is not merged.  we force the arrays to be merged
+                //if the property already exists
+                for(prop in arguments[0]){
+                    if(prop in config){
+                        $.merge(config[prop], arguments[0][prop]);
+                    }
+                }
                 return $.config('mvc', arguments[0]);
             }
         }

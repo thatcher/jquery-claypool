@@ -754,6 +754,15 @@ Claypool.Server={
         },
 		servlet: function(target){
             $$.extend(target, $$Web.Servlet);
+        },
+        proxy: function(options){
+            return $.invert([{ 
+                id:options.id||'proxy_'+$.guid(),    
+                clazz:"Claypool.Server.WebProxyServlet", 
+                options:[{
+                    rewriteMap:options.rewrite
+                }]
+            }]);
         }
 		/*,
         //TODO this is deprecated

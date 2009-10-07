@@ -35,9 +35,11 @@
                 for(prop in arguments[0]){
                     if(prop in config){
                         $.merge(config[prop], arguments[0][prop]);
+                    }else{
+                        config[prop] = arguments[0][prop];
                     }
                 }
-                return $.config('mvc', arguments[0]);
+                return this;//chain
             }
         }
 	});

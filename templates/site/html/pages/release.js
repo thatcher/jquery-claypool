@@ -11,7 +11,7 @@
                     </a>
                 </h5>
                 <h5>
-                    <a href={$.env('root')+'doc/api-'+release.id}>
+                    <a href={$.env('root')+'docs'}>
                         API
                     </a>
                 </h5>
@@ -20,7 +20,7 @@
             </div>
              
             <div id='cover' 
-                 class='column span-6 colborder'>
+                 class='column span-3 colborder'>
                     {(function(){
                         return _.e4x([
                             {a:{
@@ -43,12 +43,12 @@
                     })()}
             </div>
             <div id='media' 
-                 class='column span-9'>
+                 class='column span-12'>
                 <ol class='clear'>
                     {_('.*', release.artifacts).map(function(index, note){
                         return {li:{
-                            $class:'small quiet',
-                            $style:'margin-bottom:0',
+                            $class:'quiet small',
+                            $style:'margin-bottom:0;font-size:11px;',
                             $:[
                                 {a:{
                                     $href:this.url,
@@ -66,8 +66,8 @@
                     {_.e4x(release.description)}
                     <div class='column'>
                         <h5>
-                            <a href={release.README} target='_blank'>
-                                README
+                            <a href='#'>
+                                NOTES
                             </a>
                         </h5>
                     </div>

@@ -28,10 +28,6 @@
     			{_('.*', doc.sections).map(function(){
                     return {div:{$:[
     				    {h4:{
-                            img:{ 
-                                $src:$.env('root')+'images/star_inverting.jpg',
-                                $height: '20px'
-                            },
                             a:{
                                 $:this.name,
                                 $href:'#'+this.name.replace(' ','_') 
@@ -52,6 +48,21 @@
     				]}};
                 }).e4x()}
                 
+                <h4>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    Project
+                </h4>
+                <ul>
+                    {_('.*', docs[0].apis['project/conventions']).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/project/conventions/'+value,
+                                $:[{strong:value}]
+                            }
+                        }};
+                    }).e4x()}
+                </ul>
             </div>
             <div class='first column span-13'>
                 <h2 class='api_label'>
@@ -98,12 +109,12 @@
                     {_('.*', releases).map(function(){
                         return {li:{$:[
                             {a:{
-                                $href:$.env('root')+'doc/'+doc.id+'-'+this.id,
+                                $href:$.env('root')+'doc/guides/'+this.id+'/'+doc.id,
                                 $:this.name
                             }},
                             '|',
                             {a:{
-                                $href:$.env('root')+'release/'+this.id,
+                                $href:$.env('root')+'doc/guides/'+this.id+'/'+doc.id,
                                 $: this.id
                             }}
                         ]}};
@@ -112,13 +123,31 @@
                 
                 <h4>
                     <img src={$.env('root')+'images/star_inverting.jpg'}/>
-                    API
+                    Plugins
                 </h4>
                 <ul>
-                    {_('.*', docs[0].apis).map(function(index, value){
+                    {_('.*', docs[0].apis['plugins/user']).map(function(index, value){
                         return {li:{
                             a:{
-                                $href:$.env('root')+'doc/apis/'+docs[0].version+'/'+value,
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/plugins/user/'+value,
+                                $:[{strong:value}]
+                            }
+                        }};
+                    }).e4x()}
+                </ul>
+                
+                
+                <h4>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    Extension Points
+                </h4>
+                <ul>
+                    {_('.*', docs[0].apis['plugins/developer']).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/plugins/developer/'+value,
                                 $:[{strong:value}]
                             }
                         }};

@@ -21,6 +21,9 @@
                 if(model.parameters && model.parameters.fo == 'json'){
                     view.write(_.json(model, null, '\t'));
                     //do not proceed
+                }else if(model.parameters && model.parameters.fo == 'xml'){
+                    view.write(_.x({x:model}));
+                    //do not proceed
                 }else{
                     invocation.proceed();
                 }

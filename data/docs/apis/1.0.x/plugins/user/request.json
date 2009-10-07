@@ -1,0 +1,58 @@
+{'_':{
+/**************************************************/
+    'id':'apis/1.0.x/plugins/user/request',
+    'version':'1.0.x',
+    'location':['app/services/*'],
+    'label':'requests', 
+    'sections':[{
+/**************************************************/
+        'label':'usage',
+        'description': <>
+        <p>
+            {_.paragraph()} 
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+            {_.sentence()} 
+        </p>
+    </>
+ },{
+/**************************************************/
+        'label':'options',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+            
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+        
+            
+            {_.sentence()} 
+        </p>
+    </>
+ },{
+    /**************************************************/
+        'label':'examples',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+            
+            <pre class='box'>
+            <code>.
+        {_.words(2, false)}
+            </code>
+            </pre>
+        
+            
+            {_.sentence()} 
+        </p>
+    </> 
+}]
+
+
+}}

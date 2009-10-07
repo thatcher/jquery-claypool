@@ -7,16 +7,6 @@
     'id':'advanced',
     'version':'1.0.x',
     'label':'Getting Fancy', 
-    'description':<>
-        <p>
-         <strong>
-         This guide is applicable to both the jquery-claypool client and server
-         application frameworks.
-         </strong>  
-         Where the two differ functionally the documentation will provide notes and
-         examples of usage in each environment.
-      </p>
-    </>,
     'sections':[{
     
         'name':'coming soon',

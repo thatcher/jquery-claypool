@@ -32,11 +32,11 @@
        },{
            label:'jquery.claypool-lite.js',
            url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool-lite.js',
-           description:<><p>packaged with only the core client-side modules (core/app, logging, ioc, mvc)</p></>
+           description:<><p>Core client-side modules (core/app, logging, ioc, mvc)</p></>
        },{
            label:'jquery.claypool.app.js',
            url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.app.js',
-           description:<><p>common base code for all other modules.</p></>
+           description:<><p>Base code for all other modules.</p></>
        },{
            label:'jquery.claypool.logging.js',
            url:'http://github.com/thatcher/jquery-claypool/raw/master/dist/jquery.claypool.logging.js',

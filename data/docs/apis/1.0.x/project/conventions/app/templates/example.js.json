@@ -1,10 +1,8 @@
 {'_':{
 /**************************************************/
-    'id':'api_1.0.x_scanners',
+    'id':'apis/1.0.x/project/conventions/app/templates/example',
     'version':'1.0.x',
-    'location':'app/configs/config.js',
-    'label':'scanners', 
-    'plugin':'$.scan',
+    'label':'app/templates/example.js',
     'sections':[{
 /**************************************************/
         'label':'usage',

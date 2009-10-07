@@ -7,21 +7,37 @@
                     &lt; documentation
                 </a>
             </h3>
-            <div class='column span-5'>
+            <div class='column span-4'>
                 <h4>
                     <img src={$.env('root')+'images/star_inverting.jpg'}/>
-                    API
+                    Plugins
                 </h4>
                 <ul>
-                    {_('.*', docs[0].apis).map(function(index, value){
-                        return {li:
-                        (id.match(value))?
-                            ({strong:value}):
-                            ({a:{
-                                $href:$.env('root')+'doc/apis/'+docs[0].version+'/'+value,
+                    {_('.*', docs[0].apis['plugins/user']).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/plugins/user/'+value,
                                 $:[{strong:value}]
-                            }})
-                        };
+                            }
+                        }};
+                    }).e4x()}
+                </ul>
+                
+                
+                <h4 style='margin-left:-25px'>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    Extension Points
+                </h4>
+                <ul>
+                    {_('.*', docs[0].apis['plugins/developer']).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/plugins/developer/'+value,
+                                $:[{strong:value}]
+                            }
+                        }};
                     }).e4x()}
                 </ul>
             </div>
@@ -52,7 +68,7 @@
                 }).e4x()}
             </div>
             
-            <div class='last column span-4'>
+            <div class='last column span-5'>
                 <img src={$.env('root')+'images/star_inverting.jpg'} 
                      alt={doc.label} />
                 <strong>releases</strong>
@@ -60,17 +76,34 @@
                     {_('.*', releases).map(function(){
                         return {li:{$:[
                             {a:{
-                                $href:$.env('root')+'doc/'+doc.id+'-'+this.id,
+                                $href:$.env('root')+'doc/apis/'+this.id+'/'+doc.label,
                                 $:this.name
                             }},
                             '|',
                             {a:{
-                                $href:$.env('root')+'release/'+this.id,
+                                $href:$.env('root')+'doc/apis/'+this.id+'/'+doc.label,
                                 $: this.id
                             }}
                         ]}};
                     }).e4x()}
                 </ul>
+                
+                <h4>
+                    <img src={$.env('root')+'images/star_inverting.jpg'}/>
+                    Project
+                </h4>
+                <ul>
+                    {_('.*', docs[0].apis['project/conventions']).map(function(index, value){
+                        return {li:{
+                            a:{
+                                $href:$.env('root')+'doc/apis/'+docs[0].version+
+                                    '/project/conventions/'+value,
+                                $:[{strong:value}]
+                            }
+                        }};
+                    }).e4x()}
+                </ul>
+                
                 <h4>
                     <img src={$.env('root')+'images/star_inverting.jpg'}/>
                     Guides

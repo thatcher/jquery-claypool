@@ -233,7 +233,7 @@ jQuery.noConflict();
             
        </p>
        And now when you reload your page you should be able to click on
-       any of the numbered links we just added and get an aler message
+       any of the numbered links we just added and get an alert message
        displaying the number you just clicked on.  We'll talk more later
        about regular expressions in routes and how those become event 
        params.

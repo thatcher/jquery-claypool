@@ -1,32 +1,54 @@
 {'_':[
 
 {
-    'version': '1.0.x',
+    'version':'1.0.x',
     'latest':true,
     'guides':[
         'basics',
         'intermediate',
         'advanced'
      ],
-     'apis':[
-        'scanners',
-        'routes',
-        'events',
-        'controllers',
-        'booting',
-        'models',
-        'views',
-        'templates',
-        'environments',
-        'logging',
-        'filters',
-        'services',
-        'requests',
-        'responses',
-        'proxies',
-        'inverting',
-        'extending'
-     ]
+     'apis':{
+        'plugins/user':[
+            '$',
+            'boot',
+            'environments',
+            'event',
+            'filters',
+            'invert',
+            'logger',
+            'logging',
+            'model',
+            'proxy',
+            'request',
+            'response',
+            'routes',
+            'scan'
+        ],
+        'plugins/developer':[
+            'config',
+            'guid',
+            'manage',
+            'register',
+            'resolve',
+            'router'
+        ],
+        'project/conventions':[
+            'app/boot/client.js',
+            'app/boot/server.js',
+            'app/configs/config.js',
+            'app/configs/environments.js',
+            'app/configs/filters.js',
+            'app/configs/logging.js',
+            'app/configs/routes.js',
+            'app/controllers/example.js',
+            'app/models/example.js',
+            'app/services/example.js',
+            'app/templates/example.js',
+            'app/views/example.js',
+            'index.html'
+        ]
+     }
 }
 
 ]}

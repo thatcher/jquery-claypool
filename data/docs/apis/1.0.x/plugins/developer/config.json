@@ -10,13 +10,22 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>
+                Retrieves or extends the entire configuration, 
+                or a subset of the configuration.
+            </strong>
+            This method is entry point into jquery.claypool. All of claypools 
+            submodules, like logging, mvc, ioc, and aop will be accessed 
+            directly through $.config. Each configuration is also exposed by
+            a conveneince method. See also:
+            <ul>
+                <li><a href='../user/scan'>$.scan</a></li>
+                <li><a href='../user/invert'>$.invert</a></li>
+                <li><a href='../user/logging'>$.logging</a></li>
+                <li><a href='../user/routes'>$.routes</a></li>
+                <li><a href='../user/environments'>$.env</a></li>
+                <li><a href='../user/environments'>$.filters</a></li>
+            </ul>
         </p>
     </>
  },{

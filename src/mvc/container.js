@@ -21,16 +21,6 @@
         //components
         this.factory = new $$MVC.Factory();
         this.factory.updateConfig();
-        //create global controllers non-lazily
-        var controller,
-            id;
-        for(id in this.factory.cache){
-            //will trigger the controllerFactory to instantiate the controllers
-            controller = this.get(id);
-            //activates the controller
-            this.logger.debug("attaching mvc core controller: %s", id);
-            controller.attach();
-        }
     };
     
     $.extend($$MVC.Container.prototype, 

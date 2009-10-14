@@ -17,9 +17,12 @@
         //For another example see claypool server
 	    router : function(confId, options){
             $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-                registrationFunction.apply(_this, [
-                    configuration, confId, "Claypool.MVC.HijaxController", options
-                ]);
+                if(!_this.initialized){
+                    registrationFunction.apply(_this, [
+                        configuration, confId, "Claypool.MVC.HijaxController", options
+                    ]);
+                    _this.initialized = true;
+                }
             });
             return this;
 	    },

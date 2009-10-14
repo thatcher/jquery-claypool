@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.5 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.0.6 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -1085,13 +1085,22 @@ var Claypool={
          */
         manage : function(containerName, managedId){
             $(document).bind("claypool:initialize", function(event, context){
-                context.managedId = new ($.resolve( containerName ))();
-                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-                    //$.extend(context.managedId, new context.ContextContributor());
-                    context.managedId.registerContext(containerName);
+                if(!context[managedId]){
+                    context[managedId] = new ($.resolve( containerName ))();
+                    if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                        //$.extend(context.managedId, new context.ContextContributor());
+                        context[managedId].registerContext(containerName);
+                    }
+                }else{
+                    context[managedId].factory.updateConfig();
                 }
             }).bind("claypool:reinitialize", function(event, context){
-                context.managedId.factory.updateConfig();
+                //TODO: need to do a better job cleaning slate here.
+                context[managedId] = new ($.resolve( containerName ))();
+                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                    //$.extend(context.managedId, new context.ContextContributor());
+                    context[managedId].registerContext(containerName);
+                }
             });
             return this;
         }

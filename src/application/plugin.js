@@ -49,13 +49,22 @@
          */
         manage : function(containerName, managedId){
             $(document).bind("claypool:initialize", function(event, context){
-                context.managedId = new ($.resolve( containerName ))();
-                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-                    //$.extend(context.managedId, new context.ContextContributor());
-                    context.managedId.registerContext(containerName);
+                if(!context[managedId]){
+                    context[managedId] = new ($.resolve( containerName ))();
+                    if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                        //$.extend(context.managedId, new context.ContextContributor());
+                        context[managedId].registerContext(containerName);
+                    }
+                }else{
+                    context[managedId].factory.updateConfig();
                 }
             }).bind("claypool:reinitialize", function(event, context){
-                context.managedId.factory.updateConfig();
+                //TODO: need to do a better job cleaning slate here.
+                context[managedId] = new ($.resolve( containerName ))();
+                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                    //$.extend(context.managedId, new context.ContextContributor());
+                    context[managedId].registerContext(containerName);
+                }
             });
             return this;
         }

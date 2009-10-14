@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.5 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.0.6 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -1995,13 +1995,22 @@ Claypool.Application={
          */
         manage : function(containerName, managedId){
             $(document).bind("claypool:initialize", function(event, context){
-                context.managedId = new ($.resolve( containerName ))();
-                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-                    //$.extend(context.managedId, new context.ContextContributor());
-                    context.managedId.registerContext(containerName);
+                if(!context[managedId]){
+                    context[managedId] = new ($.resolve( containerName ))();
+                    if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                        //$.extend(context.managedId, new context.ContextContributor());
+                        context[managedId].registerContext(containerName);
+                    }
+                }else{
+                    context[managedId].factory.updateConfig();
                 }
             }).bind("claypool:reinitialize", function(event, context){
-                context.managedId.factory.updateConfig();
+                //TODO: need to do a better job cleaning slate here.
+                context[managedId] = new ($.resolve( containerName ))();
+                if(context.ContextContributor && $.isFunction(context.ContextContributor)){
+                    //$.extend(context.managedId, new context.ContextContributor());
+                    context[managedId].registerContext(containerName);
+                }
             });
             return this;
         }
@@ -3809,12 +3818,26 @@ Claypool.MVC = {
          * @type String
          */
         updateConfig: function(){
-            var mvcConfig;
+            var mvcConfig,
+                controller,
+                id;
             try{
                 this.logger.debug("Configuring Claypool MVC Controller Factory");
                 mvcConfig = this.getConfig()||{};//returns mvc specific configs
                 //Extension point for custom low-level hijax controllers
                 $(document).trigger("claypool:hijax", [this, this.initializeHijaxController, mvcConfig]);
+                
+                //create global controllers non-lazily
+                for(id in this.cache){
+                    //will trigger the controllerFactory to instantiate the controllers
+                    controller = this.get(id);
+                    //activates the controller
+                    this.logger.debug("attaching mvc core controller: %s", id);
+                    if(!controller.attached){
+                        controller.attach();
+                        controller.attached = true;
+                    }
+                }
             }catch(e){
                 this.logger.exception(e);
                 throw new $$MVC.ConfigurationError(e);
@@ -3925,16 +3948,6 @@ Claypool.MVC = {
         //components
         this.factory = new $$MVC.Factory();
         this.factory.updateConfig();
-        //create global controllers non-lazily
-        var controller,
-            id;
-        for(id in this.factory.cache){
-            //will trigger the controllerFactory to instantiate the controllers
-            controller = this.get(id);
-            //activates the controller
-            this.logger.debug("attaching mvc core controller: %s", id);
-            controller.attach();
-        }
     };
     
     $.extend($$MVC.Container.prototype, 
@@ -4049,9 +4062,12 @@ Claypool.MVC = {
         //For another example see claypool server
 	    router : function(confId, options){
             $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-                registrationFunction.apply(_this, [
-                    configuration, confId, "Claypool.MVC.HijaxController", options
-                ]);
+                if(!_this.initialized){
+                    registrationFunction.apply(_this, [
+                        configuration, confId, "Claypool.MVC.HijaxController", options
+                    ]);
+                    _this.initialized = true;
+                }
             });
             return this;
 	    },

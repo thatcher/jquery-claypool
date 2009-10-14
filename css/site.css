@@ -330,7 +330,9 @@ a:hover {
     font-size:0.9em;
     margin-bottom:1px;
 }
-
+#doc tr.option{
+    background-color:#FEE;
+}
 
 
 

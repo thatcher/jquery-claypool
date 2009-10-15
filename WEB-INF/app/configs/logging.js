@@ -16,8 +16,8 @@
         { category:"Claypool",                   level:"WARN" },
         { category:"Claypool.Application",       level:"WARN" },
         { category:"Claypool.Server",            level:"WARN" },
-        { category:"Claypool.MVC",               level:"DEBUG" },
-        { category:"Claypool.IoC",               level:"DEBUG" },
+        { category:"Claypool.MVC",               level:"WARN" },
+        { category:"Claypool.IoC",               level:"WARN" },
         { category:"Claypool.AOP",               level:"WARN" },
         { category:"jQuery.E4X",                 level:"INFO" },
         { category:"root",                       level:"WARN" }

@@ -31,6 +31,9 @@ Claypool.Logging={
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
                 $$Log.loggerFactory.updateConfig();
+            }else if($$Log.updated){
+                $$Log.loggerFactory.updateConfig();
+                $$Log.updated = false;
             }
             return $$Log.loggerFactory.create(category);
         }

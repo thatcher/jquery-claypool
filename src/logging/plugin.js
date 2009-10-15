@@ -19,6 +19,7 @@
             if(arguments.length === 0){
                 return $.config('logging');
             }else{
+                $$Log.updated = true;
                 return $.config('logging', arguments[0]);
             }
         }

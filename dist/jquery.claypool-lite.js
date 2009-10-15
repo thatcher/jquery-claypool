@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.7 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.0.8 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -845,6 +845,9 @@ Claypool.Logging={
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
                 $$Log.loggerFactory.updateConfig();
+            }else if($$Log.updated){
+                $$Log.loggerFactory.updateConfig();
+                $$Log.updated = false;
             }
             return $$Log.loggerFactory.create(category);
         }
@@ -1685,6 +1688,7 @@ Claypool.Logging={
             if(arguments.length === 0){
                 return $.config('logging');
             }else{
+                $$Log.updated = true;
                 return $.config('logging', arguments[0]);
             }
         }

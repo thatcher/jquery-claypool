@@ -4,7 +4,7 @@
         title:'An Online Quiz',
 		id:'quiz',
         description:<>
-                <img src='/images/star_inverting.jpg'/>
+            <img src='/images/star_inverting.jpg'/>
             <p>
             	 Our 'hello world'. It's a good place to start looking for
 				 how we start to structure an app.
@@ -16,6 +16,13 @@
 			world, if this all you needed to do you probably wouldn't need,
 			or benifit much from jquery-claypool.  
 			</p>
+            <p>
+            Note that additional link to 'Mini-App'.  This demonstrates that
+            jquery-claypool apps can be loaded on top of each other even well
+            after an app has been already running, this one waits about ten 
+            seconds and simulates the addition of a app that simply logs a 
+            statement to the firebug console when the link is clicked.
+            </p>
 		</>
     },
     {

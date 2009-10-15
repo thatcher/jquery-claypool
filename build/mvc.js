@@ -15,7 +15,27 @@ Claypool.MVC = {
 
 (function($){
     
-    $.manage("Claypool.MVC.Container", "claypool:MVC");
+    $.manage("Claypool.MVC.Container", "claypool:MVC", function(container){
+        var i,
+            id,
+            router,
+            config = container.factory.getConfig(),
+            type;
+        for(type in config){
+            container.logger.debug("eagerly loading mvc routers: %s", type);
+            for(i=0;i<config[type].length;i++){
+                //eagerly load the controller
+                id = config[type][i].id;
+                controller = container.get(id);
+                //activates the controller
+                container.logger.debug("attaching mvc core controller: %s", id);
+                if(controller && !controller.attached){
+                    controller.attach();
+                    controller.attached = true;
+                }
+            }
+        }
+    });
     
 })(  jQuery);
 
@@ -432,24 +452,15 @@ Claypool.MVC = {
         updateConfig: function(){
             var mvcConfig,
                 controller,
-                id;
+                type,
+                id,
+                i;
             try{
                 this.logger.debug("Configuring Claypool MVC Controller Factory");
                 mvcConfig = this.getConfig()||{};//returns mvc specific configs
                 //Extension point for custom low-level hijax controllers
                 $(document).trigger("claypool:hijax", [this, this.initializeHijaxController, mvcConfig]);
                 
-                //create global controllers non-lazily
-                for(id in this.cache){
-                    //will trigger the controllerFactory to instantiate the controllers
-                    controller = this.get(id);
-                    //activates the controller
-                    this.logger.debug("attaching mvc core controller: %s", id);
-                    if(!controller.attached){
-                        controller.attach();
-                        controller.attached = true;
-                    }
-                }
             }catch(e){
                 this.logger.exception(e);
                 throw new $$MVC.ConfigurationError(e);
@@ -521,8 +532,8 @@ Claypool.MVC = {
          * @type String
          */
         initializeHijaxController: function(mvcConfig, key, clazz, options){
-            var configuration;
-            var i;
+            var configuration,
+                i;
             if(mvcConfig[key]){
                 for(i=0;i<mvcConfig[key].length;i++){
                     configuration = {};
@@ -667,6 +678,7 @@ Claypool.MVC = {
 	/**
 	 * @constructor
 	 */
+    var log;
     //TODO : what is the useful static plugin that could be derived from Claypool.MVC?
     //      router ?
 	$.extend($, {
@@ -674,12 +686,11 @@ Claypool.MVC = {
         //For another example see claypool server
 	    router : function(confId, options){
             $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-                if(!_this.initialized){
-                    registrationFunction.apply(_this, [
-                        configuration, confId, "Claypool.MVC.HijaxController", options
-                    ]);
-                    _this.initialized = true;
-                }
+                log = log||$.logger('Claypool.MVC.Plugins');
+                log.debug('registering router plugin: %s', confId);
+                registrationFunction.apply(_this, [
+                    configuration, confId, "Claypool.MVC.HijaxController", options
+                ]);
             });
             return this;
 	    },
@@ -778,16 +789,6 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
-        }
-    }).router( "hijax:image-rollover",{
-        selector        : 'img',
-        event           : 'mouseover|mouseout',
-        strategy        : 'all',
-        routerKeys      : 'urls',
-        hijaxKey        : 'image',
-        eventNamespace  : "Claypool:MVC:HijaxImageRolloverController",
-        target       : function(event){ 
-            return event.target.src;
         }
     });
     

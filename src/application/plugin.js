@@ -47,23 +47,29 @@
          * @returns Describe what it returns
          * @type String
          */
-        manage : function(containerName, managedId){
+        manage : function(containerName, managedId, callback){
             $(document).bind("claypool:initialize", function(event, context){
                 if(!context[managedId]){
                     context[managedId] = new ($.resolve( containerName ))();
                     if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-                        //$.extend(context.managedId, new context.ContextContributor());
                         context[managedId].registerContext(containerName);
                     }
                 }else{
                     context[managedId].factory.updateConfig();
                 }
+                //allow managed containers to register callbacks post creation
+                if(callback && $.isFunction(callback)){
+                    callback(context[managedId]);
+                }
             }).bind("claypool:reinitialize", function(event, context){
                 //TODO: need to do a better job cleaning slate here.
                 context[managedId] = new ($.resolve( containerName ))();
                 if(context.ContextContributor && $.isFunction(context.ContextContributor)){
-                    //$.extend(context.managedId, new context.ContextContributor());
                     context[managedId].registerContext(containerName);
+                }
+                //allow managed containers to register callbacks post creation
+                if(callback && $.isFunction(callback)){
+                    callback(context[managedId]);
                 }
             });
             return this;

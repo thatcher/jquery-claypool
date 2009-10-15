@@ -15,6 +15,26 @@ Claypool.MVC = {
 
 (function($){
     
-    $.manage("Claypool.MVC.Container", "claypool:MVC");
+    $.manage("Claypool.MVC.Container", "claypool:MVC", function(container){
+        var i,
+            id,
+            router,
+            config = container.factory.getConfig(),
+            type;
+        for(type in config){
+            container.logger.debug("eagerly loading mvc routers: %s", type);
+            for(i=0;i<config[type].length;i++){
+                //eagerly load the controller
+                id = config[type][i].id;
+                controller = container.get(id);
+                //activates the controller
+                container.logger.debug("attaching mvc core controller: %s", id);
+                if(controller && !controller.attached){
+                    controller.attach();
+                    controller.attached = true;
+                }
+            }
+        }
+    });
     
 })(  jQuery);

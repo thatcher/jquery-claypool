@@ -15,10 +15,10 @@
         { category:"Site.Service",               level:"DEBUG" },
         { category:"Claypool",                   level:"WARN" },
         { category:"Claypool.Application",       level:"WARN" },
-        { category:"Claypool.Server",            level:"INFO" },
-        { category:"Claypool.MVC",               level:"INFO" },
-        { category:"Claypool.IoC",               level:"INFO" },
-        { category:"Claypool.AOP",               level:"DEBUG" },
+        { category:"Claypool.Server",            level:"WARN" },
+        { category:"Claypool.MVC",               level:"DEBUG" },
+        { category:"Claypool.IoC",               level:"DEBUG" },
+        { category:"Claypool.AOP",               level:"WARN" },
         { category:"jQuery.E4X",                 level:"INFO" },
         { category:"root",                       level:"WARN" }
     ]);     

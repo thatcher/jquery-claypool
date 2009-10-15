@@ -10,6 +10,7 @@
 	/**
 	 * @constructor
 	 */
+    var log;
     //TODO : what is the useful static plugin that could be derived from Claypool.MVC?
     //      router ?
 	$.extend($, {
@@ -17,12 +18,11 @@
         //For another example see claypool server
 	    router : function(confId, options){
             $(document).bind("claypool:hijax", function(event, _this, registrationFunction, configuration){
-                if(!_this.initialized){
-                    registrationFunction.apply(_this, [
-                        configuration, confId, "Claypool.MVC.HijaxController", options
-                    ]);
-                    _this.initialized = true;
-                }
+                log = log||$.logger('Claypool.MVC.Plugins');
+                log.debug('registering router plugin: %s', confId);
+                registrationFunction.apply(_this, [
+                    configuration, confId, "Claypool.MVC.HijaxController", options
+                ]);
             });
             return this;
 	    },
@@ -121,16 +121,6 @@
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
-        }
-    }).router( "hijax:image-rollover",{
-        selector        : 'img',
-        event           : 'mouseover|mouseout',
-        strategy        : 'all',
-        routerKeys      : 'urls',
-        hijaxKey        : 'image',
-        eventNamespace  : "Claypool:MVC:HijaxImageRolloverController",
-        target       : function(event){ 
-            return event.target.src;
         }
     });
     

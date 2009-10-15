@@ -10,13 +10,10 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>
+            Triggers the application framework to initialize, reading in all configurations and scan paths.
+            </strong>
+This plugin provides an entry point to the initialization of the application similar to the way jQuery.ready provides an entry point to the the html dom being ready for plugins. The boot process can be tuned via either client.js or server.js located in app/boot/
         </p>
     </>
  },{
@@ -24,16 +21,7 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table cellspacing="0" class="args"><tbody><tr class="option"><th>callback</th><td class="type"><a href="/Types#Function">Function</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A callback to be applied after the event <b>ApplicationInitialized</b> and before the event <b>ApplicationLoaded</b></td></tr></tbody></table>
         </p>
     </>
  },{
@@ -41,17 +29,18 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            This plugin method is usually used inside $(document).ready and causes jquery.claypool to start its magic.
+
         </p>
+<pre class='box'>$.boot();</pre>
+        <p>
+            Adding a post-boot callback
+
+        </p>
+        <pre class='box'>$.boot(function(){
+            //do something
+        });</pre>
+        
     </> 
 }]
 

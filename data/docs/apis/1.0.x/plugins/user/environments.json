@@ -10,13 +10,13 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>
+            Sets, extends, or retrieves properties from the environment.
+            </strong>
+            The environment is a collection of name/value pairs that can easy 
+            be switched before the application is booted to allow easy change 
+            between test, development, and production environments. 
+            You can have as many environments as you want.
         </p>
     </>
  },{
@@ -24,16 +24,12 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+           <table cellspacing="0" class="args">
+               <tbody>
+                    <tr class="option">
+                        <th>name</th>
+                        <td class="type">String</td>
+                        <td class="default"/></tr><tr><td class="desc" colspan="3">If only one arg is present, the plugin method is treated as a getter and the value of the name is returned</td></tr><tr class="option"><th>env<span class="optional"> (Optional)</span></th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">When two arguments are present, the first is treated as the name of the default environment, and the latter is the name of overriding environment.</td></tr></tbody></table>
         </p>
     </>
  },{
@@ -41,17 +37,15 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Sets the environment to 'defaults' and extends it with the values in 'client.dev'. 
+            See  <a href='../project/conventions/app/configs/environments.js'>environments.js</a>
         </p>
+        <pre class='box'>$.env('defaults', 'client.dev');</pre>
+
+        <p>
+            Returns the set environments value of 'serviceURL'
+        </p>
+        <pre class='box'>$.env('serviceURL');</pre>
     </> 
 }]
 

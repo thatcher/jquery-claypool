@@ -10,13 +10,12 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>
+            Retrieves or creates a category logger.
+            </strong>
+            This plugin provides an efficient logging implementation that allows 
+            application components to log messages at 5 levels to a hierarchical 
+            category that can be tuned via app/configs/logging.js
         </p>
     </>
  },{
@@ -24,16 +23,9 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table cellspacing="0" class="args">
+                <tbody><tr class="option"><th>category</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A dot-delimited name, usually the namespace of the class the logger is being used in.</td></tr></tbody>
+            </table>
         </p>
     </>
  },{
@@ -41,17 +33,15 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
+            The logger is returned if any category configured in app/configs/logging.js matches, including the catch-all root category, otherwise a safe, efficient NullLogger instance is returned.
+
+        </p>
+
             <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
+$.logger("MyApp.Controller.HelloController");
             </pre>
         
             
-            {_.sentence()} 
-        </p>
     </> 
 }]
 

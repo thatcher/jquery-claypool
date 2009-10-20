@@ -1,0 +1,185 @@
+{'_':{
+/**************************************************/
+    'id':'apis/1.0.x/project/conventions/app/views',
+    'version':'1.0.x',
+    'label':'app/views',
+    'sections':[{
+/**************************************************/
+        'label':'usage',
+        'description': <>
+        <h3>Views</h3>
+        <p>
+            Views update the DOM. jquery-claypool doesn't come with any DOM manipulation
+            strategies because jquery already provides everything you need to 
+            gracefully manipulate the dom. There are also already several 
+            templating plugins for jquery like srender and jtemplates. 
+            <strong> 
+            are a couple conventions you should know about so you can take 
+            full advantage of the view pattern in jquery-claypool
+            </strong> 
+        </p>
+        <h4> Views Are jQuery </h4>
+        <p>
+            It's true, they love the dom so much they attach themselves to it, 
+            and are in fact jQuery instances. how does this happen so magically? 
+            Well, if I have a view named 'Hello', it will automatically attach 
+            itself to the dom node with the id 'hello' when ever it appears in 
+            the dom (using live binding). This convention can be customized to 
+            allow a single view to attach to many nodes, but in general if a view 
+            is singular on the page it is identified by id.
+        </p>
+        <h4>Views Are Not jQuery</h4>
+        <p>
+            A View is not obligated to be a dom node, often a View is responsible
+            for rendering one, two, or ten similar nodes, and it may render them 
+            selectively or all together.  <strong>The important design goal of
+            the view is that it simply consolidate visible updates to the DOM so
+            the events net visual result can be isolated clearly.</strong>
+        </p> 
+    </>
+ },{
+/**************************************************/
+        'label':'options',
+        'description':<>
+        <h3>model</h3>
+        <p>
+            <strong>
+            Views refer to the parameter passed to them as the 'model'.  The Views
+            model is really only an aggregation of state information that was 
+            provided by the controller, not a Model (which is usually a data access 
+            object with some validation routines) 
+            </strong>
+            The 'model' is just an object, each named value provided entirely at 
+            the discretion of the controller, and perhaps embellished by a filter.
+            <br/> 
+            See also <a>event.m()</a>
+        </p>
+        <p>
+            <em>The <strong>model</strong> (lower case m) can also be refered to
+            as the <strong>request scope</strong>, or the <strong>event scope</strong>.
+            It is born with the event, and disappears when the event controller
+            flow is ended.</em>
+        </p>
+        <p>
+            The model will always include an array named 'flash'. this concept 
+            was lovingly borrowed from Rails. The array should be an array of 
+            objects, each object containing an hash of name/value pairs that 
+            are intended to provide feed back about incorrect or invalid user 
+            input or errors from controllers and models. 
+            <br/>
+            See also <a>event.flash()</a>
+        </p>
+    </>
+ },{
+    /**************************************************/
+        'label':'examples',
+        'description':<>
+        
+        <h3>think update</h3>
+        <p>
+            yes, think AND update. there is no steadfast rules, though by 
+            default the controller will pass the model to the view method 
+            'update' unless you specify another method. we do recommend you 
+            usually have at least two methods for views though, so one method 
+            'think' can be used to let the interface know the view is about to 
+            be updated. eg show a spinner or flash a color or block the ui 
+            component or display a message etc. 
+        </p> 
+        <h4>Building a jQuery View</h4>
+        <p>
+            Let's start by creating a simple closure that will define our view.
+        </p>
+        <pre class='box'>
+/*
+ * @file app/views/hello.js
+ * @description You can feel free to use your 
+ *     own writing style, we are providing an
+ *     example not a rigid requirement of how to
+ *     you have to write views.  If you 
+ *     want to take advantage of the mvc scanners
+ *     (and keep the global scope clean) you should
+ *     use a closure and single top-level namespace.
+ *     In this example we use 'MyApp'
+ */
+(function($, $V)&amp;#x7B;
+    
+    $V.Hello = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+     &#x7D;;
+
+    $.extend($V.Hello.prototype, &amp;#x7B;
+        update: function(model)&amp;#x7B;
+           //update the dom here
+         &#x7D;
+     &#x7D;);
+    
+ &#x7D;)(jQuery, MyApp.Views);
+        </pre>
+        <p>
+            This is a good lazy view because it doesn't actively do anything when 
+            the anonymous closure is executed other than define itself.
+        </p> 
+        <h4>
+            A Presumptuous View 
+        </h4>
+        <p>
+            Lets start using this mvc thing a little but keep it real simple. 
+        </p>
+        <pre class='box'>
+    update: function(model)&amp;#x7B;
+        // recall 'this' is a jquery context
+        // because the instance is auto-magically
+        // attached to $('#hello')
+        $('.msg', this).text('Hi there world!');
+    &#x7D;
+        </pre>
+        <p>
+            WoW! That was amazing! But very presumptuous, because I am not 
+            really the world just a modest fella... 
+            <strong>
+                Note: A view does not always need to be attached to a dom node...,
+                and often will use information passed from the controller to
+                update a particular node.  This is more common when there are
+                many 'like' elements on a page whose rendering is all managed
+                by a single view.
+            </strong>
+        </p>
+        <h4>A Thoughtful View </h4>
+        <p>Lets dive in.</p>
+        <pre class='box'>
+think: function()&amp;#x7B;
+    $('.msg', this).text('learning about you!');
+&#x7D;,
+update: function(model)&amp;#x7B;
+    $('.msg', this).text('Hi there '+model.username);
+&#x7D;
+        </pre>
+        <p>
+            Note that model.username is a named piece of data that was provided
+            by the controller using 
+        </p>
+        <pre class='box'>
+        event.m(&amp;#x7B;username:'chuck norris'&#x7D;);
+        </pre>
+        
+        <h3>templates</h3>
+        <p>
+            Templates are also described in detail <a href='../templates'>here</a>
+            <br/>
+            <strong>
+                Templates are often used by views to render content to the dom.
+                jquery-claypool has not requirements that you use or don't use 
+                templates, but simply makes it a very easy to integrate with your
+                prefered View technology.
+            </strong>
+            <br/>
+            That said, we encourage the use of templates in projects where html and css
+            development is managed by folks who are not javascript experts.  It 
+            simply provides an additional measure of seperation and clarity for
+            those will manage markup and style changes.
+        </p>
+    </> 
+}]
+
+
+}}

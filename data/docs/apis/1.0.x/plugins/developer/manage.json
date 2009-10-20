@@ -9,13 +9,14 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>
+            Adds the containers object pool to the pool of application 
+            managed objects.
+            </strong><br/>
+            This method is used internally for the ioc container, mvc container, 
+            aop container etc, so that when you access an object through the 
+            application context ( with $.$('id') ), the managed container will 
+            be searched and automatically created by the containers.
         </p>
     </>
  },{
@@ -23,16 +24,7 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table cellspacing="0" class="args"><tbody><tr class="option"><th>container</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">The dot-delimited name of the container class.</td></tr><tr class="option"><th>nickname</th><td class="type"><a href="/Types#Object">Object</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">The nickname will be used by the application content to hold a reference to the managed container.</td></tr></tbody></table> 
         </p>
     </>
  },{
@@ -40,17 +32,11 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Taken directly from jquery.claypool, this is how we internally delegate management of the mvc container to the application framework. Now when we call $.$("#helloController"), the mvc container will be searched for an object with this id, and will be responsible for creating it if it hasn't been created before.
+
         </p>
+        <pre class='box'>$.manage('Claypool.MVC.Container', 'claypool:MVC');</pre>
+
     </> 
 }]
 

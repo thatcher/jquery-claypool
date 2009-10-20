@@ -9,13 +9,15 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>Creates a new low level router.</strong><br/>
+            Routers are the heart of jquery.claypool. They provide clear, 
+            simple hijax patterns that sit between the browser and your 
+            application allowing all relevant events to be registered to a 
+            handful of routers that can delegate the events based on powerful 
+            regular expressions to your dormant application controllers using 
+            common or custom strategies, like first(tcp) and all(udp). 
+            Routers are a well known and popular framework tool to simplify 
+            application development.
         </p>
     </>
  },{
@@ -23,16 +25,16 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table cellspacing="0" class="args"><tbody><tr class="option"><th>id</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A unique name for this router.</td></tr><tr class="option"><th>options</th><td class="type"><a href="/Types#Object">Object</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A hash of router options.
+<p/><div class="options tabs-container" id="toptions"><b class="options">Options:</b><table cellspacing="0" class="options"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+<tr class="option"><th>selector</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An optional jQuery selector, if none is present the router is bound to the document </td></tr>
+<tr class="option"><th>event</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">required for all but a pure event router, the event specifies the type of event the router binds to (eg 'click')</td></tr>
+<tr class="option"><th>stratgey</th><td class="type"><a href="/Types#String">String</a></td><td class="default"><b>Default:</b> <span>'all'</span></td></tr><tr><td class="desc" colspan="3">Currently supports 'first' and 'all'</td></tr>
+<tr class="option"><th>routerKeys</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A pipe delimited list of properties that will be checked in the router configuration to match against the target</td></tr>
+<tr class="option"><th>hijaxKey</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">a human readable name used to log the hijax event</td></tr>
+<tr class="option"><th>eventNamespace</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An event namespace so the router can be cleanly unbound without interfering with other event bindings</td></tr>
+<tr class="option"><th>target</th><td class="type"><a href="/Types#Function">Function</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">This is the delegation function so you can bind a router to, for example, a table but return the delegated target (eg a td)</td></tr>
+</tbody></table></div></td></tr></tbody></table>
         </p>
     </>
  },{
@@ -40,17 +42,65 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            This example illustrates the use of the router plugin by showing 
+            how jquery.claypool defines it's built in routers. See routes.js 
+            for more information on how to use routers.
         </p>
+        <pre class='box'>
+    $.router( "hijax:a", &amp;#x7B;
+        selector        : 'a',
+        event           : 'click',
+        strategy        : 'first',
+        routerKeys      : 'urls',
+        hijaxKey        : 'link',
+        eventNamespace  : "Claypool:MVC:HijaxLinkController",
+        target       : function(event)&amp;#x7B; 
+            var link = event.target||event.currentTarget;
+            while(link.tagName.toUpperCase()!='A')&amp;#x7B;
+                link = $(link).parent()[0];
+            &#x7D;
+            return $(link).attr("href");
+        &#x7D;
+    &#x7D;).router( "hijax:button",&amp;#x7B;
+        selector        : ':button',
+        event           : 'click',
+        strategy        : 'all',
+        routerKeys      : 'urls',
+        hijaxKey        : 'button',
+        eventNamespace  : "Claypool:MVC:HijaxButtonController",
+        target       : function(event)&amp;#x7B; 
+            return event.target.value;
+        &#x7D;
+    &#x7D;).router( "hijax:input",&amp;#x7B;
+        selector        : 'input',
+        event           : 'click',
+        strategy        : 'all',
+        routerKeys      : 'urls',
+        hijaxKey        : 'input',
+        eventNamespace  : "Claypool:MVC:HijaxInputController",
+        target       : function(event)&amp;#x7B; 
+            return event.target.name;
+        &#x7D;
+    &#x7D;).router( "hijax:form",&amp;#x7B;
+        selector        : 'form',
+        event           : 'submit',
+        strategy        : 'first',
+        routerKeys      : 'urls',
+        hijaxKey        : 'form',
+        eventNamespace  : "Claypool:MVC:HijaxFormController",
+        target       : function(event)&amp;#x7B; 
+            return event.target.action;
+        &#x7D;
+    &#x7D;).router( "hijax:event",&amp;#x7B;
+        strategy        : 'all',
+        routerKeys      : 'event',
+        hijaxKey        : 'event',
+        eventNamespace  : "Claypool:MVC:HijaxEventController",
+        target       : function(event)&amp;#x7B; 
+            return event.type;
+        &#x7D;
+    &#x7D;);
+        </pre>
     </> 
 }]
 

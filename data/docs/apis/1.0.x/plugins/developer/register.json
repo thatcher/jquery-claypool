@@ -9,13 +9,12 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>Register the context to be searchable.</strong>
+            Claypool uses this internally to create the application context, 
+            though there may be a need in some applications to add session 
+            context or request context, etc. A context is simply access to 
+            objects managed by the framework. Using contexts is cleaner 
+            and safer than storage in global scope.
         </p>
     </>
  },{
@@ -23,16 +22,17 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table cellspacing="0" class="args"><tbody><tr class="option">
+            <th>context</th><td class="type"><a href="/Types#Object">Object</a></td>
+            <td class="default"/></tr><tr>
+            <td class="desc" colspan="3">
+            An object that implements Claypool.AbstractContext</td></tr>
+            <tr class="option"><th>prioty</th><td class="type">
+            <a href="/Types#Number">Number</a></td><td class="default"/></tr>
+            <tr><td class="desc" colspan="3">
+            If 0, the context will overwrite the built in application context, 
+            otherwise the context is added and will be searched in order of 
+            registration.</td></tr></tbody></table>
         </p>
     </>
  },{
@@ -40,17 +40,11 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Registers a custom context (in this made up example the 
+            CookieContext may load all values stored as cookies so we can 
+            access them as $.$("foo");
         </p>
+        <pre class='box'>$.register(MyApp.CookieContext, 1);</pre>
     </> 
 }]
 

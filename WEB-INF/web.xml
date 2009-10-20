@@ -44,7 +44,7 @@
         <!-- Set to false for production releases -->
         <init-param>
           <param-name>active-reload</param-name>
-          <param-value>true</param-value>
+          <param-value>false</param-value>
         </init-param>
         <load-on-startup>2</load-on-startup>
     </servlet>  

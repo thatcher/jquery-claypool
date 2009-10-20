@@ -68,14 +68,6 @@
                 <h2 class='api_label'>
                     {doc.label + ' ' + doc.version}
                 </h2>
-                <p>
-                    <strong>
-                        This guide is applicable to both the jquery-claypool 
-                        client and server application frameworks.
-                    </strong>  
-                    Where the two differ functionally the documentation will 
-                    provide notes and examples of usage in each environment.
-                </p>
                 <hr/>
                 {_('.*', doc.sections).map(function(){
                     return {div:{
@@ -153,6 +145,14 @@
                         }};
                     }).e4x()}
                 </ul>
+                <p>
+                    <strong>
+                        This guide is applicable to both the jquery-claypool 
+                        client and server application frameworks.
+                    </strong>  
+                    Where the two differ functionally the documentation will 
+                    provide notes and examples of usage in each environment.
+                </p>
             </div>
         </div>
     </block> 

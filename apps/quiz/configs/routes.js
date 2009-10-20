@@ -6,7 +6,7 @@
  */
  
 (function($){
-   $.mvc({
+   $.routes({
         "hijax:a" : [{
             id:"#example-hash-routes",
             active: true,

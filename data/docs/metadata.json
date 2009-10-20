@@ -35,17 +35,25 @@
             'router'
         ],
         'project/conventions':[
+            'app',
+            'app/boot',
             'app/boot/client.js',
             'app/boot/server.js',
+            'app/configs',
             'app/configs/config.js',
             'app/configs/environments.js',
             'app/configs/filters.js',
             'app/configs/logging.js',
             'app/configs/routes.js',
+            'app/controllers',
             'app/controllers/example.js',
+            'app/models',
             'app/models/example.js',
+            'app/services',
             'app/services/example.js',
+            'app/templates',
             'app/templates/example.js',
+            'app/views',
             'app/views/example.js',
             'index.html'
         ]

@@ -1,5 +1,136 @@
+{'_':{
+/**************************************************/
+    'id':'apis/1.0.x/project/conventions/app/controllers',
+    'version':'1.0.x',
+    'label':'app/controllers',
+    'sections':[{
+/**************************************************/
+        'label':'usage',
+        'description': <>
+<h3>Controllers</h3>
+<p>
+    Controllers are just regular event handlers! The only difference is that 
+    jquery-claypool decorates the event object with some handy, dandy, mvc to 
+    help you cleanly separate your event handling from your presentation and 
+    data access functions. We will cover these functions here because they 
+    will generally only ever be used in your controllers, but first lets go 
+    over a couple things that will help you avoid common mistakes if you are 
+    new to mvc.
+</p>
+<h4>Aggregating Event Scope State</h4>
+<p>
+    The primary goal of the controller is to aggregate some data to pass to the 
+    view.  The data may be cached, gotten via ajax, entirely made up, or all of
+    the above.  It is aggregated in a new object which is passed to the view
+    or passed along to other controllers if control is forwarded.  The aggregated 
+    data is called <strong>event scoped state</strong> because the aggregation
+     is not persistent, and disappears when the event propogation is complete.
+</p>
+<h4>Leave Presentation to the Experts</h4>
+<p>
+    Controllers are free to peruse all the info they want in the DOM but they 
+    should leave the presentation to the views. It's not a steadfast rule, 
+    sometimes a controller will modify the DOM, but usually only in ways you 
+    don't see. 
+</p>
+    </>
+ },{
+/**************************************************/
+        'label':'options',
+        'description':<>
+<h4>event.m().v().c().render(callback)</h4>
+<p>
+    The title say's it well, but you should check out the specifics here. 
+</p>
+<table cellspacing="0" class="options examples"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#m">event.m( )</a></b></td><td class="default"><b>Returns:</b> <span><a href="">Object</a></span></td></tr><tr><td class="desc" colspan="2">overloaded function getters and setters of the event model.  chainable setters.</td></tr>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#v">event.v( )</a></b></td><td class="default"><b>Returns:</b> <span><a href="">Object</a></span></td></tr><tr><td class="desc" colspan="2">overloaded function getters and setters of the event view. chainable setters.  relates to which method will be used by event.render</td></tr>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#c">event.c( )</a></b></td><td class="default"><b>Returns:</b> <span><a href="">Object</a></span></td></tr><tr><td class="desc" colspan="2">getter and setter to introspect the current controller and forward control to other controllers. setter is chainable.</td></tr>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#render">event.render( )</a></b></td><td class="default"><b>Returns:</b> <span><a href="">Object</a></span></td></tr><tr><td class="desc" colspan="2">triggers jquery-claypool to resolve the view instance and call the view method.</td></tr>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#params">event.params( )</a></b></td><td class="default"><b>Returns:</b> <span><a href="">Object</a></span></td></tr><tr><td class="desc" colspan="2">returns all route params as an object or a single route param by name.</td></tr>
+<tr class="option"><td><b><a  href="../../../plugins/user/event#reset">event.reset( )</a></b></td><td class="default"><b>Returns:</b> <span>chainable</span></td></tr><tr><td class="desc" colspan="2">resets the internal m, v, c settings to the initial state.</td></tr>
+</tbody></table>
+    </>
+ },{
+    /**************************************************/
+        'label':'examples',
+        'description':<>
+        
+<h4> Building a Good and Lazy Controller </h4>
+<p>Let's start by creating a simple closure that will define our controller.</p>
+<pre class='box'>
 /*
- * JSON File
- * 
- * This comment may need to be removed for proper parsing
+ * @file app/controllers/hello.js
+ * @description You can feel free to use your 
+ *     own writing style, we are providing an
+ *     example not a rigid requirement of how to
+ *     you have to write event handers.  If you 
+ *     want to take advantage of the mvc scanners
+ *     (and keep the global scope clean) you should
+ *     use a closure and single top-level namespace.
+ *     In this example we use 'MyApp'
  */
+(function($, $C)&amp;#x7B;
+    
+    $C.Hello = function(options)&amp;#x7B;
+        $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Hello.prototype, &amp;#x7B;
+        handle: function(event)&amp;#x7B;
+           //event handling code here
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, MyApp.Controllers);
+</pre>
+<p>
+    This is a good lazy controller because it doesn't actively do anything 
+    when the anonymous closure is executed other than define itself.
+</p>
+
+<h4> A Presumptuous Controller </h4>
+<p>Lets start using this mvc thing a little but keep it real simple.</p>
+<pre class='box'>
+handle: function(event)&amp;#x7B;
+    event.m(&amp;#x7B;
+       first_name:'chris',
+       last_name:'thatcher',
+       order:[&amp;#x7B;
+          type:'pizza,
+          opts:['cheese', 'anchovies', 'pineapple', 'black beans'],
+          quantity: 5
+       &#x7D;]
+    &#x7D;).render();
+&#x7D;
+</pre>
+<p>
+    WoW! That was amazing!  But very presumptuous, because I would have wanted 
+    some hamburger on it today as well...  
+</p>
+
+
+<h4> A Thoughtful Controller </h4>
+<p>Lets dive in.</p>
+<pre class='box'>
+handle: function(event)&amp;#x7B;
+    event.
+       v('.think').                 //show activity in progress
+       render(function()&amp;#x7B;           //mvc callback after '.think'
+          $.$('#pizzaModel').order( //order the pizza via ajax
+              event.params(),       //(mmm hamburger)
+              function(model)&amp;#x7B;      //ajax callback from model
+                  event.
+                     m(model).      //json summary of order
+                     v('.update').  //update the page
+                     render();
+              &#x7D;);
+       &#x7D;);
+&#x7D;
+</pre>
+<p>OMG!  How thoughtful indeed. </p>
+    </> 
+}]
+
+
+}}

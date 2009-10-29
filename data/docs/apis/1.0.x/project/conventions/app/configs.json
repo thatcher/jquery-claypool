@@ -1,5 +1,64 @@
-/*
- * JSON File
- * 
- * This comment may need to be removed for proper parsing
- */
+{'_':{
+/**************************************************/
+    'id':'apis/1.0.x/project/conventions/app/configs',
+    'version':'1.0.x',
+    'label':'app/configs', 
+    'sections':[{
+/**************************************************/
+        'label':'usage',
+        'description': <>
+    <p>
+        The configuration files for a jquery.claypool.js app are few and 
+        follow conventions very similiar to Rails in their layout. 
+    </p>
+    <p>
+        By no means are these conventions required and the configurations can 
+        be organized in any way the author seems fit.
+    </p>
+    <p>
+        However the reason for the conventions are simple, 
+        <i>it allows other developers a clear fore knowledge of where to look 
+        to understand and modify the configuration when needed</i>
+    </p>
+    <h3> configs </h3>
+    <p>
+        As part of our general conventions, the folder/file structure is given 
+        below as links to the specific documentation on each:
+    </p>
+    <ul>
+        <li>
+            <a  title="app/configs/config.js" 
+                href="configs/config.js">
+                config.js
+            </a>
+        </li>
+        <li>
+            <a  title="app/configs/environments.js" 
+                href="configs/environments.js">
+                environments.js
+            </a>
+        </li>
+        <li>
+            <a  title="app/configs/filters.js" 
+                href="configs/filters.js">
+                filters.js
+            </a>
+        </li>
+        <li>
+            <a  title="app/configs/logging.js" 
+                href="configs/logging.js">
+                logging.js
+            </a>
+        </li>
+        <li>
+            <a  title="app/configs/routes.js" 
+                href="configs/routes.js">
+                routes.js
+            </a>
+        </li>
+    </ul>
+</>
+ }]
+
+
+}}

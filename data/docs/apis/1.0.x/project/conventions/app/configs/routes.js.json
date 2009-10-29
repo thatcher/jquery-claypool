@@ -8,13 +8,29 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            app/configs/routes.js provides a powerful routing framework for
+             organizing event handling in a single location.
+        </p>
+        <p>
+            jQuery-Claypool uses low level event handlers to bind to the 
+            events to allow your custom event handlers (controllers) to remain 
+            dormant until they are first need. Claypool instantiates the 
+            handlers for you passing a decorated event which provides some 
+            additional methods to provide full mvc control and clarity, while 
+            leaving the handlers signature unchanged.
+        </p>
+        <p>
+            Routes can be configured with the full power of javascript regular 
+            expressions, and an additional syntax allows you to specify named 
+            'capturing' parameters in the route that will be available to the 
+            event handler.  
+        </p>
+        <p>
+            You can also define your own routers using the 
+            <a href='../../../../plugins/developer/router'>
+                $.router
+            </a> 
+            plugin!
         </p>
     </>
  },{
@@ -22,34 +38,92 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            There are five built in routers available through this plugin.
         </p>
+        <ol>
+            <li> 
+                <a  title="hijax:a" 
+                    href="../../../../plugins/user/routes#hijax:a">
+                    hijax:a
+                </a><br/>
+                This router let's you connect links href patterns 
+                to you application controllers.
+            </li>
+            <li> 
+                <a  title="hijax:form" 
+                    href="../../../../plugins/user/routes#hijax:form">
+                    hijax:form
+                </a><br/>
+                The form router let's you connect form submission and 
+                action patterns to you application controllers.
+            </li>
+            <li> 
+                <a  title="hijax:event" 
+                    href="../../../../plugins/user/routes#hijax:event">
+                    hijax:event
+                </a><br/>
+                The event router lets you connect all of the custom jquery 
+                events you need to your application controller.
+            </li>
+            <li> 
+                <a  title="hijax:button" 
+                    href="../../../../plugins/user/routes#hijax:button">
+                    hijax:button
+                </a><br/>
+                The event router lets you connect all of your buttons by id 
+                to your application controllers.
+            </li>
+            <li> 
+                <a  title="hijax:input" 
+                    href="../../../../plugins/user/routes#hijax:input">
+                    hijax:input
+                </a><br/>
+                The event router lets you connect the input id of blur 
+                events to your application controllers.
+            </li>
+        </ol>
     </>
  },{
     /**************************************************/
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Usually all routes configuration is isolated in the single location
+            at <strong>configs/routes.js</strong> and has it's own closure.  This
+            example is by no means exhaustive, routers are very powerful and flexible
+            so take the time to get to know them.<strong>They are the central 
+            nervous system of your application!</strong>
         </p>
+<pre class='box'>
+
+(function($)&amp;#x7B; 
+
+    $.routes(&amp;#x7B; 
+        "hijax:a" : [&amp;#x7B; 
+            id:"#example-hash-routes",
+            active: true,
+            filter:"[href*=#examples]",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"first",
+            hijaxMap:
+               [&amp;#x7B; urls:"examples/|:id|/$",   controller:"#quizController",      action:"show"&#x7D;]
+        &#x7D;],
+        //Hijax Forms
+        "hijax:form": [&amp;#x7B; 
+            id:"#example-form-routes",
+            active: true,
+            filter:"[action*=example]",
+            stopPropagation:true,
+            preventDefault:true,
+            hijaxMap:
+              [&amp;#x7B; urls:"score$",              controller:"#quizController",      action:"score"&#x7D;] 
+       &#x7D;]
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+
+</pre>
     </> 
 }]
 

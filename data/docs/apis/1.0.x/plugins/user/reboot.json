@@ -2,7 +2,7 @@
 /**************************************************/
     'id':'apis/1.0.x/plugins/user/reboot',
     'version':'1.0.x',
-    'label':'boot', 
+    'label':'reboot', 
     'plugin':'$.reboot',
     'sections':[{
 /**************************************************/
@@ -12,7 +12,9 @@
             <strong>
             Causes the application to re-read configurations.
             </strong>
-This plugin method allows an application to modify it's internal configuration state and re-read the configuration back so updates are applied.
+            This plugin method allows an application to modify it's internal 
+            configuration state and re-read the configuration back so updates 
+            are applied.
         </p>
     </>
  },{
@@ -20,7 +22,23 @@ This plugin method allows an application to modify it's internal configuration s
         'label':'options',
         'description':<>
         <p>
-            <table cellspacing="0" class="args"><tbody><tr class="option"><th>callback</th><td class="type"><a href="/Types#Function">Function</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">The callback is applied just after the event <b>ApplicationReinitialized</b></td></tr></tbody></table>
+            <table>
+                <tbody>
+                    <tr class="option">
+                        <th>callback</th>
+                        <td class="type">
+                            <a href="/Types#Function">Function</a>
+                        </td>
+                        <td class="default"/>
+                    </tr>
+                    <tr>
+                        <td class="desc" colspan="3">
+                            The callback is applied just after the event 
+                            <b>ApplicationReinitialized</b>
+                        </td>
+                   </tr>
+               </tbody>
+           </table>
         </p>
     </>
  },{

@@ -4,15 +4,15 @@
     'version':'1.0.x',
     'latest':true,
     'guides':[
-        'basics',
-        'intermediate',
-        'advanced'
+        'Getting Started',
+        'Getting Comfortable',
+        'Getting Fancy'
      ],
      'apis':{
         'plugins/user':[
             '$',
             'boot',
-            'environments',
+            'env',
             'event',
             'filters',
             'invert',

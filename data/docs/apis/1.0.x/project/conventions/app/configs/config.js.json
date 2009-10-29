@@ -8,13 +8,18 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            app/configs/config.js is the primary channel into jquery.claypool.js 
+            as a runtime framework.  It is usually the first file loaded which
+            is application specific and therefor where the application will
+            declare it's top-level namespace (or object literal).
+        </p>
+        <p>
+            Claypool helps to scale your application is several ways, most of 
+            which resolve around the $.config extension point which is used to
+            provide plug-ins like $.scan, $.invert, and $.factory method. 
+            Every object that is available by default though the application 
+            managed context can be seen from a birds-eye perspective by simply 
+            viewing this file.  
         </p>
     </>
  },{
@@ -22,16 +27,44 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            There are three primary patterns available through this plugin.
+        </p>
+
+        <ul>
+            <li>
+                <a href=''>scan</a>
+                <p>
+                    scanning is a process where the entire namespace is searched 
+                    for functions and each function is given a simple, default 
+                    lazy configuration.
+                </p> 
+            </li>
+            <li>
+                <a href=''>invert</a>
+                <p>
+                    the instance pattern allows you a spectrum of customizations 
+                    including custom selectors, live binding, constructor 
+                    arguments, dependency injection, etc.
+                </p>
+            </li> 
+            <li>
+                <a href=''>factory</a>
+                <p>
+                    the factory pattern is the most customizable inversion-of-control 
+                    pattern possible. The factory is created using the instance 
+                    pattern and the instances it creates are up to your own 
+                    custom logic. You only need to implement the create method 
+                    or specify the name of your creation method.
+                </p>
+            </li>
+        </ul> 
+        <p>
+            The links above are given in order of general use. Most apps can get 
+            started with only a simple scan, eventually they might need some 
+            special cases so the instance pattern provides all the details you 
+            need to modify the general pattern. Finally you may find you need a 
+            very special case where the instance itself needs it's own custom 
+            factory logic. 
         </p>
     </>
  },{
@@ -39,17 +72,33 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Notice below we are providing the simplest case for a config.js
+            file.  It simply declares its application namespaces and configures
+            a scanner.
         </p>
+            
+<pre class='box'>
+MyApp = &amp;#x7B;
+    /**
+    * This is generally a good location for you application header with
+    * version information and copyright declarations since it will
+    * end up at the top of the concatenated application file.
+    */
+    Models:&amp;#x7B;&#x7D;,
+    Views:&amp;#x7B;&#x7D;,
+    Controllers:&amp;#x7B;&#x7D;
+&#x7D;;
+
+(function($)&amp;#x7B;
+
+    $.scan([
+       "MyApp.Models",
+       "MyApp.Views",
+       "MyApp.Controllers"
+    ]);
+
+&#x7D;)(jQuery);
+</pre>
     </> 
 }]
 

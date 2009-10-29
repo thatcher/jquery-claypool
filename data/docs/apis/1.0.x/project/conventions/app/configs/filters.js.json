@@ -8,13 +8,23 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>app/configs/filters.js</strong> allows you to do just that, 
+            filter.
+        </p>
+        <p>
+            Filtering allows you to add orthogonal functionality to your 
+            application. Filters are sometimes better known as Aspects, or AOP.
+        </p>
+        <p>
+            Imagine writing a web application where you want to drive it with 
+            ajax, then your boss says 'It has to work offline'. Do you go back 
+            and write code everywhere you do ajax calls to test if the network 
+            is available and write more code to use offline storage instead?
+        </p>
+        <p>
+            A better solution is to create a simple filter that intercepts 
+            the calls to $.ajax and detects network status, rerouting to the 
+            appropriate controller. The usual code base can stay clean and clear.
         </p>
     </>
  },{
@@ -22,16 +32,41 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            There are three primary patterns available through this plugin.
+            <ol>
+                <li>
+                    <a href='../../../filters#around'>
+                        around
+                    </a><br/>
+                    around is the most powerful filter. It allows you to intercept 
+                    calls, examine the arguments, and determine whether to proceed 
+                    or call some other code.
+                </li> 
+                <li>
+                    <a href='../../../filters#before'>
+                        before
+                    </a><br/>
+                    the before pattern allows you to examine the arguments of 
+                    the intercepted call and modify the arguments. You cant 
+                    interupt the usual flow, but you can add to it by calling 
+                    additional code before the intercepted call, or by modifying 
+                    the arguments that will be passed on to the intercepted call. 
+                </li> 
+                <li>
+                    <a href='../../../filters#after'>
+                        after
+                    </a><br/>
+                    the after filter allows you to examine the return value of 
+                    the intercepted call, modify it, and return a new value. 
+                    Like before you can't interrupt the call flow but you can 
+                    add modify the return value using additional application 
+                    logic based on the intercepted return value. 
+                </li>
+            </ol>
+            Your application will not usually start with filters, but they become 
+            readily used by knowledgable developers that understand the subtle 
+            power of this pattern to keep an app clean and clear while stacking 
+            functionality in an intuitively seperate way. 
         </p>
     </>
  },{
@@ -39,16 +74,19 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+           This example is used heavily in server-side jquery-claypool.  It allows
+           us to do two things...
+        </p>
+        <p>
+            First, it allows us to
+        </p> 
+        <p>
+            Second, it also let us
+        </p> 
+<pre class='box'>
+</pre>
+        <p>
+            Go ahead and try it!...<a href='?fo=json'>?fo=json</a>
         </p>
     </> 
 }]

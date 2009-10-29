@@ -1,5 +1,150 @@
+{'_':{
+/**************************************************/
+    'id':'apis/1.0.x/project/conventions/app/models',
+    'version':'1.0.x',
+    'label':'app/models',
+    'sections':[{
+/**************************************************/
+        'label':'usage',
+        'description': <>
+    <h3> Models </h3>
+    <p>
+        Models are just regular ajax routines (maybe...)! jquery-claypool provides 
+        some guide lines as to how organize the 
+        calls to provide consistent callback routines so asynchronous usage can 
+        keep the controller in control.  But thats really all, like our stance
+        on View technology, we are Model agnostic, you can use your prefered 
+        technology.
+    </p>
+    <p>
+        jQuery provides everything you need to use ajax to build a Model.  You can
+        use you prefered server-side technology, or you can even use jquery-claypool
+        on the server-side.
+    </p>
+    
+    <h4> Models Are Data Access Objects </h4>
+    <p>
+        It's usually via AJAX, AJAH, or AJAJ (x=xml, h=html, j=json(p)).  
+        They might use caching strategies, like simple in-memory caching, 
+        cookies, or even client-side storage from html 5 or google gears sqlite.  
+    </p>
+    
+    <h4> Models Are Smart or Models Are Dumb </h4>
+    <p>
+        It's pretty much up to you.  In frameworks like Django, Models actually 
+        are very smart, they know how to validate business concerns, cache and 
+        do fancy tricks.  They can be dumb too though, and the smarts can be 
+        implemented in the controller.  The decision is yours, and we delegate 
+        to you.
+    </p>
+</>
+},{
+/**************************************************/
+    'label':'options',
+    'description':<>
+    <h3> Use a callback </h3>
+    <p>
+        The simple idea is that regardless of where we get the data, we provide 
+        a consistent place to provide a callback so the controller can act as a 
+        closure for the model response.
+    </p>
+    <p>
+        The most common patters are function(args, callback), or my personal
+        favorite is to use jQuery's ajax pattern function(options) where the
+        options include both an error and success function. 
+    </p>
+
+</>
+},{
+/**************************************************/
+    'label':'examples',
+    'description':<>
+<h4> Building a Callback Able Model </h4>
+<p>
+    Let's start by creating a simple closure that will define our model.
+</p>
+
+<pre class='box'>
 /*
- * JSON File
- * 
- * This comment may need to be removed for proper parsing
+ * @file app/models/hello.js
+ * @description You can feel free to use your 
+ *     own writing style, we are providing an
+ *     example not a rigid requirement of how to
+ *     you have to write data access objects.  If you 
+ *     want to take advantage of the mvc scanners
+ *     (and keep the global scope clean) you should
+ *     use a closure and single top-level namespace.
+ *     In this example we use 'MyApp'
  */
+(function($, $M)&amp;#x7B;
+    
+    var cache;
+    
+    $M.Hello = function(options)&amp;#x7B;
+        cache = &amp;#x7B;&#x7D;;
+        $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($M.Hello.prototype, &amp;#x7B;
+        get: function(id, callback)&amp;#x7B;
+           //model retrieval and callback logic here
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, MyApp.Models);
+</pre>
+
+
+<p>
+    This is a good lazy model because it doesn't actively do anything when 
+    the anonymous closure is executed other than define itself.
+</p>
+
+<h4> A Presumptuous Model </h4>
+<p>
+    Lets start using this mvc thing a little but keep it real simple.
+</p>
+<pre class='box'>
+get: function(id, callback)&amp;#x7B;
+    if(callback &amp;&amp; $.isFunction(callback))&amp;#x7B;
+        callback(&amp;#x7B;
+            animal:'this is a pig'
+        &#x7D;);
+    &#x7D;
+&#x7D;
+</pre>
+<p>
+    Wow! That was amazing!  But very presumptuous, because I would have 
+    wanted to hear a cow...  
+</p>
+
+<h4> A Thoughtful Model </h4>
+<p>Lets dive in.</p>
+<pre class='box'>
+get: function(id, callback)&amp;#x7B;
+    if(cache[id])&amp;#x7B;
+       callback(cache[id]);
+    &#x7D;else &amp;#x7B;
+        $.ajax(&amp;#x7B;
+           type:'GET',
+           dataType:'json',
+           url: id,
+           success:function(animal)&amp;#x7B;
+               cache[id]=animal;
+               callback(animal);
+           &#x7D;,
+           error: function(xhr, status, e)&amp;#x7B;
+               callback(&amp;#x7B;
+                   animal:'failed to load animal: '+id
+               &#x7D;);
+           &#x7D;
+        &#x7D;)
+    &#x7D;
+&#x7D;
+</pre>
+    </>
+
+}]
+
+
+}}

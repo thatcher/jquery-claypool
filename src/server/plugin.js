@@ -50,7 +50,7 @@
                 id:options.id||'proxy_'+$.guid(),    
                 clazz:"Claypool.Server.WebProxyServlet", 
                 options:[{
-                    rewriteMap:options.rewrite
+                    rewriteMap:options.rewrites
                 }]
             }]);
         }

@@ -10,48 +10,263 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            Filters are defined by passing an array of
+            individual filters to the $.filter plugin.  Filters are
+            merged so the plugin may be used many times to add filters
+            using the same method.  By convention it is recommended that
+            filters be defined in <strong>app/configs/filters.js</strong>
+            so other developers will know where to look for them, and the entire 
+            file be defined within it's own closure. 
         </p>
+        <pre class='box'>
+(function($)&amp;#x7B; 
+
+    $.filters([
+        /**
+         &amp;#x7B;  individual filter configurations here &#x7D;,
+         &amp;#x7B;  and here &#x7D;,
+         &amp;#x7B;  and here &#x7D;,
+         &amp;#x7B;  etc &#x7D;
+        */
+    ])
+
+&#x7D;)(jQuery);
+        </pre>
+    </>
+},{
+/**************************************************/
+        'label':'common_options',
+        'description':<>
+        <p>
+            In general, individual filter configurations support some very
+            powerful regular expression syntax, so you can apply a filter
+            across an entire namespace (called the target), and on any 
+            functions of the target that match
+            the given expression (specified by around, before, or after).  Each
+            type of filter is defined below:
+        </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>id</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A unique id for the filter across the application
+                </td></tr>
+                <tr  class="option">
+                    <th>target</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Either the name of a global function, a dot-delimited name 
+                    of a class (as a string),  an application managed object id 
+                    (prefixed with 'ref://'), or a namespace followed by ".*", which
+                    implies the filter will be applied to every object in the 
+                    namespace. (see example below for illustration)
+                </td></tr>
+                <tr  class="option">
+                    <th>around|before|after</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Treated as a RegExp, you can apply the filter to multiple 
+                    methods of the target.
+                </td></tr>
+            </tbody>
+        </table>
     </>
  },{
 /**************************************************/
-        'label':'options',
+        'label':'around',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+        Around is type of filter that allows you to intercept a function call
+        before it is made, inspect the arguments, and either allow the function
+        call to continue naturally, or prevent the function being called, perhaps
+        calling another function in its place.  You can also then inspect the 
+        returned value and either modify it, return it, or return another value 
+        entirely.  
         </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>advice</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr>
+                    <td class="desc" colspan="3">
+                        The advice is the function that will be called at the 
+                        interception point. this function will have the argument:
+                        'invocation
+                    </td>
+                </tr>
+                <tr class="option">
+                    <th>invocation.proceed</th>
+                    <td><a>function</a></td>
+                </tr>
+                <tr>
+                    <td class="desc" colspan="3">
+                        You must call invocation.proceed to allow the 
+                        intercepted function to be called as expected. 
+                    </td>
+                </tr>
+                <tr class="option">
+                    <th>invocation.arguments</th>
+                    <td><a>function</a></td>
+                </tr>
+                <tr>
+                    <td class="desc" colspan="3">
+                        is the array of args as presented to the 
+                                intercepted function
+                    </td>
+                </tr>
+                <tr class="option">
+                    <th>invocation.object</th>
+                    <td><a>function</a></td>
+                </tr>
+                <tr>
+                    <td class="desc" colspan="3">
+                        is a refernece to the object the intercepted function
+                        was called on.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            In the following example we have a data access object that has a 
+            requirement of needing a valid session id in order for ajax calls 
+            to happen successfully. we simply intercept the call, establish a 
+            session if it has timed out, and proceed with the call as usual
+        </p>
+        <pre class='box'>
+/*
+ * @file app/configs/filters.js
+ * @description If you need to intercept calls to portions
+ *     of you application and modify the behavior based on
+ *     state or other conditions, filters are the place to do it
+ */
+(function($)&amp;#x7B;
+    
+    var contactModel;
+
+    $.filters([&amp;#x7B;   
+ 
+        id      : "session-filter",
+        target  : "MyApp.Models.Contact",
+        around  : "(find|save|create|delete)",
+        advice  : function(invocation)&amp;#x7B;
+            contactModel = contactModel||$.$("#contactModel");
+            if(contactModel &amp;&amp; contactModel.sessionExpired)&amp;#x7B;
+                $.$("#searchController").init(function(session)&amp;#x7B;
+                    if(session)&amp;#x7B;
+                        invocation.proceed();
+                    &#x7D;else&amp;#x7B;
+                alert('session invalid, please login');
+                    &#x7D;
+                &#x7D;);
+            &#x7D;else&amp;#x7B;
+                alert('session invalid, please login');
+            &#x7D;
+        &#x7D;
+
+    &#x7D;]);
+    
+&#x7D;)(jQuery);
+        </pre>
     </>
  },{
     /**************************************************/
-        'label':'examples',
+        'label':'before',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            'before' filters allow you to intercept a collection of function
+            calls and optionally modify the arguments passed to them.
         </p>
+        <table cellspacing="0" class="options"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+            <tr class="option"><th>before</th><td class="type"><a href="#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">Treated as a RegExp, you can apply the filter to multiple methods of the target.</td></tr>
+        </tbody></table>
+        <p>
+            In the following example we are intercepting a call to a particular
+            view rendering and passing some additional information and sorting
+            the name alphabetically.
+        </p>
+        <pre class='box'>
+/*
+ * @file app/configs/filters.js
+ * @description If you need to intercept calls to portions
+ *     of you application and modify the behavior based on
+ *     state or other conditions, filters are the place to do it
+ */
+(function($)&amp;#x7B;
+    
+    var userModel;
+
+    $.filters([&amp;#x7B;   
+ 
+        id      : "user-decoration-filter",
+        target  : "MyApp.Views.Contacts",
+        before  : "(update)",
+        advice  : function()&amp;#x7B;
+            userModel = userModel||$.$("#userModel");
+            userModel.sort(arguments[0], arguments[0].sortMode);
+            $.extend(true, arguments[0], &amp;#x7B;
+                lastAdded:userModel.lastAdded
+            &#x7D;);
+        &#x7D;    
+
+    &#x7D;]);
+    
+&#x7D;)(jQuery);
+
+        </pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'after',
+        'description':<>
+        <p>
+            After filters allow you to intercept the return value of a set of functions
+            and either modify them or just use them to trigger additional events etc.
+        </p>
+        <table cellspacing="0" class="options"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+            <tr class="option"><th>after</th><td class="type"><a href="#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">Treated as a RegExp, you can apply the filter to multiple methods of the target.</td></tr>
+        </tbody></table>
+        <p>
+            In the following example we are intercepting a the return value 
+            of a network call that indicates if the submission is successful. 
+            Based on the return value we trigger additional events.
+        </p> 
+            
+        <pre class='box'>
+/*
+ * @file app/configs/filters.js
+ * @description If you need to intercept calls to portions
+ *     of you application and modify the behavior based on
+ *     state or other conditions, filters are the place to do it
+ */
+(function($)&amp;#x7B;
+
+    $.filters([&amp;#x7B;   
+ 
+        id      : "status-filter",
+        target  : "MyApp.Models.Search",
+        after   : "(submit)",
+        advice  : function(retval)&amp;#x7B;
+            if(retval > 0)&amp;#x7B;
+                $(document).trigger('searching');
+            &#x7D;else&amp;#x7B;
+                $(document).trigger('network-unavailable');
+            &#x7D;
+        &#x7D;    
+
+    &#x7D;]);
+    
+&#x7D;)(jQuery);
+
+        </pre>
     </> 
 }]
 

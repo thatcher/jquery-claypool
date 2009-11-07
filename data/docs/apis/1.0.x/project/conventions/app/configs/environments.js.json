@@ -8,13 +8,14 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>app/configs/environments.js</strong> 
+            is what we use to create a collection of global application settings 
+            that can be easily toggled between in our boot file. This allows us, 
+            as individual  developers, and as a team of developers, maintain a 
+            standard collection of settings we may need to easily switch 
+            between when developing.<a href='../../../../plugins/user/env '>
+                See also $.env plugin.
+            </a>
         </p>
     </>
  },{
@@ -22,34 +23,128 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            There are generally two use cases for this plugin. 
+            <ul>
+                <li>
+                    <a href='#setting'>setting</a>
+                    setting is a process of defining environments then initializing 
+                    the environment plugin. It can be set several times, and will 
+                    over write values previously set. 
+                </li> 
+                <li>
+                    <a href='#getting'>getting</a>
+                    getting an environment setting simply reads the value as a 
+                    property of the internal env hash. 
+                </li>
+            </ul>
         </p>
     </>
  },{
     /**************************************************/
-        'label':'examples',
+        'label':'setting',
         'description':<>
+        <h3>defining environments</h3>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            You can define as many environments as you need, including as many 
+            'default' environments as is convenient. Environments are defined 
+            using the <a href='../../../../plugins/user/env '>$.env plugin.</a> 
         </p>
+<pre class='box'>
+/*
+ * @file app/configs/environments.js
+ * @description If you, or team members, need to switch between 
+ *     environments easily for testing, development and production
+ *     the $.env plugin allow us to transparently access the values
+ *     we need without modifying the code base anywhere other than
+ *     our boot file.
+ */
+(function($)&amp;#x7B;
+    
+    $.env(&amp;#x7B;
+        
+        defaults : &amp;#x7B;
+            storageUrl:"/xmldb/",
+            searchUrl:"/search/",
+            spellUrl:"http://search.yahooapis.com/spellingSuggestion",
+            spellUrlAppid:"ZitGk.XV34H3lyaRyCuFH.aLvT7Rm"
+        &#x7D;,
+        
+        dev:&amp;#x7B;
+            client:&amp;#x7B;
+                storageUrl:"/xmldb-dev/",
+                searchUrl:"/search-dev/"
+            &#x7D;
+        &#x7D;,
+
+        prod:&amp;#x7B;
+            client:&amp;#x7B;
+                spellUrlAppid:"ZitGk.X4357hgbsSERCuFH.aLvT7Rm"
+            &#x7D;
+        &#x7D;,
+
+        test:&amp;#x7B;
+            client:&amp;#x7B;
+                storageUrl:"/storage-fixtures/",
+                searchUrl:"/search-fixtures/"
+            &#x7D;
+        &#x7D;
+    &#x7D;); 
+    
+&#x7D;)(jQuery);
+
+</pre>
+        <h3>selecting environments</h3>
+        <p>
+            To toggle between environments you only need to change a single line 
+            in <a href='../boot/client.js'>app/boot/client.js</a> or 
+            <a href='../boot/server.js'>app/boot/server.js</a>
+        </p>
+<pre class='box'>
+    $.env('defaults','client.dev');
+</pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'getting',
+        'description':<>
+        <h3>getting values from the environment </h3>
+        <p>
+            Using values from the selected environment is very easy, the only 
+            caveat you need to be careful to mind is that the environment isn't 
+            defined until just prior to booting the application. This isn't 
+            normally a problem, but the best practice is to use the values in 
+            constructors or in the boot script clearly after the environment 
+            has been set. 
+        </p>
+        <pre class='box'>
+(function($, $M)&amp;#x7B;
+
+    /**
+     * @constructor
+     */
+    $M.Spellcheck = function(options)&amp;#x7B;
+        $.extend(true, this, &amp;#x7B;
+            url:    $.env('spellUrl'),
+            appid:  $.env('spellAppId')
+        &#x7D;,options);
+    &#x7D;;
+    
+    $.extend($M.Spellcheck.prototype,&amp;#x7B;
+        suggest: function(words, callback)&amp;#x7B;
+          $.getJSON(this.url+"?callback=?",&amp;#x7B;
+              appid:this.appid,
+              query:words,
+              output:"json"
+            &#x7D;,
+            function(data)&amp;#x7B;
+              if(callback)&amp;#x7B;callback(data);&#x7D;
+            &#x7D;);
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, Example.Models);
+
+        </pre>
     </> 
 }]
 

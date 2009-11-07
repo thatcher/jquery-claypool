@@ -47,7 +47,9 @@
                     {doc.label + ' ' + doc.version}
                 </h2>
                 {_('.*', doc.sections).map(function(index, value){
-                    return {div:{$:[
+                    return {div:{
+                    $id:this.label,
+                    $:[
                         {h2:{
                             img:{
                               $src:$.env('root')+('images/star_inverting.jpg'),

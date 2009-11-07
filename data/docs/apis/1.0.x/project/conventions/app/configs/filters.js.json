@@ -35,7 +35,7 @@
             There are three primary patterns available through this plugin.
             <ol>
                 <li>
-                    <a href='../../../filters#around'>
+                    <a href='../../../../plugins/user/filters#around'>
                         around
                     </a><br/>
                     around is the most powerful filter. It allows you to intercept 
@@ -43,7 +43,7 @@
                     or call some other code.
                 </li> 
                 <li>
-                    <a href='../../../filters#before'>
+                    <a href='../../../../plugins/user/filters#before'>
                         before
                     </a><br/>
                     the before pattern allows you to examine the arguments of 
@@ -53,7 +53,7 @@
                     the arguments that will be passed on to the intercepted call. 
                 </li> 
                 <li>
-                    <a href='../../../filters#after'>
+                    <a href='../../../../plugins/user/filters#after'>
                         after
                     </a><br/>
                     the after filter allows you to examine the return value of 
@@ -78,16 +78,68 @@
            us to do two things...
         </p>
         <p>
-            First, it allows us to
+            First, it allows us to intercept all calls to render our page 
+            templates, and determine if a format parameter was passed.  If the
+            format parameter was present we are able to prevent the template
+            from being rendered and simply serialize the model as json!
         </p> 
         <p>
-            Second, it also let us
+            Second, it also let us add a standard set of state data to the
+            request scope on the model m(), which in this case is the http 
+            request parameters, request headers, and currently defined response 
+            headers.
         </p> 
-<pre class='box'>
-</pre>
         <p>
+            Every page of this application uses these filters! 
             Go ahead and try it!...<a href='?fo=json'>?fo=json</a>
         </p>
+<pre class='box'>
+
+(function($, _)&amp;#x7B;
+
+    var log;
+    
+    
+    $.filters([
+        &amp;#x7B;
+            id        : "#contentNegotiationFilter",
+            target    : "Site.Views.*",
+            around    : "(render)",
+            advice    : function(invocation)&amp;#x7B;
+                log = log||$.logger('Site.Filters.ContentNegotiation');
+                log.debug('Intercepted call to render');
+                var model = invocation.arguments[0],
+                    view = invocation.object;
+                if(model.parameters &amp;&amp; model.parameters.fo == 'json')&amp;#x7B;
+                    view.write(_.json(model, null, '\t'));
+                    //do not proceed
+                &#x7D;else if(model.parameters &amp;&amp; model.parameters.fo == 'xml')&amp;#x7B;
+                    view.write(_.x(&amp;#x7B;x:model&#x7D;));
+                    //do not proceed
+                &#x7D;else&amp;#x7B;
+                    invocation.proceed();
+                &#x7D;
+            &#x7D;
+        &#x7D;,
+        &amp;#x7B;
+            id        : "#requestResponseParamFilter",
+            target    : "Site.Services.*",
+            before    : "(handleGet|handlePost|handleDelete|handlePut)",
+            advice    : function(request, response)&amp;#x7B;
+                log = log||$.logger('Site.Filters.ContentNegotiation');
+                log.debug('Intercepted call to handleHTTPMethod');
+                response.m(&amp;#x7B;
+                    parameters:request.parameters,
+                    requestHeaders:request.headers,
+                    responseHeaders: response.headers
+                &#x7D;);
+            &#x7D;
+        &#x7D;
+    ]);
+
+&#x7D;)(jQuery, jsPath);
+    
+</pre>
     </> 
 }]
 

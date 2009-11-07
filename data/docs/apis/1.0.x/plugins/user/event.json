@@ -10,13 +10,13 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            jquery-claypool treats the event as a <strong>request scope</strong>
+            container.  This just means that the event object itself is used
+            to store state information whose expected lifetime is the duration 
+            of the event.  This state information includes application specific
+            data used to render the views, (called the 'model' with a lowercase m),
+            trigger rendering, select additional views to render, forward control,
+            etc.
         </p>
     </>
  },{
@@ -38,20 +38,65 @@
     </>
  },{
     /**************************************************/
-        'label':'examples',
+        'label':'event.m',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <strong>
+                overloaded function getters and setters of the event model. 
+                chainable setters.
+            </strong>
+            overloaded function for easily setting and getting values on a the 
+            event model that will be presented to the view class when 
+            event.render is called. the event model is array like so it makes 
+            sense that it can be both extended and merged. the event model will 
+            be passed to the event view automatically with event.render
         </p>
+        <ul>
+            <li>
+                <strong>returns the current model.</strong> 
+                <pre class='box'>
+// by default this is the object 
+// &amp;#x7B;flash:[], length:0&#x7D;
+event.m();
+                </pre>
+            </li>
+            <li>
+                <strong>
+                    returns the current model.
+                </strong> 
+                <pre class='box'>
+event.m('mylist');
+                </pre>
+            </li>
+            <li>
+                <strong>
+                    when there is a single argument and it is an Object or 
+                    Array, the interal model is deeply extended or merged 
+                    respectively
+                </strong> 
+                <pre class='box'>
+event.
+   m(&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
+   m(['D','E','F']);
+                </pre>
+            </li>
+            <li>
+                <strong>
+                    when there are two arguments the first should be a string. 
+                    this is the name of the models property that will be set on
+                    the model. if the second argument is an object or array, 
+                    the internal model is deeply extended or merged respectively, 
+                    and when it is a simple value the value is set directly.
+                </strong> 
+                <pre class='box'>
+event.
+   m('mysimple','This is a pig.').
+   m('myprops',&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
+   m('mylist',['D','E','F']);
+
+                </pre>
+            </li>
+        </ul>
     </> 
 }]
 

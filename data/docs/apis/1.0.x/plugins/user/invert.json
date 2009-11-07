@@ -10,48 +10,215 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>$.invert</strong> is a simple wrapper around the 
+            configuration for the IoC container (Inversion-of-Control).
+            The concept of inversion is very simple, it simply allows
+            you to wire together existing application components.
+        </p>
+        <p>
+            Inverting your objects can be useful, though often it is just
+            as clear to uses $.$ to set references to other application
+            object compenents in the constuctor and simply use $.scan to keep
+            configuration to a minimum.  That said $.invert is a powerful little
+            tool which can be used to very clearly describe application objects
+            without the boiler plate code that goes along with creating a new
+            application component.
+        </p>
+        <p>
+            There are two distint ways to use this plugin.
+            <ul>
+                <li>
+                    <a href='#instance'>instance</a><br/>
+                    The instance pattern uses 'new' to create the object
+                    from its constructor.
+                </li>
+                <li>
+                    <a href='#factory'>factory</a><br/>
+                    The factory pattern allows another object to manage
+                    the creation of the object.
+                </li>
+            </ul>
         </p>
     </>
  },{
 /**************************************************/
-        'label':'options',
+        'label':'instance',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Inversion of Control is a powerful tool for removing hard wiring 
+            of dependencies from code and allowing the instance to remain 
+            'dormant' until the application framework detects it's needed, 
+            creating it on-the-fly and decorating with knowledge of other 
+            run time application components, or simply making use of highly 
+            configurable objects with unique options.  
         </p>
+        <table cellspacing="0" class="options"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+<tr class="option"><th>id</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An unique, preferably human readable name</td></tr>
+<tr class="option"><th>clazz</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">Dot-delimited name of the class (constructor)</td></tr>
+<tr class="option"><th>selector</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A jQuery selector used to bind the object to a dom node(or nodes)</td></tr>
+<tr class="option"><th>active</th><td class="type"><a href="/Types#Boolean">Boolean</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">Is the selector live</td></tr>
+<tr class="option"><th>options</th><td class="type"><a href="/Types#Array">Array</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An array treated as arguments for construction</td></tr>
+<tr class="option"><th>inject</th><td class="type"><a href="/Types#Object">Object</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An hash of values or references to other application objects to be attached to the instance after it is constructed</td></tr>
+</tbody></table>
+        <p>
+            In the following example we use all the bells and whistles.  
+            We create an instance <b>#wikipadView</b> thats attached to the
+             dom node with the id <b>#wikipad</b>.  The dom element doesn't 
+             need to be present when the application starts, or even when the 
+             instance is created, it will be bound to the element when ever 
+             it's appended to the dom.
+        </p>
+        <p>
+            We also provide the class name as a string, claypool will resolve 
+            it, so the class doenst even have to exist when the application 
+            is started.  The <b>options</b> will be passes as arguments when 
+            the class is created with <b>new</b>.
+        </p>
+        <p>
+            Finally, the wiki parser is <b>injected</b>, meaning the parser 
+            property is set after the instance is created.  The <b>ref://</b> 
+            prefix let's claypool know the object it's injecting is another 
+            application managed component, so it will create it if it hasn't 
+            been created before.
+        </p>
+        <pre class='box'>
+/*
+ * @file app/configs/config.js
+ * @description If you need to integrate some legacy code
+ *     or have written some highly reusable code that
+ *     provides some flexible abstraction the instance
+ *     configuration is what you'll want to use.
+ */
+
+(function($)&amp;#x7B;
+    
+    $.invert([&amp;#x7B;
+        
+         id:"#wikipadView",
+         selector:"#wikipad",
+         active: true,
+         clazz: "MyApp.Views.WikiPad",
+         options: [&amp;#x7B;safeStripHtml: true&#x7D;],
+         inject: &amp;#x7B;
+             parser:"ref://#creoleParser"
+         &#x7D;
+
+    &#x7D;,&amp;#x7B;
+    
+         id:"#creoleParser",
+         clazz:"Parse.Simple.Creole",
+         options: [&amp;#x7B;
+             interwiki: &amp;#x7B;
+                 WikiCreole: 'http://www.wikicreole.org/wiki/',
+                 Wikipedia: 'http://en.wikipedia.org/wiki/'
+             &#x7D;,
+             linkFormat: ''
+         &#x7D;]
+    &#x7D;]);
+    
+&#x7D;)(jQuery);
+        </pre>
+        <p>
+            The important options for the configuration of the parser
+            is floated to the configuration, which is assumed to be important
+            for the purpose of this example.
+        </p>
+    </>
+ },{
+/**************************************************/
+        'label':'factory',
+        'description':<>
+        <p>
+            The <b>factory</b> pattern allows the construction of the 
+            application managed object to be delegated to another class.  
+            The factory class may either be specified as dot-delimited 
+            String so claypool can resolve it, or it can be a reference 
+            to another application managed object by prefixing it's name 
+            with <b>ref://</b>.
+        </p>
+        <table cellspacing="0" class="options"><thead><tr><th>Name</th><th>Type</th></tr></thead><tbody>
+        <tr class="option"><th>id</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">An unique, preferably human readable name</td></tr>
+        <tr class="option"><th>factory</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">Dot-delimited name of the factory class (constructor) or a <b>ref://</b> to another application managed object</td></tr>
+        <tr class="option"><th>factoryMethod</th><td class="type"><a href="/Types#String">String</a></td><td class="default"><b>Default:</b> <span>'create'</span></td></tr><tr><td class="desc" colspan="3">Optionally, the method claypool will call on the factory.  The returned value is the new object</td></tr>
+        </tbody></table>
+        <p>
+            In the following example have two separate factory patterns.  
+            The first illustrates the use of a factory that is itself an 
+            application managed object (presumably the factory is doing 
+            something like detecting what wiki parser is available 
+            or something)
+        </p>
+        <p>
+            The second example shows the use of a factory specified by class 
+            name with a custom create method <b>connect</b>.  This factory 
+            might detect network status and use an offline datastore.
+        </p>
+        <pre class='box'>
+/*
+ * @file app/configs/config.js
+ * @description If you want to have special control over the
+ *     construction of you application object, you can use 
+ *     the factory pattern.  Factories can be classes or 
+ *     application managed components.
+ */
+
+(function($)&amp;#x7B;
+    
+    $.invert([&amp;#x7B;
+        
+         id:"#wikipadView",
+         selector:"#wikipad",
+         active: true,
+         factory: "ref://#wikipadFactory"
+
+    &#x7D;,&amp;#x7B;
+         
+         id:"#wikipadFactory",
+         clazz:"MyApp.Utils.WikiPadFactory"
+
+    &#x7D;,&amp;#x7B;
+        
+         id:"#addressBookModel",
+         factory: "MyApp.Utils.NetworkAdaptorFactory",
+         factoryMethod: "connect"
+
+    &#x7D;]);
+    
+&#x7D;)(jQuery);
+        </pre>
     </>
  },{
     /**************************************************/
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            A very good example of the power of invert is shows how jquery-claypool
+            uses it to define the server-side plugin <a href='proxy'>$.proxy</a>.
+            This is taken directly from the source:
         </p>
+        <pre class='box'>
+    proxy: function(options)[&amp;#x7B;
+        return $.invert([[&amp;#x7B; 
+            id:options.id||'proxy_'+$.guid(),    
+            clazz:"Claypool.Server.WebProxyServlet", 
+            options:[[&amp;#x7B;
+                rewriteMap:options.rewrites
+            &#x7D;]
+        &#x7D;]);
+    &#x7D;
+        </pre>
+        <p>
+            Which means we can very simply create new proxies like
+        </p>
+        <pre class='box'>
+    $.proxy([&amp;#x7B;
+        id:'feedProxy',
+        rewrites:[
+            &amp;#x7B; urls:'^/share/', rewrite:'http://someotherhost.com/foo' &#x7D;,
+            &amp;#x7B; urls:'^/feeds/', rewrite:'http://blogs.otherhost.org/' &#x7D;
+        ]
+    &#x7D;);
+        </pre>
     </> 
 }]
 

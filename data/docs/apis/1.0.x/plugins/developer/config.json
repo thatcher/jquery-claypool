@@ -14,8 +14,9 @@
                 Retrieves or extends the entire configuration, 
                 or a subset of the configuration.
             </strong>
-            This method is entry point into jquery.claypool. All of claypools 
-            submodules, like logging, mvc, ioc, and aop will be accessed 
+            This method is an entry point into jquery.claypool's internal 
+            configuration for application components. All of claypools 
+            submodules, like logging, mvc, ioc, and aop can be accessed 
             directly through $.config. Each configuration is also exposed by
             a conveneince method. See also:
             <ul>

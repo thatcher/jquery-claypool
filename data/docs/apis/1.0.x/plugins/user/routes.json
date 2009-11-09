@@ -10,49 +10,638 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            Routes are used to describe a collection of related events, and provide
+            a map that delegates the event to one or many application controllers.
+        </p>
+        <p>
+            There are several reasons why routing is a common pattern in popular
+            application frameworks.  The first reason is that routes are an excellent 
+            place to undertand, at a high level, an application features and where
+            each feature is implemented.  The second is that jquery-claypool can create
+            a couple low-level controllers that have knowledge of all application
+            events, so the application controllers can remain dormant until relevant
+            events show up in the router. 
         </p>
     </>
  },{
 /**************************************************/
         'label':'options',
         'description':<>
+        <a href='#hijax:a'>hijax:a</a> | 
+        <a href='#hijax:form'>hijax:form</a> | 
+        <a href='#hijax:event'>hijax:event</a> | 
+        <a href='#hijax:input'>hijax:input</a> | 
+        <a href='#hijax:button'>hijax:button</a> 
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            There are several common option among all routers which we will describe
+            first here.  Additional aptions are described under each specific router
+            below.  Don't forget if these routers aren't enough you can create
+            additional router types with the developer plugin 
+            <a href='../developer/router'>$.router</a>. 
         </p>
+        <p>
+            The event is the usual event jquery 
+            would pass if you had attached to events directly to your own controller, 
+            but jquery-claypool decorates it with some additional convenience methods.
+            See <a href='./event'>event</a>.
+        </p>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+
+                <tr class="option">
+                    <th>id</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    An application scope unique identifier.
+                </td></tr>
+             
+                <tr class="option">
+                    <th>active</th>
+                    <td class="type"><a href="#Boolean">Boolean</a></td>
+                    <td class="default"><b>Default:</b> <span>true</span></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Live binding to the DOM.  This simply means that if this is
+                    a selector based router, then all live DOM changes are 
+                    reflected and bound to the router when matched.
+                </td></tr>
+                 
+                <tr class="option">
+                    <th>filter</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    The filter is appended to the selector (for example the primary
+                    selector for the hijax:a router is a). The filter can be any string
+                    which when concatenated with the primary selector is a valid
+                    jquery selector.  The hijax:event router is not  selector based so it
+                    makes no sense for it to honor this option. 
+                </td></tr>
+                 
+                <tr class="option">
+                    <th>stopPropagation</th>
+                    <td class="type"><a href="#Boolean">Boolean</a></td>
+                    <td class="default"><b>Default:</b> <span>true</span></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Stops the propagation of the event.
+                </td></tr>
+                 
+                <tr class="option">
+                    <th>preventDefault</th>
+                    <td class="type"><a href="#Boolean">Boolean</a></td>
+                    <td class="default"><b>Default:</b> <span>true</span></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Prevents the default browser behavior.
+                </td></tr>
+                 
+                <tr class="option">
+                    <th>strategy</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"><b>Default:</b> <span>'first'</span></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Either 'all' or 'first'.  This is similar to udp versus tcp
+                    routers on the web.  'first' simply the router will stop at 
+                    the first match and route the event, while 'all' will continue 
+                    down the list of available routes and continue to delegate 
+                    the routes that match.
+                </td></tr>
+                 
+                <tr class="option">
+                    <th>hijaxMap</th>
+                    <td class="type"><a href="#Array">Array</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    An array of objects, each object specifying a route.  The options
+                    for a hijaxMap are generally specific to the router, so see
+                    each specific router below for details.
+                </td></tr>
+        
+            </tbody>
+        </table>
+        <h3>hijaxMap</h3>
+        <p>
+            The hijaxMap is an array of objects, and the expected options of each
+            object varies only slightly between routers.  Some routers use a href or action
+            attribute so the route uses the option name 'urls', while some use the element id
+            so the routes hijaxMap uses 'ids', and finally the event router uses 'event'.
+        </p>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>urls|ids|event</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression matching the route specific attribute of target 
+                    links (for example href, action, id, or event name).  
+                    Supports <a href='#capturingexpressions'>capturing
+                    expressions</a>
+                </td></tr>
+                
+                <tr class="option">
+                    <th>controller</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr><tr><td class="desc" colspan="3">
+                    The application id of the controller to route the event to
+                </td></tr>
+                
+                <tr class="option">
+                    <th>action</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"><b>Default:</b> <span>'handle'</span></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    The name of the method that will be invoked on the target 
+                    controller.
+                </td></tr>
+            </tbody>
+        </table>
+        <h3 id='capturingexpressions'>capturing expressions on routes</h3>
+        <p>
+            Most application framweorks that provide routers also allow a special 
+            syntax to allow the developer to specify <strong>captured expression</strong>
+            in the route expression.  All routes are regular expressions by two 
+            special syntaxes are check for before the expression is compiled.
+            <ul>
+                <li><a>|:name|</a><br/>
+                    <strong>word expressions</strong> can be used to specify the
+                    name a portion of the expression will use to capture
+                    any word boundary match (a-zA-Z0-9_)+ The captured value
+                    will be available via the event.params('name') or event.params()['name']
+                </li>
+                <li><a>&lt;:name(regexp):></a><br/>
+                    <strong>any expressions</strong> can be used to specify the name
+                    used to store the captured match against the custom regxp provided
+                    inside the paranthesis.
+                </li>
+            </ul>
+        </p>
+        <pre class='box'>
+/**
+ * An example hijaxMap 
+ *      This example shows the use of capturing expressions 
+ *      which you may find in either the hijax:a or hijax:form 
+ *      routers.  The hijax:input and hijax:button routers 
+ *      would be similar but use 'ids' instead of 'urls'.  
+ *      The event router does not use capturing expressions. 
+ */
+hijaxMap:
+   [&amp;#x7B;
+        urls:"examples/&lt;:id([0-9]{5}-[a-z]{3}):>/$", 
+        controller:"#quizController", 
+        action:"score"
+    &#x7D;,&amp;#x7B;
+        urls:"hello/|:name|/$", 
+        controller:"#helloController", 
+        action:"sayHello"&#x7D;]
+
+        </pre>
+        
+        <p>So assuming we had some marup like this</p>
+        <pre class='box'>
+&lt;a href="#hello/chris">say hello&lt;/a>
+        </pre>
+        <p>
+            Then clicking that link would be routed to our controller. 
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Hello = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Hello.prototype,&amp;#x7B;
+        sayHello: function(event)&amp;#x7B;
+           var name = event.param('name');
+           //name is 'chris'
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+
+        </pre>
     </>
  },{
     /**************************************************/
-        'label':'examples',
+        'label':'hijax:a',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            hijax:a routes allow you to intercept click events on html 
+            hyperlinks. The match is based on regular expression tests against 
+            the href attribute. You can specify named parameters in the regular 
+            expression which will be passed are named parameters to a closure 
+            scope function, decorated on the event, event.param("name").  
         </p>
+        <h3>hijaxMap</h3>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>urls</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression matching the href attribute of target 
+                    links.  Supports <a href='#capturingexpressions'>capturing
+                    expressions</a>
+                </td></tr>
+            </tbody>
+        </table>
+            <pre class='box'>
+/*
+ * @file app/configs/routes.js
+ */
+(function($)&amp;#x7B;
+    
+    $.routes(&amp;#x7B;
+        //,.. other routes
+        "hijax:a" : [&amp;#x7B;
+            id:"#example-hash-routes",
+            active: true,
+            filter:"[href*=#]",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"first",
+            hijaxMap:
+                [&amp;#x7B;urls:"examples/|:id|/$", controller:"#quizController", action:"show"&#x7D;,
+                &amp;#x7B;urls:"hello/|:name|/$", controller:"#helloController", action:"sayHello"&#x7D;]
+        /*,.. other hijax:a routes*/]
+        //,.. other routes
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+            </pre>
+            
+            <h3>example</h3>
+            
+        
+        <p>So assuming we had some mark up like this</p>
+        <pre class='box'>
+&lt;a href="#hello/chris">say hello&lt;/a>
+        </pre>
+        <p>
+            Then clicking that link would be routed to our link controller. 
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Hello = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Hello.prototype,&amp;#x7B;
+        sayHello: function(event)&amp;#x7B;
+           var name = event.param('name');
+           //name is 'chris'
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+        </pre>
+            
+        
     </> 
+},{
+    /**************************************************/
+        'label':'hijax:form',
+        'description':<>
+        <p>
+            hijax:form routes allow you to intercept submit events on html forms. 
+            The match is based on regular expression tests against the action 
+            attribute. 
+        </p>
+        <h3>hijaxMap</h3>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>urls</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression matching the action attribute of target 
+                    forms.  Supports <a href='#capturingexpressions'>capturing
+                    expressions</a>
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+/*
+ * @file app/configs/routes.js
+ */
+(function($)&amp;#x7B;
+    
+    $.routes(&amp;#x7B;
+        //,.. other routes
+        "hijax:form" : [&amp;#x7B;
+            id:"#example-form-routes",
+            active: true,
+            filter:"[action*=myapp]",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"first",
+            hijaxMap:
+                [&amp;#x7B;urls:"edit/|:id|/$", controller:"#quizController", action:"show"&#x7D;,
+                &amp;#x7B;urls:"hello/|:name|/$", controller:"#helloController", action:"sayHello"&#x7D;]
+        &#x7D;/*,.. other hijax:form routes*/]
+        //,.. other routes
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+
+        </pre>
+        
+        
+        <h3>example</h3>
+        
+        <p>So assuming we had some markup like this: </p>
+        <pre class='box'>
+&lt;form action="myapp/hello/chris" method='post'>
+  &lt;input type='submit' value='say hello'/>
+&lt;/form>
+        </pre>
+        
+        <p>
+            Then clicking that submit button would be routed to our 
+            form controller.   
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Hello = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Hello.prototype,&amp;#x7B;
+        sayHello: function(event)&amp;#x7B;
+           var name = event.param('name');
+           //name is 'chris'
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+        </pre>
+    </>
+},{
+    /**************************************************/
+        'label':'hijax:button',
+        'description':<>
+        <p>
+            hijax:button routes allow you to intercept click events on html 
+            inputs with type='button'. The match is based on regular expression 
+            tests against the id attribute. 
+        </p>
+        <h3>hijaxMap</h3>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>ids</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression matching the id attribute of target 
+                    buttons.  Supports <a href='#capturingexpressions'>capturing
+                    expressions</a>
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+/*
+ * @file app/configs/routes.js
+ */
+(function($)&amp;#x7B;
+    
+    $.routes(&amp;#x7B;
+        //,.. other routes
+        "hijax:button" : [&amp;#x7B;
+            id:"#example-dialog-routes",
+            active: true,
+            filter:"[id*=dialog]",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"all",
+            hijaxMap:
+               [&amp;#x7B;ids:"show/|:id|$", controller:"#dialogController", action:"show"&#x7D;,
+               &amp;#x7B;ids:"hide/|:id|$", controller:"#dialogController", action:"hide"&#x7D;,
+               &amp;#x7B;ids:"close/|:id|$", controller:"#dialogController", action:"close"&#x7D;]
+        &#x7D;/*,.. other hijax:button routes*/]
+        //,.. other routes
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+
+        </pre>
+        
+        <h3>example</h3>
+        
+        <p>So assuming we had some markup like this: </p>
+        <pre class='box'>
+&lt;form id='mydialog'>
+   &lt;input id='dialog/show/123-456-7' type='button' value='0'/>
+   &lt;input id='dialog/hide/123-456-7' type='button' value='_'/>
+   &lt;input id='dialog/close/123-456-7' type='button' value='X'/>
+&lt;/form>
+        </pre>
+        
+        <p>
+            Then clicking the 'X' button would be routed to our 
+            dialog controller.  
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Dialog = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Dialog.prototype,&amp;#x7B;
+        close: function(event)&amp;#x7B;
+           var id = event.param('id');
+           //id is '123-456-7'
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+        </pre>
+    </>
+},{
+    /**************************************************/
+        'label':'hijax:input',
+        'description':<>
+        <p>
+            hijax:input routes allow you to intercept blur events on html inputs. 
+            The match is based on regular expression tests against the id 
+            attribute. 
+        </p>
+        <h3>hijaxMap</h3>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>ids</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression matching the id attribute of target 
+                    inputs.  Supports <a href='#capturingexpressions'>capturing
+                    expressions</a>
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+/*
+ * @file app/configs/routes.js
+ */
+(function($)&amp;#x7B;
+    
+    $.routes(&amp;#x7B;
+        //,.. other routes
+        "hijax:input" : [&amp;#x7B;
+            id:"#example-dialog-routes",
+            active: true,
+            filter:"[type=text][id*=register]",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"all",
+            hijaxMap:
+               [&amp;#x7B;ids:"/|:id|/|:field_name|$", controller:"#registrationController", action:"validate"&#x7D;]
+        &#x7D;/*,.. other hijax:input routes*/]
+        //,.. other routes
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+
+        </pre>
+        
+        <h3>example</h3>
+        
+        <p>So assuming we had some markup like this: </p>
+        <pre class='box'>
+&lt;form id='registration'>
+   &lt;input id='register/123-456-7/zipcode' type='text' value=''/>
+   &lt;input id='register/123-456-7/first_name' type='text' value=''/>
+   &lt;input id='register/123-456-7/last_name' type='text' value=''/>
+&lt;/form>
+        </pre>
+        
+        <p>
+            Then typing into text area and tabbing to the next, 
+            an event would be routed to our event controller. 
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Register = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Register.prototype,&amp;#x7B;
+        validate: function(event)&amp;#x7B;
+           var field_name = event.param('field_name');
+           if(field_name == 'zipcode')&amp;#x7B;
+              //make sure its valid or set a flash message
+           &#x7D;
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+
+        </pre>
+    </>
+},{
+    /**************************************************/
+        'label':'hijax:event',
+        'description':<>
+        <p>
+            hijax:event routes allow you to intercept custom events in your 
+            application. The match is based on an exact match since the event 
+            name must be supplied to the router exactly so that it may bind 
+            to the events.  It is unique among application routers because it 
+            does not provide regular expression support.
+        </p>
+        <h3>hijaxMap</h3>
+        <table cellspacing="0" class="options">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>ids</th>
+                    <td class="type"><a href="#String">String</a></td>
+                    <td class="default"/>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A string matching exactly the name of the target
+                    events
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+/*
+ * @file app/configs/routes.js
+ */
+(function($)&amp;#x7B;
+    
+    $.routes(&amp;#x7B;
+        //,.. other routes
+        "hijax:event" : [&amp;#x7B;
+            id:"#example-event-routes",
+            stopPropagation:true,
+            preventDefault:true,
+            strategy:"all",
+            hijaxMap:
+                [&amp;#x7B;event:"autosave", controller:"#quizController", action:"save"&#x7D;,
+                &amp;#x7B;event:"hello", controller:"#helloController", action:"sayHello"&#x7D;]
+        &#x7D;/*,.. other hijax:event routes*/]
+        //,.. other routes
+    &#x7D;);
+    
+&#x7D;)(jQuery);
+
+        </pre>
+        
+        <h3>example</h3>
+        
+        <p>So assuming we had some jquery like this: </p>
+        <pre class='box'>
+$(document).trigger('hello', ['chris']);
+        </pre>
+        
+        <p>
+            Then our event router will send the event on to our 
+            application controller.
+        </p>
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+
+    $C.Hello = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+    &#x7D;;
+
+    $.extend($C.Hello.prototype,&amp;#x7B;
+        sayHello: function(event, name)&amp;#x7B;
+           //name is 'chris'
+        &#x7D;
+    &#x7D;);
+&#x7D;)(jQuery, MyApp.Controllers);
+        </pre>
+    </>
 }]
 
 

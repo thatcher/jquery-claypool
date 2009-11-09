@@ -8,30 +8,13 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
-        </p>
-    </>
- },{
-/**************************************************/
-        'label':'options',
-        'description':<>
-        <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Nothing special about a server boot file.  It is generally the last 
+            file loaded, it should start with jQuery.noConflict(), the it
+            should select an environment using something like 
+            $.env('default', 'dev.server'), which sets the default environment  
+            settings to use, and the setting to override those with, then finally
+            it should use jQuery.ready to call 
+            <a href='../../../../plugins/user/boot'>$.boot</a>.
         </p>
     </>
  },{
@@ -39,17 +22,45 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Here is a very generic example.
         </p>
+        
+<pre class='box'>
+
+jQuery.noConflict();
+(function($)&amp;#x7B;
+    
+    //A static logger for any initialization routines we might add here
+    var log = $.logger("Site");
+    
+    //Select an environment
+    //The environments are described in environments.js
+    try&amp;#x7B;
+       $.env('defaults', "dev.server");
+       //$.env('defaults', "appsengine.server");
+       
+    &#x7D;catch(e)&amp;#x7B;
+       log.error("Environmental selection is invalid!").exception(e);
+    &#x7D;
+    
+    $(document).ready(function()&amp;#x7B;
+        log.info("Initializing Application");
+        $.boot(function()&amp;#x7B;
+          //you can do additional initialization here
+            log.info("Successfully Initialized Application");
+            //preload all application data
+            $.$('#docsModel').get();
+            $.$('#releasesModel').get();
+            $.$('#newsModel').get();
+            $.$('#eventsModel').get();
+            $.$('#examplesModel').get();
+            log.info("Successfully Preloaded Caches");
+        &#x7D;);
+    &#x7D;);    
+    
+&#x7D;)(jQuery);  
+
+</pre>
     </> 
 }]
 

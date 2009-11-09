@@ -9,7 +9,7 @@ jQuery.noConflict();
 (function($){
     
     //A static logger for any initialization routines we might add here
-    var log = $.logger("Example");
+    var log = $.logger("Site");
     
     //The environments are described in environments.js
     try{

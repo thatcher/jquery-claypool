@@ -8,13 +8,14 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            Booting your application is an simple, and really just an extension 
+            of the jQuery document ready event handler making use of the
+            <a href='../../../plugins/user/boot'>$.boot</a>
+        </p>
+        <p>
+            The only thing you need to focus on with a boot strapping process
+            is selecting your environment, triggering the boot process, and optionally
+            include any additional setup steps that are required for your application.
         </p>
     </>
  },{
@@ -22,16 +23,23 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            In general there may be no difference between a client.js and server.js
+            boot file, but generally we know from experience that there are 
+            different environmental setting we have to have for each, so the
+            convention has kept it easy enough to help us remember where we are working.
+            (It can be easy to forget you are working with jquery-claypool!)
+            <ul>
+                <li>
+                    <a href='./client.js'>client.js</a><br/>
+                     If your doing your server side development with jquery.claypool, 
+                     you'll want to check this out too. 
+                </li>
+                <li>
+                    <a href='./server.js'>server.js</a><br/>
+                     If your doing your server side development with jquery.claypool, 
+                     you'll want to check this out too. 
+                </li>
+            </ul> 
         </p>
     </>
  },{
@@ -39,17 +47,45 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+        The general structure of a boot file, client or server is usually 
+        like the following:
         </p>
+<pre class='box'>
+
+jQuery.noConflict();
+(function($)&amp;#x7B;
+    
+    //A static logger for any initialization routines we might add here
+    var log = $.logger("Site");
+    
+    //Select an environment
+    //The environments are described in environments.js
+    try&amp;#x7B;
+       $.env('defaults', "dev.server");
+       //$.env('defaults', "appengine.server");
+       
+    &#x7D;catch(e)&amp;#x7B;
+       log.error("Environmental selection is invalid!").exception(e);
+    &#x7D;
+    
+    $(document).ready(function()&amp;#x7B;
+        log.info("Initializing Application");
+        $.boot(function()&amp;#x7B;
+          //you can do additional initialization here
+            log.info("Successfully Initialized Application");
+            //preload all application data
+            $.$('#docsModel').get();
+            $.$('#releasesModel').get();
+            $.$('#newsModel').get();
+            $.$('#eventsModel').get();
+            $.$('#examplesModel').get();
+            log.info("Successfully Preloaded Caches");
+        &#x7D;);
+    &#x7D;);    
+    
+&#x7D;)(jQuery);  
+
+</pre>
     </> 
 }]
 

@@ -15,7 +15,10 @@
             </strong>
             This plugin provides an efficient logging implementation that allows 
             application components to log messages at 5 levels to a hierarchical 
-            category that can be tuned via app/configs/logging.js
+            category that can be tuned via 
+            <a href='../../project/conventions/app/configs/logging.js'>
+                app/configs/logging.js
+            </a>
         </p>
     </>
  },{
@@ -23,8 +26,55 @@
         'label':'options',
         'description':<>
         <p>
+            <h3>creating</h3>
+            Loggers are created by simply defining their category.
             <table cellspacing="0" class="args">
-                <tbody><tr class="option"><th>category</th><td class="type"><a href="/Types#String">String</a></td><td class="default"/></tr><tr><td class="desc" colspan="3">A dot-delimited name, usually the namespace of the class the logger is being used in.</td></tr></tbody>
+                <tbody>
+                    <tr class="option">
+                        <th>category</th>
+                        <td class="type"><a href="#String">String</a></td>
+                        <td class="default"/>
+                    </tr>
+                    <tr>
+                        <td class="desc" colspan="3">
+                            A dot-delimited name, usually the namespace of the 
+                            class the logger is being used in.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+        <p>
+            <h3>using</h3>
+            All logger methods are chainable and use a sprintf style argument
+            pattern.  This mean the first arg is a string like 
+            <strong>"The %s fox jumped over the %s brown dog."</strong> and the
+            remainder of the arguments are used to replace the %s in the string.
+            <table cellspacing="0" class="args">
+                <tbody>
+                    <tr class="option">
+                        <th>argument[0]</th>
+                        <td class="type"><a href="#String">String</a></td>
+                        <td class="default"/>
+                    </tr>
+                    <tr>
+                        <td class="desc" colspan="3">
+                            A sprintf style string used as the template for the logging
+                            message: eg "a+b=%s"
+                        </td>
+                    </tr>
+                    <tr class="option">
+                        <th>argument[1..n]</th>
+                        <td class="type"><a href="#String">Any</a></td>
+                        <td class="default"/>
+                    </tr>
+                    <tr>
+                        <td class="desc" colspan="3">
+                            All remaining arguments are used to replace the
+                            %s values in the message template.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </p>
     </>
@@ -33,15 +83,53 @@
         'label':'examples',
         'description':<>
         <p>
-            The logger is returned if any category configured in app/configs/logging.js matches, including the catch-all root category, otherwise a safe, efficient NullLogger instance is returned.
-
+            The logger is returned if any category configured in 
+            <a href='../../project/conventions/app/configs/logging.js'>
+                app/configs/logging.js
+            </a> matches, including the catch-all root category, otherwise a 
+            safe, efficient, chainable NullLogger instance is returned.
         </p>
 
             <pre class='box'>
-$.logger("MyApp.Controller.HelloController");
+var log = $.logger("MyApp.Controller.HelloController");
+log.debug("this is a %s message", 'debug').
+    info("this is a %s message", 'info').
+    warn("this is a %s message", 'warn').
+    error("this is a %s message", 'error').
+    exception(e);
             </pre>
         
-            
+        <p>
+            Note that logging methods are chainable.
+        </p>
+        
+        <h3> Creating Loggers as Closure Objects </h3>
+
+        <p>
+            It doesnt take much, just decide on the category name, and call 
+            $.logger.
+        </p> 
+        <pre class='box'>
+(function($, $C)&amp;#x7B;
+    //private static logger used across all instances
+    var log;
+
+    $C.Hello = function(options)&amp;#x7B;
+       //initialize the instance
+       $.extend(true, this, options);
+       //initalize the logger
+       log = log||$.logger('MyApp.Controllers.Hello');
+    &#x7D;;
+
+    $.extend($C.Hello.prototype,&amp;#x7B;
+        sayHello: function(name)&amp;#x7B;
+          log.debug("Saying hello to %s", name);
+        &#x7D;
+    &#x7D;);
+    
+&#x7D;)(jQuery, MyApp.Controllers);
+
+        </pre>
     </> 
 }]
 

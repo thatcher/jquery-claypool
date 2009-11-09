@@ -5,52 +5,58 @@
     'label':'app/', 
     'sections':[{
 /**************************************************/
-        'label':'usage',
+        'label':'conventions',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            Welcome to jQuery-Claypool!  This is where a Project begins...
+            When you use this manual, understand we have two purposes for
+            providing information in this "project layout" format.
+            We want to share, and we want you to be able to share, and a couple
+            simple conventions provide a simple framework for doing just that.
+        </p>
+        <p>    
+            These conventions are not required in general, and by design.
+            Feel free to modify conventions as suits your project, and feel
+            encouraged to provide your experience and requirements so we can
+            integrate painlessly.
         </p>
     </>
  },{
 /**************************************************/
-        'label':'options',
+        'label':'anatomy',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            You will be able to understand any jquery-claypool app by understanding
+            where to put and find things.  Nothing new about that idea.  
+            <ul>
+                <li>
+                    <a href='./configs'>app/configs</a>
+                    <p>
+                        You will find all the high level wiring for event routing, 
+                        logging, environments, and filters.
+                    </p>
+                </li>
+                <li>
+                    <a href='./models'>app/models</a> |
+                    <a href='./views'>app/views</a> |
+                    <a href='./controllers'>app/controllers</a><br/>
+                    <p>
+                        The models, views, and controllers folders will hold all your
+                        app specific code while seperating concerns to keep it clean
+                        and concise.
+                    </p>
+                </li>
+                <li>
+                    <a href='./'>app/boot</a>
+                    <p>
+                        Whether you are writing a client-side or server-side app,
+                        this is the application entry point.
+                    </p>
+                </li>
+            </ul>  
         </p>
     </>
- },{
-    /**************************************************/
-        'label':'examples',
-        'description':<>
-        <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
-        </p>
-    </> 
+ 
 }]
 
 

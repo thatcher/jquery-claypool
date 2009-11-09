@@ -31,33 +31,36 @@
         'label':'options',
         'description':<>
         <p>
-            There are three primary patterns available through this plugin.
+            There are three primary options available for this plugin,
+            though generally only two are used.level, along with category 
+            is the minimum required 
+            information you need to turn on/off, up/down loggers so 
+            you can quickly and easily debug you application without 
+            the performance hit when you don't need it.
             <ol>
+                <li> 
+                    <a href='../../../plugins/user/logging#category'> 
+                        category
+                    </a><br/>
+                    A dot delimited string name.  Categories are hierarchical
+                    when not configured.  So if the logger A.B.C is not configured
+                    specifically, it will look in order for A.B, A, then finally root
+                    to detemine it's configuration.
+                </li> 
                 <li> 
                     <a href='../../../plugins/user/logging#level'> 
                         level
                     </a><br/>
-                    level, along with category is the minimum required 
-                    information you need to turn on/off, up/down loggers so 
-                    you can quickly and easily debug you application without 
-                    the performance hit when you don't need it.
+                    Level is either DEBUG, INFO, WARN, ERROR, or NONE.
                 </li> 
                 <li> 
-                    <a href='../../../plugins/user/logging#appender'> 
+                    <a href='../../../plugins/user/logging#formatter'> 
                         appender
                     </a><br/>
                     the appender pattern allows you log in a browser or in 
                     Rhino, or over the network, or to a cookie, etc. By default 
                     the logging appenders will detect with you are in a browser 
                     or in Rhino and append messages appropriately. 
-                </li> 
-                <li> 
-                    <a href='../../../plugins/user/logging#formatter'> 
-                        formatter
-                    </a><br/>
-                    the formatter pattern is most rarely used, and will always 
-                    be linked to an appender. It simply allows you to specify 
-                    how the message will be serialized. 
                 </li>
             </ol>
             The links above are given in order of general use. Most apps can get 
@@ -75,7 +78,7 @@
         <p>
             Usually all logging configuration is isolated in the single location
             at <strong>configs/logging.js</strong> and has it's own closure.  
-            Here is an example that can help get you started, just replace 'MyApp'
+            Here is an example that can help get you started, just replace 'Example'
             with your applications own top level object literal. 
         </p>
 <pre class='box'>

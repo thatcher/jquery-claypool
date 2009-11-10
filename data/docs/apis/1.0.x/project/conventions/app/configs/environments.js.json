@@ -13,9 +13,10 @@
             that can be easily toggled between in our boot file. This allows us, 
             as individual  developers, and as a team of developers, maintain a 
             standard collection of settings we may need to easily switch 
-            between when developing.<a href='../../../../plugins/user/env '>
-                See also $.env plugin.
-            </a>
+            between when developing. See also the  
+            <a href='../../../../plugins/user/env'>
+                $.env
+            </a> plugin.
         </p>
     </>
  },{
@@ -47,7 +48,7 @@
         <p>
             You can define as many environments as you need, including as many 
             'default' environments as is convenient. Environments are defined 
-            using the <a href='../../../../plugins/user/env '>$.env plugin.</a> 
+            using the <a href='../../../../plugins/user/env'>$.env</a> plugin. 
         </p>
 <pre class='box'>
 /*

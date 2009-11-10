@@ -24,19 +24,16 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            The following methods are all available on the event object<br/>
+            <a href='#event.m'>event.m</a> | 
+            <a href='#event.v'>event.v</a> | 
+            <a href='#event.c'>event.c</a> | 
+            <a href='#event.params'>event.params</a> | 
+            <a href='#event.render'>event.render</a> | 
+            <a href='#event.reset'>event.reset</a>
         </p>
     </>
- },{
+},{
     /**************************************************/
         'label':'event.m',
         'description':<>
@@ -51,53 +48,236 @@
             sense that it can be both extended and merged. the event model will 
             be passed to the event view automatically with event.render
         </p>
-        <ul>
-            <li>
-                <strong>returns the current model.</strong> 
-                <pre class='box'>
+        
+        <h3>getter</h3>
+        <p>
+            Returns the current model (event scope state)
+        </p> 
+        <pre class='box'>
 // by default this is the object 
 // &amp;#x7B;flash:[], length:0&#x7D;
 event.m();
-                </pre>
-            </li>
-            <li>
-                <strong>
-                    returns the current model.
-                </strong> 
-                <pre class='box'>
+        </pre>
+        <h3>getter</h3>
+        <p>
+            Returns the value specified or null if it has not been set.
+        </p> 
+        <pre class='box'>
 event.m('mylist');
-                </pre>
-            </li>
-            <li>
-                <strong>
-                    when there is a single argument and it is an Object or 
-                    Array, the interal model is deeply extended or merged 
-                    respectively
-                </strong> 
-                <pre class='box'>
+        </pre>
+        
+        <h3>setter</h3>
+        <p>
+            When there is a single argument and it is an Object or 
+            Array, the interal model is deeply extended or merged 
+            respectively
+        </p>
+        <pre class='box'>
 event.
-   m(&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
-   m(['D','E','F']);
-                </pre>
-            </li>
-            <li>
-                <strong>
-                    when there are two arguments the first should be a string. 
-                    this is the name of the models property that will be set on
-                    the model. if the second argument is an object or array, 
-                    the internal model is deeply extended or merged respectively, 
-                    and when it is a simple value the value is set directly.
-                </strong> 
-                <pre class='box'>
+m(&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
+m(['D','E','F']);
+        </pre>
+        
+        <h3>setter</h3>
+        <p>
+            When there are two arguments the first should be a string. 
+            this is the name of the models property that will be set on
+            the model. if the second argument is an object or array, 
+            the internal model is deeply extended or merged respectively, 
+            and when it is a simple value the value is set directly.
+        </p>
+        <pre class='box'>
 event.
-   m('mysimple','This is a pig.').
-   m('myprops',&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
-   m('mylist',['D','E','F']);
-
-                </pre>
-            </li>
-        </ul>
+m('mysimple','This is a pig.').
+m('myprops',&amp;#x7B;a:'A',b:'B',c:'C'&#x7D;).
+m('mylist',['D','E','F']);
+        </pre>
     </> 
+},{
+/**************************************************/
+        'label':'event.v',
+        'description':<>
+        <p>
+            <strong>
+            overloaded function getters and setters of the event view. 
+            chainable setters. relates to which method will be used by 
+            event.render
+            </strong>
+            the event.v function gives an overloaded function for easily 
+            setting and getting the event view and view method. the event 
+            view is resolved my jquery-claypool and called when event.render 
+            is issued.
+        </p>
+        
+        <h3>getter</h3>
+        <p>
+            when there is no argument the current view will be returned. 
+            If the controller has the application id '#helloController', 
+            then by default the code below will return '#helloView' and by 
+            default the method called on the view is 'update'.
+        </p>
+        <pre class='box'>
+event.v()
+        </pre>
+        
+        <h3>setter</h3>
+        <p>
+            Sets the view and/or view method which will be rendered.
+            when there is an argument, it should be a single string of the 
+            form '#appId' or '.methodname' or '#appId.methodname'. the '#' 
+            portion determines the view instance and the '.' portion 
+            determines the view method that will be called. this method 
+            is chainable.
+        </p>
+        <pre class='box'>
+event.
+m(&amp;#x7B;a:'A'&#x7D;).
+v('.think').
+render()
+        </pre>
+    </>
+},{
+/**************************************************/
+        'label':'event.c',
+        'description':<>
+        <p>
+            <strong>
+            getter and setter to introspect the current controller and forward 
+            control to other controllers. setter is chainable.
+            </strong>
+            event.c method, especially if used in conjunction with the 
+            event.render(callback) method, provides a very rich set of 
+            patterns for collecting model information and performing multiple 
+            view updates from a single event.
+        </p>
+        
+        <h3>getter</h3>
+        <p>
+            when no argument is present, returns the current controller 
+            application id as a string. not chainable.
+        </p>
+        <pre class='box'>
+event.c()
+        </pre>
+        
+        <h3>setter</h3>
+        <p>
+            Forwards control to another controller.
+            Single argument is a string of the form 'target.action' where 
+            'target' is required , and '.action' is optional. target is the 
+            application id of the controller (usually of the form 
+            '#helloController'). 'action' is the name of the desired method to 
+            call on the controller, by default this is 'handle' when not 
+            specified. chainable, and when control is released by the forwarded
+            controller, it is returned to the current controller.
+        </p>
+        <pre class='box'>
+event.
+m(&amp;#x7B;a:'A'&#x7D;).
+c('#userController.session').
+render();
+        </pre>
+    </>
+},{
+/**************************************************/
+        'label':'event.params',
+        'description':<>
+        <p>
+            <strong>
+            returns all route params as an object or a single route 
+            param by name.  also always setter via two arguments.
+            </strong>
+            route params are set automatically based on the routers 
+            <a href='./routes#capturingexpressions'>
+                capturing expressions
+            </a>
+        </p>
+        
+        <h3>getter</h3>
+        <p>no arguments returns the entire set of params as an object</p>
+        <pre class='box'>
+/**
+ * assuming urls:'/|:type|/|:id|/edit$'
+ * assuming pattern '/user/532/edit' 
+ * returns &amp;#x7B;
+ *     type: 'user',
+ *     id:'532'   
+ * &#x7D;
+ */
+event.params();
+        </pre>
+        
+        <h3>setter</h3>
+        <p>a single string argument returns the named param or null </p>
+        <pre class='box'>
+/**
+ * assuming urls:'/|:type|/|:id|/edit$'
+ * assuming pattern '/user/532/edit' 
+ * returns 'user'
+ */
+event.params('type');
+        </pre>
+    </>
+},{
+/**************************************************/
+        'label':'event.render',
+        'description':<>
+        <p>
+            <strong>
+                triggers jquery-claypool to resolve the view instance and call 
+                the view method.
+            </strong>
+            event.render triggers jquery-claypool to resolve the view instance 
+            and call the specified view method, passing the model event.m() 
+            as the first argument. an optional callback can be specified, it 
+            will be called when the view method has returned. chainable.
+        </p>
+        
+        <h3>example</h3>
+        <p>
+            triggers jquery-claypool to resolve the view instance 
+            and call the view method passing it the event scope state aggregated
+            by event.m()
+        </p>
+        <pre class='box'>
+event.render();
+        </pre>
+        
+        
+        <h3>callback</h3>
+        <p>
+            triggers jquery-claypool to resolve the view instance and call 
+            the view method and then calls the a callback
+        </p>
+        <pre class='box'>
+event.
+   v('.think').
+   render(function()&amp;#x7B;
+      event.
+          v('.update').
+          render()
+   '&#x7D;);
+        </pre>
+        
+    </>
+},{
+/**************************************************/
+        'label':'event.reset',
+        'description':<>
+        <p>
+            <strong>
+           resets the internal m, v, c settings to the initial state.
+            </strong>
+            The event.reset function can be used to clear all model data, 
+            reset the view target and method, etc.
+        </p>
+        
+        <h3>example</h3>
+        <p>Resets the event scope state.</p>
+        <pre class='box'>
+event.reset();
+        </pre>
+    </>
 }]
 
 

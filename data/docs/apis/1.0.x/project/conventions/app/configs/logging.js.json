@@ -39,7 +39,7 @@
             the performance hit when you don't need it.
             <ol>
                 <li> 
-                    <a href='../../../plugins/user/logging#category'> 
+                    <a href='../../../../plugins/user/logging#category'> 
                         category
                     </a><br/>
                     A dot delimited string name.  Categories are hierarchical
@@ -48,13 +48,13 @@
                     to detemine it's configuration.
                 </li> 
                 <li> 
-                    <a href='../../../plugins/user/logging#level'> 
+                    <a href='../../../../plugins/user/logging#level'> 
                         level
                     </a><br/>
                     Level is either DEBUG, INFO, WARN, ERROR, or NONE.
                 </li> 
                 <li> 
-                    <a href='../../../plugins/user/logging#formatter'> 
+                    <a href='../../../../plugins/user/logging#appender'> 
                         appender
                     </a><br/>
                     the appender pattern allows you log in a browser or in 

@@ -27,12 +27,12 @@
         'label':'options',
         'description':<>
         <p>
-            There are three primary patterns available through this plugin.
+            There are two patterns available through this plugin.
         </p>
 
         <ul>
             <li>
-                <a href=''>scan</a>
+                <a href='../../../../plugins/user/scan'>scan</a>
                 <p>
                     scanning is a process where the entire namespace is searched 
                     for functions and each function is given a simple, default 
@@ -40,18 +40,12 @@
                 </p> 
             </li>
             <li>
-                <a href=''>invert</a>
+                <a href='../../../../plugins/user/invert'>invert</a>
                 <p>
                     the instance pattern allows you a spectrum of customizations 
                     including custom selectors, live binding, constructor 
-                    arguments, dependency injection, etc.
-                </p>
-            </li> 
-            <li>
-                <a href=''>factory</a>
-                <p>
-                    the factory pattern is the most customizable inversion-of-control 
-                    pattern possible. The factory is created using the instance 
+                    arguments, dependency injection, etc. the factory pattern is 
+                    also available through $.invert. The factory is created using the instance 
                     pattern and the instances it creates are up to your own 
                     custom logic. You only need to implement the create method 
                     or specify the name of your creation method.

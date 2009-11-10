@@ -52,7 +52,7 @@
             The 'model' is just an object, each named value provided entirely at 
             the discretion of the controller, and perhaps embellished by a filter.
             <br/> 
-            See also <a>event.m()</a>
+            See also <a href='../../../plugins/user/event#m'>event.m()</a>
         </p>
         <p>
             <em>The <strong>model</strong> (lower case m) can also be refered to
@@ -67,7 +67,7 @@
             are intended to provide feed back about incorrect or invalid user 
             input or errors from controllers and models. 
             <br/>
-            See also <a>event.flash()</a>
+            See also <a  href='../../../plugins/user/event#flash'>event.flash()</a>
         </p>
     </>
  },{
@@ -164,7 +164,9 @@ update: function(model)&amp;#x7B;
         
         <h3>templates</h3>
         <p>
-            Templates are also described in detail <a href='../templates'>here</a>
+            Templates are also described in detail <a href='../app/templates'>
+                app/templates
+            </a>
             <br/>
             <strong>
                 Templates are often used by views to render content to the dom.

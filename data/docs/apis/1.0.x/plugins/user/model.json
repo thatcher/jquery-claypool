@@ -10,13 +10,18 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            jQuery has such an excellent ajax interface, that we decided to
+            use it to provide an optional model layer more familiar to
+            framework developers while still feeling like $.ajax becuase it
+            is $.ajax.
+        </p>
+        <p>
+            The goal of the model layer is to provide
+            a DRY interface that can be used out of the box to describe, validate,
+            and serialize and provide some business logic that can be used for
+            ajax on the client and can back-end to a json storage cloud on the 
+            server.  The model is literally entirely reusable on the client
+            and server.
         </p>
     </>
  },{
@@ -24,34 +29,571 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            To create a model you only need to use $.model once.
         </p>
+        
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+                <tr  class="option">
+                    <th>fields</th>
+                    <td><a>Object</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    The fields object describes each field name that the model
+                    will serialize, as well as optionally providing a regular
+                    expression to validate against, a list of explicit values
+                    it may not be equal to (using ==), as well as some additional
+                    candy described in more detail in <a href='#fields'>fields</a>
+                    below .
+                </td></tr>
+            </tbody>
+        </table>
+        
+        <h3 id='fields'>fields</h3>
+        <p>
+            The fields object clearly describes the fields the model represents,
+            giving the developer a quick place to look to understand the data
+            she's expected to provide or be provided.  Each field is property
+            of the fields object, whose name is the name of the field. For example:
+        </p>
+        <pre class='box'>
+$.model('contacts', &amp;#x7B;
+    id:&amp;#x7B;
+        //field options here
+    &#x7D;,
+    firstName:&amp;#x7B;
+        //field options here
+    &#x7D;,
+    lastName:&amp;#x7B;
+        //field options here
+    &#x7D;,
+    email:&amp;#x7B;
+        //field options here
+    &#x7D;,
+    physical:&amp;#x7B;
+        //field options here
+    &#x7D;,
+    //extensibility mark lets you add any other json serializable fields
+    //which are serialized based on introspection
+    __anything__:true
+&#x7D;);
+        </pre>
+        <p>Here are the field options.  All field options are optional.</p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+            
+                <tr class="option">
+                    <th>pattern</th>
+                    <td><a>Regexp</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A regular expression which will be compiled and used to
+                    validate against.  When this option is present the 'msg'
+                    option should be present as well.
+                </td></tr>
+                
+                <tr  class="option">
+                    <th>not</th>
+                    <td><a>Array</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    An Array of values the field should not be == too.
+                    When this option is present the 'msg'
+                    option should be present as well.
+                </td></tr>
+                
+                <tr  class="option">
+                    <th>msg</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A message that will be provided to and error callback
+                    as an array of failure messages (flash) when the object
+                    fails to validate against the model. 
+                </td></tr>
+                
+                <tr  class="option">
+                    <th>generate</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    If present, when the field is <strong>undefined</strong> this
+                    function will be called to provide an automatically generated
+                    value.
+                </td></tr>
+                
+                <tr  class="option">
+                    <th>type</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    This is a feature in development.  Currently 'html' is well
+                    supported and will use an 'outerHTML' serialization to a string.
+                    Other experimental options include 'json', 'xmllist', and 'jsam'.
+                </td></tr>
+                
+            </tbody>
+        </table>
+        <p> And here is our completed model for demonstration purposes.</p>
+        <pre class='box'>
+var Contacts = $.model('contacts', &amp;#x7B;
+    id:&amp;#x7B;
+        pattern:/\d&amp;#x7B;13&#x7D;-\d+$/,
+        not:[null],
+        msg:'id must be defined',
+        generate:function()&amp;#x7B;
+            return new Date().getTime()+"-"+Math.floor(Math.random()*(100000000));
+        &#x7D;
+    &#x7D;,
+    firstName:&amp;#x7B;
+        pattern:/^[a-zA-Z_]&amp;#x7B;1,64&#x7D;$/,
+        msg:'firstName is optional, less than 64 characters and \
+               should use only letters and underscores'
+    &#x7D;,
+    lastName:&amp;#x7B;
+        pattern:/^.&amp;#x7B;1,64&#x7D;$/,
+        not:[null],
+        msg:'lastName must be defined, less than 64 characters and \
+               can use any characters'
+    &#x7D;,
+    email:&amp;#x7B;
+        pattern:/^[^@]&amp;#x7B;1,64&#x7D;@[^@.]&amp;#x7B;1,64&#x7D;\.[^@.]&amp;#x7B;1,12&#x7D;$/,
+        msg:'email must a valid email address'
+    &#x7D;,
+    //extensibility mark lets you add any other json serializable fields
+    //which are serialized based on introspection
+    __anything__:false
+&#x7D;);
+        </pre>
     </>
  },{
     /**************************************************/
-        'label':'examples',
+        'label':'api',
+        'description':<>
+        <p>
+            <a href='#validate'>validate</a> | 
+            <a href='#serialize'>serialize</a> | 
+            <a href='#create'>create</a> | 
+            <a href='#destroy'>destroy</a> | 
+            <a href='#metadata'>metadata</a> | 
+            <a href='#save'>save</a> | 
+            <a href='#get'>get</a> | 
+            <a href='#add'>add</a> | 
+            <a href='#remove'>remove</a> | 
+            <a href='#find'>find</a> 
+        </p>
+        <p>
+            The API is a bit different than the rest of jquery-claypool which
+            errs on the side of nearly zero interfaces.  The reason is that
+            this is both an optional appraoch and we wanted the DRYest solution
+            which would allow the exact same code to work on the client and server
+            with mutliple backends including ReSTful ajax, cloud json storage, and
+            moving forward sqlite, html5, and gears.
+        </p>
+        <p>
+            We achieved this in reality about 99% so by default the rest implementation
+            is used and other backends require a couple setting via the $.env plugin
+            which seems like a perfectly fine trade off. 
+        </p>
+    </> 
+},{
+    /**************************************************/
+        'label':'validate',
+        'description':<>
+        <p>
+            Takes an options object which is an extension of the jQuery.ajax
+            options arguments.  It will validate the options.data against the model
+            and use the success or failure callbacks provided.
+        </p>
+        <h3>options</h3>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>data</th>
+                    <td><a>Object or Array</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Required.  When the 'batch' option is undefined or false,
+                    the data is treated as an object representing an instance
+                    of the model and validated against it.  When options.batch
+                    is true the data is treated as an object whose properties 
+                    are ids and each id is an instance for which each 
+                    is validated in turn.
+                </td></tr>
+                <tr class="option">
+                    <th>batch</th>
+                    <td><a>Boolean</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    When false the data option is treated as a single instance,
+                    otherwise it is treated as an object whose properties are
+                    id's and each id is an instances.
+                </td></tr>
+                <tr class="option">
+                    <th>serialize</th>
+                    <td><a>Boolean</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    When false or not present, the instance is returned as is,
+                    (when valid), otherwise when true, the validation method will
+                    also call <a href='#serialize'>serialize</a> on the instance(s).
+                </td></tr>
+                <tr class="option">
+                    <th>success</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    The object or objects
+                    will be passed as the argument to the success callback.
+                </td></tr>
+                <tr class="option">
+                    <th>error</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                   The orginal object or array of objects will be passed to
+                   this callback as the first argument.  An Array of objects
+                   providing detailed descriptions of the reasons for validation
+                   failure will be passed as the second argument.
+                </td></tr>
+            </tbody>
+        </table>
+        <h3>validating an instance</h3>
+        <pre class='box'>
+Contacts.validate(&amp;#x7B;
+    data: &amp;#x7B;
+        "firstName": "Chris",
+        "lastName": "Thatcher",
+        "email": ["dontemailme@example.com", "fakeid@example.com"]
+    &#x7D;,
+    success: function(data)&amp;#x7B;
+        //do something like save it
+    &#x7D;,
+    error: function(data, flash)&amp;#x7B;
+        //use the flash to provide feedback about
+        //why it is invalid
+    &#x7D;
+&#x7D;);
+        </pre>
+        <h3>validating by batch</h3>
+        <pre class='box'>
+Contacts.validate(&amp;#x7B;
+    batch:true,
+    data: &amp;#x7B;
+        '0001':&amp;#x7B;
+        "firstName": "Chris",
+        "lastName": "Thatcher",
+        "email": ["dontemailme@example.com", "fakeid@example.com"]
+        &#x7D;,
+        '0002':&amp;#x7B;
+        "firstName": "Weilun",
+        "lastName": "Jonah",
+        "email": ["meneither@example.com", "whathesaid@example.com"]
+        &#x7D;
+    &#x7D;,
+    success: function(data)&amp;#x7B;
+        //do something like save it
+    &#x7D;,
+    error: function(data, flash)&amp;#x7B;
+        //use the flash to provide feedback about
+        //why it is invalid
+    &#x7D;
+&#x7D;);
+        </pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'serialize',
+        'description':<>
+        <p>
+            The serialize method strips all fields not specified on the model
+            and removes all functions as well.  When a model description
+            has the field __anything__:true additional fields that are json
+            serializable will not be stripped.  This works because both ReST
+            and schemaless json storage allow additional fields to be stored.
+        </p>
+        <h3>arguments</h3>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>instance</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    takes an object instance of the model and strips all functions
+                    and fields not included in the models decription.
+                </td></tr>
+            </tbody>
+        </table>
+        <h3>__anything__:false</h3>
+        <pre class='box'>
+var data = Contacts.serialize(&amp;#x7B;
+    "firstName": "Chris",
+    "lastName": "Thatcher",
+    "email": ["dontemailme@example.com", "fakeid@example.com"],
+    doSomething: function()&amp;#x7B;
+        return;
+    &#x7D;,
+    "middleName":"Danger"
+&#x7D;)
+/**
+ * data = &amp;#x7B;
+ *  "firstName": "Chris",
+ *  "lastName": "Thatcher",
+ *  "email": ["dontemailme@example.com", "fakeid@example.com"]
+ * &#x7D;;
+ */
+        </pre><h3>__anything__:true</h3>
+        <pre class='box'>
+var data = Contacts.serialize(&amp;#x7B;
+    "firstName": "Chris",
+    "lastName": "Thatcher",
+    "email": ["dontemailme@example.com", "fakeid@example.com"],
+    doSomething: function()&amp;#x7B;
+        return;
+    &#x7D;,
+    "middleName":"Danger"
+&#x7D;)
+/**
+ * data = &amp;#x7B;
+ *  "firstName": "Chris",
+ *  "lastName": "Thatcher",
+ *  "email": ["dontemailme@example.com", "fakeid@example.com"],
+ *  "middleName":"Danger"
+ * &#x7D;;
+ */
+        </pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'create',
+        'description':<>
+        <p>
+            Loosely speaking, creates a storage space.  For ReST this
+            translates to a HTTP PUT to /rest/name and for schemaless
+            json stores it creates a 'collection' or 'domain'. 
+        </p>
+        <h3>options</h3>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="options">
+                    <th>$.ajax options</th>
+                    <td><a>Options</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Honors options for $.ajax like 'async' etc
+                </td></tr>
+                <tr class="option">
+                    <th>success</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Callback applied when the operation completed with no error
+                    condition.  The object returned should contain some metadata,
+                    though unless you are using jquery.claypool on the server
+                    the response will vary.
+                </td></tr>
+                <tr class="option">
+                    <th>error</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Callback applied when the operation completed with an error
+                    condition.  The object returned should contain some metadata,
+                    though unless you are using jquery.claypool on the server
+                    the response will vary.
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+Contacts.create(&amp;#x7B;
+    //async:false,
+    success: function(result)&amp;#x7B;
+        log.debug('create: %o', result);
+    &#x7D;,
+    error: function()&amp;#x7B;
+       log.debug('failed to create contacts storage space');
+    &#x7D;
+&#x7D;);
+        </pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'destroy',
+        'description':<>
+        <p>
+            'drops' a storage space.  For ReST this
+            translates to a HTTP DELETE to /rest/name and for schemaless
+            json stores it deletes a 'collection' or 'domain'. 
+        </p>
+        <h3>options</h3>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="options">
+                    <th>$.ajax options</th>
+                    <td><a>Options</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Honors options for $.ajax like 'async' etc
+                </td></tr>
+                <tr class="option">
+                    <th>success</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Callback applied when the operation completed with no error
+                    condition.  The object returned should contain some metadata,
+                    though unless you are using jquery.claypool on the server
+                    the response will vary.
+                </td></tr>
+                <tr class="option">
+                    <th>error</th>
+                    <td><a>Function</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    Callback applied when the operation completed with an error
+                    condition.  The object returned should contain some metadata,
+                    though unless you are using jquery.claypool on the server
+                    the response will vary.
+                </td></tr>
+            </tbody>
+        </table>
+        <pre class='box'>
+Contacts.destroy(&amp;#x7B;
+    //async:false,
+    success: function(result)&amp;#x7B;
+        log.debug('destroy: %o', result);
+    &#x7D;,
+    error: function()&amp;#x7B;
+       log.debug('failed to destroy contacts storage space');
+    &#x7D;
+&#x7D;);
+        </pre>
+    </> 
+},{
+    /**************************************************/
+        'label':'metadata',
         'description':<>
         <p>
             {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
         </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+            </tbody>
+        </table>
+    </> 
+},{
+    /**************************************************/
+        'label':'save',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+        </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+            </tbody>
+        </table>
+    </> 
+},{
+    /**************************************************/
+        'label':'get',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+        </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+            </tbody>
+        </table>
+    </> 
+},{
+    /**************************************************/
+        'label':'add',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+        </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+            </tbody>
+        </table>
+    </> 
+},{
+    /**************************************************/
+        'label':'find',
+        'description':<>
+        <p>
+            {_.paragraph()} 
+        </p>
+        <table cellspacing="0">
+            <thead><tr><th>Name</th><th>Type</th></tr></thead>
+            <tbody>
+                <tr class="option">
+                    <th>name</th>
+                    <td><a>String</a></td>
+                </tr>
+                <tr><td class="desc" colspan="3">
+                    A name for the model.  It will be used for ajax to construct
+                    restful urls like /rest/name/id where the /rest/ portion 
+                    is configurable through the $.env plugin.
+                </td></tr>
+            </tbody>
+        </table>
     </> 
 }]
 

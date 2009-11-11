@@ -19,7 +19,9 @@
     <p>
         jQuery provides everything you need to use ajax to build a Model.  You can
         use you prefered server-side technology, or you can even use jquery-claypool
-        on the server-side.
+        on the server-side. jquery-claypool now has a <a href='../../../plugins/user/model'>
+        $.model </a> plugin to allow you to cleanly describe, validate, and serialize
+        your model for ajax on the client and json storage on the cloud.
     </p>
     
     <h4> Models Are Data Access Objects </h4>

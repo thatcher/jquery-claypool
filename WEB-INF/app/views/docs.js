@@ -20,7 +20,7 @@
                 'docs':model.id.match('api')?
                     'api':'guide';
             this.write($.e4x(
-                "site/html/pages/"+page+".js?"+(model.id?model.id:''),
+                "site/html/pages/"+page+".js"+(model.id?"?"+model.id:''),
                 model, 
                 true
             ));

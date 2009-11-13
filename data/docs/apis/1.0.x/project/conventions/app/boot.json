@@ -30,12 +30,12 @@
             (It can be easy to forget you are working with jquery-claypool!)
             <ul>
                 <li>
-                    <a href='./client.js'>client.js</a><br/>
+                    <a href='./boot/client.js'>client.js</a><br/>
                      If your doing your server side development with jquery.claypool, 
                      you'll want to check this out too. 
                 </li>
                 <li>
-                    <a href='./server.js'>server.js</a><br/>
+                    <a href='./boot/server.js'>server.js</a><br/>
                      If your doing your server side development with jquery.claypool, 
                      you'll want to check this out too. 
                 </li>

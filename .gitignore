@@ -1,3 +1,3 @@
 *~
-server/logs/*
-server/*/*/WEB-INF/classes/*
+server/logs/*.log
+server/logs/*.log.*

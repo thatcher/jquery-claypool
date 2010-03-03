@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.pre06 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -799,13 +799,14 @@ var Claypool={
                  }
                  return env[arguments[0]]||null;
              }
-         }
+         },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
-        //TODO add plugin convenience methods for creating cache;
-        //cache: function(){} 
+        cache: function(options){
+            return new $$.SimpleCachingStrategy(options);
+        } 
         
     });
     $.extend($$, plugins);
@@ -3474,8 +3475,9 @@ Claypool.MVC = {
 })(  jQuery, Claypool, Claypool.MVC );
 
 /**
- * In Claypool a controller is meant to be a wrapper for a generally 'atomic'
- * unit of business logic. 
+ * In Claypool a controller is meant to be expose various 
+ * aggregations of event-scope state.
+ * 
  * @author 
  * @version $Rev$
  * @requires OtherClassName
@@ -3485,8 +3487,6 @@ Claypool.MVC = {
 	 * @constructor
 	 */
 	$$MVC.Controller = function(options){
-        this.model  = null;
-        this.view   = null;
         $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.MVC.Controller");
@@ -3547,7 +3547,12 @@ Claypool.MVC = {
             this.logger.debug("Handling pattern: %s", data.pattern);
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
-            var _this = this;
+            var _this = this,
+                state = {};
+            if(this.forwardingList.length > 0){
+                this.logger.debug('normalizing event state params');
+                state = this.normalize(data.args[0]/*the event*/);
+            }
             return jQuery(this.forwardingList).each(function(){
                 var target, 
                     action, 
@@ -3561,6 +3566,8 @@ Claypool.MVC = {
                         this.payload.controller.replace('Controller', 'View') : null;
                     defaultView = this.payload.controller.match('Service') ?
                         this.payload.controller.replace('Service', 'View') : defaultView;
+                    //make params object represent the normalized state accentuated by route param map
+                    this.map = $.extend(state, this.map);
                     (function(t){
                         var  _event = data.args[0],//the event is the first arg, 
                             extra = [],//and then tack back on the original extra args.
@@ -3706,7 +3713,13 @@ Claypool.MVC = {
                     event.preventDefault();
                     retVal = false;
                 }
-                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
+                _this.handle({
+                    pattern: _this.target.apply(_this, arguments), 
+                    args:arguments,
+                    normalize: _this.normalize?_this.normalize:function(){
+                        return {};
+                    }
+                });
                 return retVal;
             };
             if(this.event){
@@ -3778,7 +3791,7 @@ Claypool.MVC = {
                             //if a 'writer' is provided the view is called with both args
                             if(this.write){
                                 view.write = this.write;
-                                view.append = this.append;
+                                view.writeln = this.writeln;
                                 view[viewMethod](this.m());
                             }else{
                                 view[viewMethod](this.m());
@@ -3818,7 +3831,7 @@ Claypool.MVC = {
         }
     });
     
-})(  jQuery, Claypool, Claypool.MVC );
+})(jQuery, Claypool, Claypool.MVC );
 
 
 /**

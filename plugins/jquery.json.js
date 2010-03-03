@@ -201,6 +201,11 @@
                 return isFinite(value) ? String(value) : 'null';
 
             case 'boolean':
+            case 'xml':
+
+                return '"'+value.toXMLString().
+                            replace('\n', '\\\n', 'g').
+                            replace('"','\\"','g')+'"';
             case 'null':
 
                 return String(value);

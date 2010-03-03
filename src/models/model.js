@@ -33,13 +33,15 @@
                 batch,
                 id;
             if(options.batch){
-                batch = {};
-                for(id in model){
+                batch = [];
+                for(i=0;i<model.length;i++){
+                    id = model[i].$id;
                     this.validate($.extend({},options,{
-                        data: model[id],
+                        data: model[i],
                         batch:false,
                         success:function(data){
-                            batch[id]=data;
+                            data.$id = id;
+                            batch.push(data);
                         },
                         error:function(data, _flash){
                             flash.push(_flash);
@@ -67,6 +69,7 @@
                                         //to pass to the callback
                                         flash[flash.length]={
                                             index:j,
+                                            field: field,
                                             value:model[field][j],
                                             msg:this.fields[field].msg
                                         };          
@@ -79,13 +82,15 @@
                                     //to pass to the callback
                                     flash[flash.length]={
                                         value:model[field],
+                                        field: field,
                                         msg:this.fields[field].msg
                                     };          
                                 }
                             }
                         }       
                     }
-                    if(this.fields[field].pattern ){
+                    //only validate patterns if defined
+                    if(this.fields[field].pattern && (model[field]!==undefined)){
                         if(model[field] instanceof Array){
                             //handle array of simple values
                             for(j=0;j<model[field].length;j++){
@@ -94,6 +99,7 @@
                                     //to pass to the callback
                                     flash[flash.length]={
                                         index:j,
+                                        field: field,
                                         value:model[field][j],
                                         msg:this.fields[field].msg
                                     };        
@@ -106,6 +112,7 @@
                                 //to pass to the callback
                                 flash[flash.length]={
                                     value:model[field],
+                                    field: field,
                                     msg:this.fields[field].msg
                                 };        
                             }
@@ -133,7 +140,7 @@
                 i;
             for(var field in model){
                 if((this.fields[field]!==undefined ||
-                   '__anything__' in this.fields) && !$.isFunction(model[field])){
+                   '__anything__' in this.fields || field == '$id') && !$.isFunction(model[field])){
                     if(this.fields[field] && 
                        this.fields[field].type){
                         if(this.fields[field].type == 'json'){
@@ -141,11 +148,11 @@
                             serialized[field] = jsPath.js2json(model[field]);
                         }else if (this.fields[field].type == 'html'){
                             //serializes a dom html blob
-                            serialized[field] = $('<div>').append( $(model[field]).clone() ).html();
+                            serialized[field] = $('<div/>').append( $(model[field]).clone() ).html();
                         }else if (this.fields[field].type == 'xmllist'){
                             //serializes a e4x xml blob
                             serialized[field] = model[field].toString();
-                        }else if (this.fields[field].type == 'jsam'){
+                        }/**else if (this.fields[field].type == 'jsam'){
                             //serializes as an array of jsam paths
                             //requires jsPath plugin
                             multi = jsPath('..*', model[field], {resultType:"JSAM", pathStyle:"DOT"});
@@ -153,7 +160,7 @@
                             for(i=0;i<multi.length;i++){
                                 serialized[field][i] = multi[i];
                             }
-                        } 
+                        }*/
                     }else{
                         serialized[field] = model[field];
                     }
@@ -162,7 +169,26 @@
             return serialized;
         },
         deserialize: function(model){
-            var deserialized;
+            var deserialized = {};
+            for(var field in this.fields){
+                if((model[field]!==undefined ||
+                   '__anything__' in this.fields) && !$.isFunction(model[field])){
+                    if(this.fields[field].type){
+                        if(this.fields[field].type == 'json'){
+                            //deserializes a json blob
+                            deserialized[field] = jsPath.json2js(model[field]);
+                        }else if (this.fields[field].type == 'html'){
+                            //deserializes a dom html blob
+                            deserialized[field] = $(model[field]);
+                        }else if (this.fields[field].type == 'xmllist'){
+                            //deserializes a e4x xml blob
+                            deserialized[field] = new XMLList(model[field]);
+                        }
+                    }else{
+                        serialized[field] = model[field];
+                    }
+                }
+            }
             return deserialized;
         }
         

@@ -11,10 +11,12 @@ Claypool.Server={
  * $Rev: 265 $
  * 
  *
- *   -   Server (Servlet) Patterns  -
+ *   -   Server (Servlet-ish) Patterns  -
  */
 };
 (function($, $$, $$Web){
+    
+    var log;
     
     $.router( "hijax:server", {
         event:          'claypool:serve',
@@ -22,8 +24,32 @@ Claypool.Server={
         routerKeys:     'urls',
         hijaxKey:       'request',
         eventNamespace: "Claypool:Server:HijaxServerController",
-        target:     function(event, request){ 
-            return request.url;//request/response object
+        target:     function(event, request, response){ 
+            log = log||$.logger('Claypool.Server');
+            log.debug('targeting request event');
+            event.request = request;
+            event.response = response;
+            event.write = function(str){
+                log.debug('writing response.body : %s', str);
+                response.body = str+''; 
+                return this;
+            };
+            event.writeln = function(str){
+                log.debug('writing line to response.body : %s', str);
+                response.body += str+'';
+                return this;
+            };
+            return request.requestURL+'';
+        },
+        normalize:  function(event){
+            //adds request parameters to event.params()
+            //normalized state map
+            return $.extend( {}, {
+                    parameters:event.request.parameters,
+                    method: event.request.method,
+                    body: event.request.body,
+                    headers: $.extend(event.response.headers, event.request.headers)
+            });
         }
     });
     

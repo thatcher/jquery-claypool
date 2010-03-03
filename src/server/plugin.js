@@ -12,7 +12,7 @@
      */
     //TODO : what is the useful static plugin that could be derived from Claypool.Server?
     //      console ?
-    var $log;
+    var log;
     
     var console;
     
@@ -22,29 +22,57 @@
             console.run(command);
         },
         serve: function(request, response){ 
-            $log = $log||$.logger("Claypool.Server");
-            $log.info("Handling global request routing for request: %s ", request.requestURL).
+            var prop;
+            log = log||$.logger("Claypool.Server");
+            log.info("Handling global request routing for request: %s ", request.requestURL).
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
-            $.extend( response.headers, { contentType:'text/html', status: 404 });
+            $.extend( response.headers, { 'Content-Type':'text/html', status: -1 });
             response.body = "<html><head></head><body>"+
                 "Not Found :\n\t"+request.requestURL+
             "</body></html>";
             try{
-                $(document).trigger("claypool:serve",[
-                    {url:request.requestURL},
-                    request, response
-                ]);
+                log.debug('serving request event');
+                $(document).trigger("claypool:serve",[ request, response ]);
+                
+                log.debug('finished serving request event');
+                //Hope for the best
+                if(response.headers.status === -1){
+                    response.headers.status = 200;
+                }
             }catch(e){
-                $log.error("Error Handling Request.").exception(e);
+                log.error("Error Handling Request.").exception(e);
                 response.headers["Content-Type"] = "text/html";
                 response.headers.status = 500;
-                response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
+                response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
+                
+                response.body += "<h2>Error Details</h2>";
+                for(prop in e){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+e[prop]+'</span><br/>';
+                }
+                response.body += "<h2>General Request Details</h2>";
+                for(prop in request){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+request[prop]+'</span><br/>';
+                } 
+                response.body += "<h2>Request Header Details</h2>";
+                for(prop in request.headers){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+request.headers[prop]+'</span><br/>';
+                }
+                response.body += "</body></html>";
             }
         },
 		servlet: function(target){
+            log = log||$.logger("Claypool.Server");
+            log.debug('Applying servlet pattern to %s', target);
             $$.extend(target, $$Web.Servlet);
         },
+        
         proxy: function(options){
             return $.invert([{ 
                 id:options.id||'proxy_'+$.guid(),    
@@ -54,11 +82,6 @@
                 }]
             }]);
         }
-		/*,
-        //TODO this is deprecated
-        render: function(request, response){
-            $log.debug("Finished Handling global request : %s  response %o", request.requestURL, response);
-        }*/
     });
     
     /**@global*/

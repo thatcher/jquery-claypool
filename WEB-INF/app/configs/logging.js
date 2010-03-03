@@ -9,7 +9,7 @@
     
    $.logging([
         { category:"Site",                       level:"DEBUG" },
-        { category:"Site.Models",                level:"INFO" },
+        { category:"Site.Models",                level:"DEBUG" },
         { category:"Site.Views",                 level:"DEBUG" },
         { category:"Site.Controllers",           level:"DEBUG" },
         { category:"Site.Service",               level:"DEBUG" },

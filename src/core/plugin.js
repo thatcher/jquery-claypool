@@ -151,13 +151,14 @@
                  }
                  return env[arguments[0]]||null;
              }
-         }
+         },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
-        //TODO add plugin convenience methods for creating cache;
-        //cache: function(){} 
+        cache: function(options){
+            return new $$.SimpleCachingStrategy(options);
+        } 
         
     });
     $.extend($$, plugins);

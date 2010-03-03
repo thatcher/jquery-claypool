@@ -22,67 +22,51 @@
     
     $.extend($Web.RestServlet.prototype, 
             $Web.Servlet.prototype,{
-        handleGet: function(request, response){
+        handleGet: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id'),
-                ids,
+			    domain = event.params('domain'),
+                id = event.params('id'),
+                ids = id?id.split(','):[],
                 select;
+                
             log.debug("Handling GET for %s %s", domain, id);
             if(!domain && !id){
                 //response is an array of all domain names
                 this.db.get({
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
-            }else if(domain && !id){
-                log.debug("Handling GET for %s %s", domain, request.params);
-                for(var param in request.parameters){
-                    log.debug('param[%s]=%s', param, request.parameters[param]);
-                }
-                if(request.parameters&&('id' in request.parameters)){
-                    log.debug("LIST OF ITEMS!!!");
+            }else if(domain && (ids.length > 1 || !id)){
+                log.debug("Handling GET for %s %s", domain, id);
+                if(ids.length > 1){
                     //response is batch get of items by id
-                    ids = request.parameters.id.split(',');
-                    select = 'select * from `'+domain+'` where itemName() in (\''+
-                        ids.join("','")+
-                    '\')';
-                    log.debug("%s",select);
-                    this.db.find({
-                        select: select,
+                    this.db.get({
+                        id: ids,
+                        domain:domain,
                         async: false,
                         success: function(result){
-                            response.headers.status = 200;
-                            response.body = _this.js2json(
-                                $.extend(result, response.params())
-                            );
+                            handleSuccess(event, result, _this);
                         },
-	                    error: function(result){
-	                        handleError(result, response, _this);
-	                    }
+                        error: function(result){
+                            handleError(event, result, _this);
+                        }
                     });
                 }else{
-                    log.debug("LIST OF ITEM NAMES!!!", domain, id);
+                    log.debug("getting list of item ids for domain %s", domain, id);
                     //response is list of item names for the domain
-                    this.db.find({
-                        select: "select itemName() from `"+domain+"`",
+                    this.db.get({
+                        domain:domain,
                         async: false,
                         success: function(result){
-                            response.headers.status = 200;
-                            response.body = _this.js2json(
-                                $.extend(result, response.params())
-                            );
+                            handleSuccess(event, result, _this);
                         },
 	                    error: function(result){
-	                        handleError(result, response, _this);
+	                        handleError(event, result, _this);
 	                    }
                     });
                 }
@@ -94,13 +78,10 @@
                     async: false,
                     dataType:'text',
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && id && id == 'metadata'){
@@ -110,67 +91,55 @@
                     async: false,
                     dataType:'text',
                     success:function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         },
-        handlePost: function(request, response){
+        handlePost: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id'),
+			    domain = event.params('domain'),
+                id = event.params('id'),
                 item,
                 items,
                 query;
             log.debug("Handling POST for %s %s", domain, id).
-                debug("Reading POST body %s", request.body);
+                debug("Reading POST body %s", event.body);
             
             if(domain && id){
                 //create a new record(s)
-                log.debug('saving single object', request.body);
-                item = this.json2js(request.body);
+                log.debug('saving single object', event.request.body);
+                item = this.json2js(event.request.body);
                 this.db.save({
                     domain: domain,
                     id:id,
                     data:item,
                     async: false,
-                    replace: ('update' in request.parameters)?false:true,
+                    replace: ('update' in event.request.parameters)?false:true,
                     success: function(result){
-                        var body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('response %s', body);
-                        response.headers.status = 200;
-                        response.body = body;
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && !id){
                 log.debug('saving array of objects (bulk save)');
-                items = this.json2js(request.body);
+                items = this.json2js(event.request.body);
     			this.db.save({
                     domain: domain,
                     data: items,
                     async: false,
 					batch: true,
-                    replace: ('update' in request.parameters)?false:true,
+                    replace: ('update' in event.request.parameters)?false:true,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('resultset %s', response.body);
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(!domain && !id){
@@ -178,8 +147,8 @@
                 //serialization used to build a query
                 //dynamically - use the content-type
                 //header
-                query = request.body;
-                if(request.contentType.match('application/json')){
+                query = event.request.body;
+                if(event.request.contentType.match('application/json')){
                     query = js2query(this.json2js(query));
                 }
                 log.debug('executing query \n%s', query);
@@ -187,22 +156,18 @@
                     select:query,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('resultset %s', response.body);
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
             
         },
-        handlePut: function(request, response){
+        handlePut: function(event){
             var _this = this,
-			    domain = response.params('domain');
+			    domain = event.params('domain');
             log.debug("Handling PUT for %s %s", domain);
             if(domain){
                 //create a new domain
@@ -210,21 +175,18 @@
                     domain: domain,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         },
-        handleDelete: function(request, response){
+        handleDelete: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id');
+			    domain = event.params('domain'),
+                id = event.params('id');
             log.debug("Handling DELETE for %s %s", domain, id);
 
             if(domain && id){
@@ -234,13 +196,10 @@
                     id:id,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && !id){
@@ -249,29 +208,39 @@
                     domain: domain,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         }
     });
     
-    var handleError = function(result, response, servlet){
-        var body =  servlet.js2json(result);
+    var handleSuccess = function(event, result, servlet){
+        var body =  servlet.js2json(result, null, 4);
+        log.debug('succeeded. %s', body);
+        event.response.headers = {
+            status:         200,
+            'Content-Type': 'text/javascript'
+        };
+        event.response.body = body;
+    };
+    
+    
+    var handleError = function(event, result, servlet){
+        var body =  servlet.js2json(result, null, 4);
         log.error('failed. %s', body);
-        response.headers.status = result.$code?result.$code:500;
-        response.body = body?body:
-              "{'db$error':{"+
-                "'$code'  : 500,"+
-                "'$type'  : 'UnknownClaypoolWrapperError',"+
-                "'$msg'   : 'unknown error, check network'"+
-               "}}";
+        event.response.headers ={
+            status : result.code?result.code:500,
+            'Content-Type': 'text/javascript'
+        };
+        event.response.body = body?body:"{'error':{"+
+            "'code'  : 500,"+
+            "'type'  : 'UnknownClaypoolRestError',"+
+            "'msg'   : 'unknown error, check network'"+
+        "}}";
     };
     
     

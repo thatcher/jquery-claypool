@@ -33,7 +33,7 @@
                    (selector instanceof Array)){
                // if selector is array
                // a select (`selector[0]`, `selector[1]`, etc) 
-               $.merge(this.selectors,selector);
+               $.merge(this.selectors, selector);
            }else{
                // if arg is not any of the above it is '*'
                // a select `selector` 
@@ -274,18 +274,21 @@
       
         //select * from `artists` where `$name` = 'Vox Populi' 
         //or $tags in ('alternative', 'rock') 
-        _ = new $Q();
+        _ = $.query();
       
-        $('#artistsModel').find(
-           _.items('*').
-             where('$name').
-             is('Vox Populi').
-             or('$tags').
-             isin(['alternative', 'rock']),
-           function(results, pages){
-               //do something with results
-           }
-        );
+        $('#artistsModel').find({
+            query: _.items('*').
+                    where('name').
+                    is('Vox Populi').
+                    or('tags').
+                    isin(['alternative', 'rock']),
+            success: function ( results ) {
+                //do something with results
+            },
+            error: function( code, exception ){
+                //do something with error conditions
+            }
+        });
         //is equivalent to
         _ = new $Q();
         

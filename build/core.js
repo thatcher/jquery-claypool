@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.pre06 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -799,13 +799,14 @@ var Claypool={
                  }
                  return env[arguments[0]]||null;
              }
-         }
+         },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
-        //TODO add plugin convenience methods for creating cache;
-        //cache: function(){} 
+        cache: function(options){
+            return new $$.SimpleCachingStrategy(options);
+        } 
         
     });
     $.extend($$, plugins);

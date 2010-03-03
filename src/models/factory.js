@@ -30,21 +30,28 @@
         log.debug("loading database client connection %s", dbclient);
         if(dbclient=='rest'){
             dbclient = new $M.RestClient(options);
-        }else if(dbclient == 'direct'){
-            //get the database implementation and connection information
-            DB = options&&options.db?
-                    options.db:$.env('db');
-            dbconnection = options&&options.dbconnection?
-                    options.dbconnection:$.env('dbconnection');
-            log.debug("loading database implementation %s", DB);
-            if(typeof(DB)=='string'){
-                log.debug("resolving database implementation %s", DB);
-                DB = $.resolve(DB);
+        }else{// if(dbclient == 'direct'){
+            try{
+                //get the database implementation and connection information
+                DB = options&&options.db?
+                        options.db:$.env('db');
+                dbconnection = options&&options.dbconnection?
+                        options.dbconnection:$.env('dbconnection');
+                log.debug("loading database implementation %s", DB);
+                if(typeof(DB)=='string'){
+                    log.debug("resolving database implementation %s", DB);
+                    DB = $.resolve(DB);
+                }
+                dbclient = new $M.Client($.extend({
+                    //initialize the database connection
+                    db: new DB(dbconnection)
+    			},options));
+            }catch(e){
+                log.error('direct connection not available', e).
+                    exception(e);
+                //try the rest client
+                dbclient = new $M.RestClient(options);
             }
-            dbclient = new $M.Client($.extend({
-                //initialize the database connection
-                db: new DB(dbconnection)
-			},options));
         }
         return dbclient;
     };

@@ -22,7 +22,7 @@
     };
     $.extend($$Web.WebProxyServlet.prototype, 
         $$Web.Servlet.prototype,{
-        handleGet: function(request, response){
+        handleGet: function(event, response){
             var options = _proxy.route(request, this);
             var proxyURL = options.proxyURL,
                 params   = options.params;
@@ -34,7 +34,7 @@
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    beforeSend:function(xhr){_proxy.beforeSend(event.request, response, xhr);},
                     success:function(text){_proxy.success(response, text);},
                     error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
                     complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
@@ -42,8 +42,8 @@
             }
             return response;
         },
-        handlePost:function(request, response){
-            var options = _proxy.route(request, this);
+        handlePost:function(event, response){
+            var options = _proxy.route(event.request, this);
             var proxyURL = options.proxyURL,
                 params   = options.params;
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
@@ -54,7 +54,7 @@
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    beforeSend:function(xhr){_proxy.beforeSend(event.request, response, xhr);},
                     success:function(text){_proxy.success(response, text);},
                     error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
                     complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}

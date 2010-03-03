@@ -60,7 +60,8 @@
             return this;
         },
         save: function(options){
-            var id;
+            var id,
+                i;
             if(!options.batch&&options.id){
 
                 if(options.serialize){
@@ -88,8 +89,8 @@
                 //and each property value corresponding
                 //to the item to be saved
 				if(options.serialize){
-	                for(id in options.data){
-	                    options.data[id] = this.serialize(options.data[id]);
+	                for(i=0;i<options.data.length;i++){
+	                    options.data[i] = this.serialize(options.data[i]);
 	                }
 				}
                 

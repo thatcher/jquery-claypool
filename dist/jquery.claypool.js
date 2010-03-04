@@ -291,7 +291,7 @@ var Claypool={
 							return '(\\w+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
-                        this.add(String($.guid()) , {
+                        this.add(String($.uuid()) , {
                             pattern:new RegExp(pattern), 
                             payload:patternMap[i],
 							params : params
@@ -714,7 +714,7 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        guid: function(){
+        uuid: function(){
             return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
         },
         /**
@@ -2135,7 +2135,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.guid(), _weave(f));
+                        this.add($.uuid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -2394,7 +2394,7 @@ Claypool.AOP={
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
-                                            id : aopconf.id+$.guid(),
+                                            id : aopconf.id+$.uuid(),
                                             target : namespace[prop]
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
@@ -2752,7 +2752,7 @@ Claypool.IoC={
             _this           : null,     //A reference to the managed object
             id              : null,     //published to the application context
             configuration   : null,     //the instance configuration
-            guid            : $.guid(), //globally (naively) unique id for the instance created internally
+            guid            : $.uuid(), //globally (naively) unique id for the instance created internally
             type            : null,     //a reference to the clazz
             id              : id,
             configuration   : configuration||{},
@@ -3802,7 +3802,7 @@ Claypool.MVC = {
                             //some times a view is removed and reattached.  such 'active' views
                             //are bound to the post create lifecycle event so they can resolve 
                             //as soon as possible
-                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.guid();
+                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.uuid();
                             $(document).bind(guidedEventRegistration,function(event, newView){
                                 _this.logger.warn("The view is reattached to the dom.");
                                 //unbind handler
@@ -5917,7 +5917,7 @@ Claypool.Server={
         
         proxy: function(options){
             return $.invert([{ 
-                id:options.id||'proxy_'+$.guid(),    
+                id:options.id||'proxy_'+$.uuid(),    
                 clazz:"Claypool.Server.WebProxyServlet", 
                 options:[{
                     rewriteMap:options.rewrites

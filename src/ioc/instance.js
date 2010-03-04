@@ -15,7 +15,7 @@
             _this           : null,     //A reference to the managed object
             id              : null,     //published to the application context
             configuration   : null,     //the instance configuration
-            guid            : $.guid(), //globally (naively) unique id for the instance created internally
+            guid            : $.uuid(), //globally (naively) unique id for the instance created internally
             type            : null,     //a reference to the clazz
             id              : id,
             configuration   : configuration||{},

@@ -66,7 +66,7 @@
          * @returns Describe what it returns
          * @type String
          */
-        guid: function(){
+        uuid: function(){
             return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
         },
         /**

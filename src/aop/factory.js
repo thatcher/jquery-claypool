@@ -87,7 +87,7 @@
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
-                                            id : aopconf.id+$.guid(),
+                                            id : aopconf.id+$.uuid(),
                                             target : namespace[prop]
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 

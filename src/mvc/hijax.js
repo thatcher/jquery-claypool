@@ -301,7 +301,7 @@
                             //some times a view is removed and reattached.  such 'active' views
                             //are bound to the post create lifecycle event so they can resolve 
                             //as soon as possible
-                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.guid();
+                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.uuid();
                             $(document).bind(guidedEventRegistration,function(event, newView){
                                 _this.logger.warn("The view is reattached to the dom.");
                                 //unbind handler

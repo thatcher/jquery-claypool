@@ -69,7 +69,7 @@
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.guid(), _weave(f));
+                        this.add($.uuid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }

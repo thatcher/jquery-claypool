@@ -291,7 +291,7 @@ var Claypool={
 							return '(\\w+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
-                        this.add(String($.guid()) , {
+                        this.add(String($.uuid()) , {
                             pattern:new RegExp(pattern), 
                             payload:patternMap[i],
 							params : params
@@ -714,7 +714,7 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        guid: function(){
+        uuid: function(){
             return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
         },
         /**

@@ -1159,7 +1159,7 @@ Claypool.Logging={
      */
     $$Log.ConsoleAppender = function(options){
         try{
-            if(window&&window.console&&window.console.log){
+            if(window&&window.console&&window.console.log&&!Envjs){
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;

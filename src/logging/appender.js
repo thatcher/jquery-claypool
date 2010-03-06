@@ -95,7 +95,8 @@
      */
     $$Log.ConsoleAppender = function(options){
         try{
-            if(window&&window.console&&window.console.log&&!Envjs){
+            if(window&&window.console&&window.console.log){
+                try{Envjs;return new $$Log.SysOutAppender(options);}catch(e){}
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;

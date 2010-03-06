@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.pre06 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.rc1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -1159,7 +1159,8 @@ Claypool.Logging={
      */
     $$Log.ConsoleAppender = function(options){
         try{
-            if(window&&window.console&&window.console.log&&!Envjs){
+            if(window&&window.console&&window.console.log){
+                try{Envjs;return new $$Log.SysOutAppender(options);}catch(e){}
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;

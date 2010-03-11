@@ -83,6 +83,9 @@
                 link = $(link).parent()[0];
             }
             return $(link).attr("href");
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:button",{
         selector        : ':button',
@@ -93,6 +96,9 @@
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:input",{
         selector        : 'input',
@@ -103,6 +109,9 @@
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -113,6 +122,9 @@
         eventNamespace  : "Claypool:MVC:HijaxFormController",
         target       : function(event){ 
             return event.target.action;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:event",{
         strategy        : 'all',
@@ -121,6 +133,9 @@
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        },
+        normalize:  function(event){
+            return {};
         }
     });
     

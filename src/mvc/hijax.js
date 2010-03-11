@@ -50,7 +50,9 @@
                 state = {};
             if(this.forwardingList.length > 0){
                 this.logger.debug('normalizing event state params');
-                state = this.normalize(data.args[0]/*the event*/);
+                if($.isFunction(this.normalize)){
+                    state = this.normalize(data.args[0]/*the event*/);
+                }
             }
             return jQuery(this.forwardingList).each(function(){
                 var target, 

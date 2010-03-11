@@ -3552,7 +3552,9 @@ Claypool.MVC = {
                 state = {};
             if(this.forwardingList.length > 0){
                 this.logger.debug('normalizing event state params');
-                state = this.normalize(data.args[0]/*the event*/);
+                if($.isFunction(this.normalize)){
+                    state = this.normalize(data.args[0]/*the event*/);
+                }
             }
             return jQuery(this.forwardingList).each(function(){
                 var target, 
@@ -4163,6 +4165,9 @@ Claypool.MVC = {
                 link = $(link).parent()[0];
             }
             return $(link).attr("href");
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:button",{
         selector        : ':button',
@@ -4173,6 +4178,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:input",{
         selector        : 'input',
@@ -4183,6 +4191,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -4193,6 +4204,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxFormController",
         target       : function(event){ 
             return event.target.action;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:event",{
         strategy        : 'all',
@@ -4201,6 +4215,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        },
+        normalize:  function(event){
+            return {};
         }
     });
     

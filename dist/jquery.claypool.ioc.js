@@ -165,7 +165,7 @@ Claypool.IoC={
                     //Every Instance gets a logger!
                     _this.$ns = this.configuration.clazz;
                     _this.$log = $.logger(_this.$ns);
-                    _this.$log.info("Created new instance of %s", _this.$ns);
+                    _this.$log.debug("Created new instance of %s", _this.$ns);
                     
                     this._this = $.extend(true, _this, this._this);
                 }

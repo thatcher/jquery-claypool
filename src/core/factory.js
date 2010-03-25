@@ -100,11 +100,11 @@
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.warn( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
                 try{
                 	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
                     if($$.Configuration[this.configurationId]){
-                        this.logger.info("Found Claypool.Configuration");
+                        this.logger.debug("Found Claypool.Configuration");
                         this.configuration = $$.Configuration[this.configurationId];
                     }else if(!$$.Configuration){
                         //it's not specified in js code so look for it remotely
@@ -127,7 +127,7 @@
         loadConfig: function(options){
         	options = options||{};
             this.configurationUrl = options.url||this.configurationUrl;
-            this.logger.info("Attempting to load configuration from: %s", this.configurationUrl);
+            this.logger.debug("Attempting to load configuration from: %s", this.configurationUrl);
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
@@ -165,7 +165,7 @@
          * @type String
          */
     	setConfig: function(id, configuration){
-    	    this.logger.info("Setting configuration");
+    	    this.logger.debug("Setting configuration");
             this.configuration = configuration;
             $$.Configuration[id] = configuration;
         },

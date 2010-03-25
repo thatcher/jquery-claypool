@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.rc1 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.rc3 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -472,11 +472,11 @@ var Claypool={
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.warn( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
                 try{
                 	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
                     if($$.Configuration[this.configurationId]){
-                        this.logger.info("Found Claypool.Configuration");
+                        this.logger.debug("Found Claypool.Configuration");
                         this.configuration = $$.Configuration[this.configurationId];
                     }else if(!$$.Configuration){
                         //it's not specified in js code so look for it remotely
@@ -499,7 +499,7 @@ var Claypool={
         loadConfig: function(options){
         	options = options||{};
             this.configurationUrl = options.url||this.configurationUrl;
-            this.logger.info("Attempting to load configuration from: %s", this.configurationUrl);
+            this.logger.debug("Attempting to load configuration from: %s", this.configurationUrl);
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
@@ -537,7 +537,7 @@ var Claypool={
          * @type String
          */
     	setConfig: function(id, configuration){
-    	    this.logger.info("Setting configuration");
+    	    this.logger.debug("Setting configuration");
             this.configuration = configuration;
             $$.Configuration[id] = configuration;
         },
@@ -715,7 +715,7 @@ var Claypool={
          * @type String
          */
         uuid: function(){
-            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
+            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does

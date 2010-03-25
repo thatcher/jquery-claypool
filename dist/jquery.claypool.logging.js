@@ -796,7 +796,7 @@ Claypool.Logging={
             var logconf;
             var i;
             try{
-                this.logger.info("Configuring Claypool Logging");
+                this.logger.debug("Configuring Claypool Logging");
                 this.clear();
                 loggingConfiguration = this.getConfig()||[];
                 for(i=0;i<loggingConfiguration.length;i++){

@@ -67,7 +67,7 @@
          * @type String
          */
         uuid: function(){
-            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
+            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does

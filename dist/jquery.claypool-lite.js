@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.rc3 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -845,8 +845,8 @@ Claypool.Logging={
         getLogger: function(category){
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
-                $$Log.loggerFactory.updateConfig();
-            }else if($$Log.updated){
+            }
+            if($$Log.updated){
                 $$Log.loggerFactory.updateConfig();
                 $$Log.updated = false;
             }
@@ -1158,9 +1158,15 @@ Claypool.Logging={
      * @constructor
      */
     $$Log.ConsoleAppender = function(options){
+        var test;
         try{
             if(window&&window.console&&window.console.log){
-                try{Envjs;return new $$Log.SysOutAppender(options);}catch(e){}
+                try{
+                    test = Envjs;
+                    return new $$Log.SysOutAppender(options);
+                }catch(e){
+                    print(e);
+                }
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;
@@ -1568,7 +1574,7 @@ Claypool.Logging={
             if(!this.configuration){
                 //Only warn about lack of configuration once
                 if(!this.attemptedConfigure){
-                    this.logger.warn("Claypool Logging was not initalized correctly.  Logging will not occur unless initialized.");
+                    this.logger.warn("Claypool Logging was not initalized correctly. Logging will not occur unless initialized.");
                 }
                 this.attemptedConfigure = true;
                 return new $$Log.NullLogger();
@@ -1588,6 +1594,7 @@ Claypool.Logging={
                 }
                 //try the special 'root' category
                 rootLoggerConf = this.find('root');
+                this.logger.debug('root logging category is set to %s', rootLoggerConf);
                 if(rootLoggerConf !== null){
                     //The level is set by the closest subcategory, but we still want the 
                     //full category to display when we log the messages

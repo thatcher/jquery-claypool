@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -291,7 +291,7 @@ var Claypool={
 							return '(\\w+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
-                        this.add(String($.guid()) , {
+                        this.add(String($.uuid()) , {
                             pattern:new RegExp(pattern), 
                             payload:patternMap[i],
 							params : params
@@ -472,11 +472,11 @@ var Claypool={
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.warn( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
                 try{
                 	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
                     if($$.Configuration[this.configurationId]){
-                        this.logger.info("Found Claypool.Configuration");
+                        this.logger.debug("Found Claypool.Configuration");
                         this.configuration = $$.Configuration[this.configurationId];
                     }else if(!$$.Configuration){
                         //it's not specified in js code so look for it remotely
@@ -499,7 +499,7 @@ var Claypool={
         loadConfig: function(options){
         	options = options||{};
             this.configurationUrl = options.url||this.configurationUrl;
-            this.logger.info("Attempting to load configuration from: %s", this.configurationUrl);
+            this.logger.debug("Attempting to load configuration from: %s", this.configurationUrl);
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
@@ -537,7 +537,7 @@ var Claypool={
          * @type String
          */
     	setConfig: function(id, configuration){
-    	    this.logger.info("Setting configuration");
+    	    this.logger.debug("Setting configuration");
             this.configuration = configuration;
             $$.Configuration[id] = configuration;
         },
@@ -714,8 +714,8 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        guid: function(){
-            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
+        uuid: function(){
+            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does
@@ -799,13 +799,14 @@ var Claypool={
                  }
                  return env[arguments[0]]||null;
              }
-         }
+         },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
-        //TODO add plugin convenience methods for creating cache;
-        //cache: function(){} 
+        cache: function(options){
+            return new $$.SimpleCachingStrategy(options);
+        } 
         
     });
     $.extend($$, plugins);
@@ -844,8 +845,8 @@ Claypool.Logging={
         getLogger: function(category){
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
-                $$Log.loggerFactory.updateConfig();
-            }else if($$Log.updated){
+            }
+            if($$Log.updated){
                 $$Log.loggerFactory.updateConfig();
                 $$Log.updated = false;
             }
@@ -1157,8 +1158,15 @@ Claypool.Logging={
      * @constructor
      */
     $$Log.ConsoleAppender = function(options){
+        var test;
         try{
             if(window&&window.console&&window.console.log){
+                try{
+                    test = Envjs;
+                    return new $$Log.SysOutAppender(options);
+                }catch(e){
+                    print(e);
+                }
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;
@@ -1566,7 +1574,7 @@ Claypool.Logging={
             if(!this.configuration){
                 //Only warn about lack of configuration once
                 if(!this.attemptedConfigure){
-                    this.logger.warn("Claypool Logging was not initalized correctly.  Logging will not occur unless initialized.");
+                    this.logger.warn("Claypool Logging was not initalized correctly. Logging will not occur unless initialized.");
                 }
                 this.attemptedConfigure = true;
                 return new $$Log.NullLogger();
@@ -1586,6 +1594,7 @@ Claypool.Logging={
                 }
                 //try the special 'root' category
                 rootLoggerConf = this.find('root');
+                this.logger.debug('root logging category is set to %s', rootLoggerConf);
                 if(rootLoggerConf !== null){
                     //The level is set by the closest subcategory, but we still want the 
                     //full category to display when we log the messages
@@ -1609,7 +1618,7 @@ Claypool.Logging={
             var logconf;
             var i;
             try{
-                this.logger.info("Configuring Claypool Logging");
+                this.logger.debug("Configuring Claypool Logging");
                 this.clear();
                 loggingConfiguration = this.getConfig()||[];
                 for(i=0;i<loggingConfiguration.length;i++){
@@ -2134,7 +2143,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.guid(), _weave(f));
+                        this.add($.uuid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -2393,7 +2402,7 @@ Claypool.AOP={
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
-                                            id : aopconf.id+$.guid(),
+                                            id : aopconf.id+$.uuid(),
                                             target : namespace[prop]
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
@@ -2751,7 +2760,7 @@ Claypool.IoC={
             _this           : null,     //A reference to the managed object
             id              : null,     //published to the application context
             configuration   : null,     //the instance configuration
-            guid            : $.guid(), //globally (naively) unique id for the instance created internally
+            guid            : $.uuid(), //globally (naively) unique id for the instance created internally
             type            : null,     //a reference to the clazz
             id              : id,
             configuration   : configuration||{},
@@ -2873,7 +2882,7 @@ Claypool.IoC={
                     //Every Instance gets a logger!
                     _this.$ns = this.configuration.clazz;
                     _this.$log = $.logger(_this.$ns);
-                    _this.$log.info("Created new instance of %s", _this.$ns);
+                    _this.$log.debug("Created new instance of %s", _this.$ns);
                     
                     this._this = $.extend(true, _this, this._this);
                 }
@@ -3474,8 +3483,9 @@ Claypool.MVC = {
 })(  jQuery, Claypool, Claypool.MVC );
 
 /**
- * In Claypool a controller is meant to be a wrapper for a generally 'atomic'
- * unit of business logic. 
+ * In Claypool a controller is meant to be expose various 
+ * aggregations of event-scope state.
+ * 
  * @author 
  * @version $Rev$
  * @requires OtherClassName
@@ -3485,8 +3495,6 @@ Claypool.MVC = {
 	 * @constructor
 	 */
 	$$MVC.Controller = function(options){
-        this.model  = null;
-        this.view   = null;
         $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.MVC.Controller");
@@ -3547,7 +3555,14 @@ Claypool.MVC = {
             this.logger.debug("Handling pattern: %s", data.pattern);
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
-            var _this = this;
+            var _this = this,
+                state = {};
+            if(this.forwardingList.length > 0){
+                this.logger.debug('normalizing event state params');
+                if($.isFunction(this.normalize)){
+                    state = this.normalize(data.args[0]/*the event*/);
+                }
+            }
             return jQuery(this.forwardingList).each(function(){
                 var target, 
                     action, 
@@ -3561,6 +3576,8 @@ Claypool.MVC = {
                         this.payload.controller.replace('Controller', 'View') : null;
                     defaultView = this.payload.controller.match('Service') ?
                         this.payload.controller.replace('Service', 'View') : defaultView;
+                    //make params object represent the normalized state accentuated by route param map
+                    this.map = $.extend(state, this.map);
                     (function(t){
                         var  _event = data.args[0],//the event is the first arg, 
                             extra = [],//and then tack back on the original extra args.
@@ -3706,7 +3723,13 @@ Claypool.MVC = {
                     event.preventDefault();
                     retVal = false;
                 }
-                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
+                _this.handle({
+                    pattern: _this.target.apply(_this, arguments), 
+                    args:arguments,
+                    normalize: _this.normalize?_this.normalize:function(){
+                        return {};
+                    }
+                });
                 return retVal;
             };
             if(this.event){
@@ -3778,7 +3801,7 @@ Claypool.MVC = {
                             //if a 'writer' is provided the view is called with both args
                             if(this.write){
                                 view.write = this.write;
-                                view.append = this.append;
+                                view.writeln = this.writeln;
                                 view[viewMethod](this.m());
                             }else{
                                 view[viewMethod](this.m());
@@ -3789,7 +3812,7 @@ Claypool.MVC = {
                             //some times a view is removed and reattached.  such 'active' views
                             //are bound to the post create lifecycle event so they can resolve 
                             //as soon as possible
-                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.guid();
+                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.uuid();
                             $(document).bind(guidedEventRegistration,function(event, newView){
                                 _this.logger.warn("The view is reattached to the dom.");
                                 //unbind handler
@@ -3818,7 +3841,7 @@ Claypool.MVC = {
         }
     });
     
-})(  jQuery, Claypool, Claypool.MVC );
+})(jQuery, Claypool, Claypool.MVC );
 
 
 /**
@@ -4149,6 +4172,9 @@ Claypool.MVC = {
                 link = $(link).parent()[0];
             }
             return $(link).attr("href");
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:button",{
         selector        : ':button',
@@ -4159,6 +4185,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:input",{
         selector        : 'input',
@@ -4169,6 +4198,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -4179,6 +4211,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxFormController",
         target       : function(event){ 
             return event.target.action;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:event",{
         strategy        : 'all',
@@ -4187,6 +4222,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        },
+        normalize:  function(event){
+            return {};
         }
     });
     

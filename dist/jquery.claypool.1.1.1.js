@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.0.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -291,7 +291,7 @@ var Claypool={
 							return '(\\w+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
-                        this.add(String($.guid()) , {
+                        this.add(String($.uuid()) , {
                             pattern:new RegExp(pattern), 
                             payload:patternMap[i],
 							params : params
@@ -472,11 +472,11 @@ var Claypool={
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.warn( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
                 try{
                 	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
                     if($$.Configuration[this.configurationId]){
-                        this.logger.info("Found Claypool.Configuration");
+                        this.logger.debug("Found Claypool.Configuration");
                         this.configuration = $$.Configuration[this.configurationId];
                     }else if(!$$.Configuration){
                         //it's not specified in js code so look for it remotely
@@ -499,7 +499,7 @@ var Claypool={
         loadConfig: function(options){
         	options = options||{};
             this.configurationUrl = options.url||this.configurationUrl;
-            this.logger.info("Attempting to load configuration from: %s", this.configurationUrl);
+            this.logger.debug("Attempting to load configuration from: %s", this.configurationUrl);
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
@@ -537,7 +537,7 @@ var Claypool={
          * @type String
          */
     	setConfig: function(id, configuration){
-    	    this.logger.info("Setting configuration");
+    	    this.logger.debug("Setting configuration");
             this.configuration = configuration;
             $$.Configuration[id] = configuration;
         },
@@ -714,8 +714,8 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        guid: function(){
-            return (++guid)+"_"+new Date().getTime()+"_"+Math.round(Math.random()*100000000);
+        uuid: function(){
+            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
         },
         /**
          * Describe what this method does
@@ -799,13 +799,14 @@ var Claypool={
                  }
                  return env[arguments[0]]||null;
              }
-         }
+         },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
-        //TODO add plugin convenience methods for creating cache;
-        //cache: function(){} 
+        cache: function(options){
+            return new $$.SimpleCachingStrategy(options);
+        } 
         
     });
     $.extend($$, plugins);
@@ -844,8 +845,8 @@ Claypool.Logging={
         getLogger: function(category){
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
-                $$Log.loggerFactory.updateConfig();
-            }else if($$Log.updated){
+            }
+            if($$Log.updated){
                 $$Log.loggerFactory.updateConfig();
                 $$Log.updated = false;
             }
@@ -1157,8 +1158,15 @@ Claypool.Logging={
      * @constructor
      */
     $$Log.ConsoleAppender = function(options){
+        var test;
         try{
             if(window&&window.console&&window.console.log){
+                try{
+                    test = Envjs;
+                    return new $$Log.SysOutAppender(options);
+                }catch(e){
+                    print(e);
+                }
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);
                 return this;
@@ -1566,7 +1574,7 @@ Claypool.Logging={
             if(!this.configuration){
                 //Only warn about lack of configuration once
                 if(!this.attemptedConfigure){
-                    this.logger.warn("Claypool Logging was not initalized correctly.  Logging will not occur unless initialized.");
+                    this.logger.warn("Claypool Logging was not initalized correctly. Logging will not occur unless initialized.");
                 }
                 this.attemptedConfigure = true;
                 return new $$Log.NullLogger();
@@ -1586,6 +1594,7 @@ Claypool.Logging={
                 }
                 //try the special 'root' category
                 rootLoggerConf = this.find('root');
+                this.logger.debug('root logging category is set to %s', rootLoggerConf);
                 if(rootLoggerConf !== null){
                     //The level is set by the closest subcategory, but we still want the 
                     //full category to display when we log the messages
@@ -1609,7 +1618,7 @@ Claypool.Logging={
             var logconf;
             var i;
             try{
-                this.logger.info("Configuring Claypool Logging");
+                this.logger.debug("Configuring Claypool Logging");
                 this.clear();
                 loggingConfiguration = this.getConfig()||[];
                 for(i=0;i<loggingConfiguration.length;i++){
@@ -2134,7 +2143,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.guid(), _weave(f));
+                        this.add($.uuid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -2393,7 +2402,7 @@ Claypool.AOP={
                                     if($.isFunction(namespace[prop])){
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
-                                            id : aopconf.id+$.guid(),
+                                            id : aopconf.id+$.uuid(),
                                             target : namespace[prop]
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
@@ -2751,7 +2760,7 @@ Claypool.IoC={
             _this           : null,     //A reference to the managed object
             id              : null,     //published to the application context
             configuration   : null,     //the instance configuration
-            guid            : $.guid(), //globally (naively) unique id for the instance created internally
+            guid            : $.uuid(), //globally (naively) unique id for the instance created internally
             type            : null,     //a reference to the clazz
             id              : id,
             configuration   : configuration||{},
@@ -2873,7 +2882,7 @@ Claypool.IoC={
                     //Every Instance gets a logger!
                     _this.$ns = this.configuration.clazz;
                     _this.$log = $.logger(_this.$ns);
-                    _this.$log.info("Created new instance of %s", _this.$ns);
+                    _this.$log.debug("Created new instance of %s", _this.$ns);
                     
                     this._this = $.extend(true, _this, this._this);
                 }
@@ -3474,8 +3483,9 @@ Claypool.MVC = {
 })(  jQuery, Claypool, Claypool.MVC );
 
 /**
- * In Claypool a controller is meant to be a wrapper for a generally 'atomic'
- * unit of business logic. 
+ * In Claypool a controller is meant to be expose various 
+ * aggregations of event-scope state.
+ * 
  * @author 
  * @version $Rev$
  * @requires OtherClassName
@@ -3485,8 +3495,6 @@ Claypool.MVC = {
 	 * @constructor
 	 */
 	$$MVC.Controller = function(options){
-        this.model  = null;
-        this.view   = null;
         $$.extend(this, $$.SimpleCachingStrategy);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.MVC.Controller");
@@ -3547,7 +3555,14 @@ Claypool.MVC = {
             this.logger.debug("Handling pattern: %s", data.pattern);
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
-            var _this = this;
+            var _this = this,
+                state = {};
+            if(this.forwardingList.length > 0){
+                this.logger.debug('normalizing event state params');
+                if($.isFunction(this.normalize)){
+                    state = this.normalize(data.args[0]/*the event*/);
+                }
+            }
             return jQuery(this.forwardingList).each(function(){
                 var target, 
                     action, 
@@ -3561,6 +3576,8 @@ Claypool.MVC = {
                         this.payload.controller.replace('Controller', 'View') : null;
                     defaultView = this.payload.controller.match('Service') ?
                         this.payload.controller.replace('Service', 'View') : defaultView;
+                    //make params object represent the normalized state accentuated by route param map
+                    this.map = $.extend(state, this.map);
                     (function(t){
                         var  _event = data.args[0],//the event is the first arg, 
                             extra = [],//and then tack back on the original extra args.
@@ -3706,7 +3723,13 @@ Claypool.MVC = {
                     event.preventDefault();
                     retVal = false;
                 }
-                _this.handle({pattern: _this.target.apply(_this, arguments), args:arguments});
+                _this.handle({
+                    pattern: _this.target.apply(_this, arguments), 
+                    args:arguments,
+                    normalize: _this.normalize?_this.normalize:function(){
+                        return {};
+                    }
+                });
                 return retVal;
             };
             if(this.event){
@@ -3778,7 +3801,7 @@ Claypool.MVC = {
                             //if a 'writer' is provided the view is called with both args
                             if(this.write){
                                 view.write = this.write;
-                                view.append = this.append;
+                                view.writeln = this.writeln;
                                 view[viewMethod](this.m());
                             }else{
                                 view[viewMethod](this.m());
@@ -3789,7 +3812,7 @@ Claypool.MVC = {
                             //some times a view is removed and reattached.  such 'active' views
                             //are bound to the post create lifecycle event so they can resolve 
                             //as soon as possible
-                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.guid();
+                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$.uuid();
                             $(document).bind(guidedEventRegistration,function(event, newView){
                                 _this.logger.warn("The view is reattached to the dom.");
                                 //unbind handler
@@ -3818,7 +3841,7 @@ Claypool.MVC = {
         }
     });
     
-})(  jQuery, Claypool, Claypool.MVC );
+})(jQuery, Claypool, Claypool.MVC );
 
 
 /**
@@ -4149,6 +4172,9 @@ Claypool.MVC = {
                 link = $(link).parent()[0];
             }
             return $(link).attr("href");
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:button",{
         selector        : ':button',
@@ -4159,6 +4185,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxButtonController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:input",{
         selector        : 'input',
@@ -4169,6 +4198,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxInputController",
         target       : function(event){ 
             return event.target.id;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -4179,6 +4211,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxFormController",
         target       : function(event){ 
             return event.target.action;
+        },
+        normalize:  function(event){
+            return {};
         }
     }).router( "hijax:event",{
         strategy        : 'all',
@@ -4187,6 +4222,9 @@ Claypool.MVC = {
         eventNamespace  : "Claypool:MVC:HijaxEventController",
         target       : function(event){ 
             return event.type;
+        },
+        normalize:  function(event){
+            return {};
         }
     });
     
@@ -4242,13 +4280,15 @@ Claypool.Models = {
                 batch,
                 id;
             if(options.batch){
-                batch = {};
-                for(id in model){
+                batch = [];
+                for(i=0;i<model.length;i++){
+                    id = model[i].$id;
                     this.validate($.extend({},options,{
-                        data: model[id],
+                        data: model[i],
                         batch:false,
                         success:function(data){
-                            batch[id]=data;
+                            data.$id = id;
+                            batch.push(data);
                         },
                         error:function(data, _flash){
                             flash.push(_flash);
@@ -4276,6 +4316,7 @@ Claypool.Models = {
                                         //to pass to the callback
                                         flash[flash.length]={
                                             index:j,
+                                            field: field,
                                             value:model[field][j],
                                             msg:this.fields[field].msg
                                         };          
@@ -4288,13 +4329,15 @@ Claypool.Models = {
                                     //to pass to the callback
                                     flash[flash.length]={
                                         value:model[field],
+                                        field: field,
                                         msg:this.fields[field].msg
                                     };          
                                 }
                             }
                         }       
                     }
-                    if(this.fields[field].pattern ){
+                    //only validate patterns if defined
+                    if(this.fields[field].pattern && (model[field]!==undefined)){
                         if(model[field] instanceof Array){
                             //handle array of simple values
                             for(j=0;j<model[field].length;j++){
@@ -4303,6 +4346,7 @@ Claypool.Models = {
                                     //to pass to the callback
                                     flash[flash.length]={
                                         index:j,
+                                        field: field,
                                         value:model[field][j],
                                         msg:this.fields[field].msg
                                     };        
@@ -4315,6 +4359,7 @@ Claypool.Models = {
                                 //to pass to the callback
                                 flash[flash.length]={
                                     value:model[field],
+                                    field: field,
                                     msg:this.fields[field].msg
                                 };        
                             }
@@ -4342,7 +4387,7 @@ Claypool.Models = {
                 i;
             for(var field in model){
                 if((this.fields[field]!==undefined ||
-                   '__anything__' in this.fields) && !$.isFunction(model[field])){
+                   '__anything__' in this.fields || field == '$id') && !$.isFunction(model[field])){
                     if(this.fields[field] && 
                        this.fields[field].type){
                         if(this.fields[field].type == 'json'){
@@ -4350,11 +4395,11 @@ Claypool.Models = {
                             serialized[field] = jsPath.js2json(model[field]);
                         }else if (this.fields[field].type == 'html'){
                             //serializes a dom html blob
-                            serialized[field] = $('<div>').append( $(model[field]).clone() ).html();
+                            serialized[field] = $('<div/>').append( $(model[field]).clone() ).html();
                         }else if (this.fields[field].type == 'xmllist'){
                             //serializes a e4x xml blob
                             serialized[field] = model[field].toString();
-                        }else if (this.fields[field].type == 'jsam'){
+                        }/**else if (this.fields[field].type == 'jsam'){
                             //serializes as an array of jsam paths
                             //requires jsPath plugin
                             multi = jsPath('..*', model[field], {resultType:"JSAM", pathStyle:"DOT"});
@@ -4362,7 +4407,7 @@ Claypool.Models = {
                             for(i=0;i<multi.length;i++){
                                 serialized[field][i] = multi[i];
                             }
-                        } 
+                        }*/
                     }else{
                         serialized[field] = model[field];
                     }
@@ -4371,7 +4416,26 @@ Claypool.Models = {
             return serialized;
         },
         deserialize: function(model){
-            var deserialized;
+            var deserialized = {};
+            for(var field in this.fields){
+                if((model[field]!==undefined ||
+                   '__anything__' in this.fields) && !$.isFunction(model[field])){
+                    if(this.fields[field].type){
+                        if(this.fields[field].type == 'json'){
+                            //deserializes a json blob
+                            deserialized[field] = jsPath.json2js(model[field]);
+                        }else if (this.fields[field].type == 'html'){
+                            //deserializes a dom html blob
+                            deserialized[field] = $(model[field]);
+                        }else if (this.fields[field].type == 'xmllist'){
+                            //deserializes a e4x xml blob
+                            deserialized[field] = new XMLList(model[field]);
+                        }
+                    }else{
+                        serialized[field] = model[field];
+                    }
+                }
+            }
             return deserialized;
         }
         
@@ -4446,7 +4510,7 @@ Claypool.Models = {
                    (selector instanceof Array)){
                // if selector is array
                // a select (`selector[0]`, `selector[1]`, etc) 
-               $.merge(this.selectors,selector);
+               $.merge(this.selectors, selector);
            }else{
                // if arg is not any of the above it is '*'
                // a select `selector` 
@@ -4687,18 +4751,21 @@ Claypool.Models = {
       
         //select * from `artists` where `$name` = 'Vox Populi' 
         //or $tags in ('alternative', 'rock') 
-        _ = new $Q();
+        _ = $.query();
       
-        $('#artistsModel').find(
-           _.items('*').
-             where('$name').
-             is('Vox Populi').
-             or('$tags').
-             isin(['alternative', 'rock']),
-           function(results, pages){
-               //do something with results
-           }
-        );
+        $('#artistsModel').find({
+            query: _.items('*').
+                    where('name').
+                    is('Vox Populi').
+                    or('tags').
+                    isin(['alternative', 'rock']),
+            success: function ( results ) {
+                //do something with results
+            },
+            error: function( code, exception ){
+                //do something with error conditions
+            }
+        });
         //is equivalent to
         _ = new $Q();
         
@@ -4857,7 +4924,8 @@ Claypool.Models = {
             return this;
         },
         save: function(options){
-            var id;
+            var id,
+                i;
             if(!options.batch&&options.id){
 
                 if(options.serialize){
@@ -4885,8 +4953,8 @@ Claypool.Models = {
                 //and each property value corresponding
                 //to the item to be saved
 				if(options.serialize){
-	                for(id in options.data){
-	                    options.data[id] = this.serialize(options.data[id]);
+	                for(i=0;i<options.data.length;i++){
+	                    options.data[i] = this.serialize(options.data[i]);
 	                }
 				}
                 
@@ -5075,21 +5143,28 @@ Claypool.Models = {
         log.debug("loading database client connection %s", dbclient);
         if(dbclient=='rest'){
             dbclient = new $M.RestClient(options);
-        }else if(dbclient == 'direct'){
-            //get the database implementation and connection information
-            DB = options&&options.db?
-                    options.db:$.env('db');
-            dbconnection = options&&options.dbconnection?
-                    options.dbconnection:$.env('dbconnection');
-            log.debug("loading database implementation %s", DB);
-            if(typeof(DB)=='string'){
-                log.debug("resolving database implementation %s", DB);
-                DB = $.resolve(DB);
+        }else{// if(dbclient == 'direct'){
+            try{
+                //get the database implementation and connection information
+                DB = options&&options.db?
+                        options.db:$.env('db');
+                dbconnection = options&&options.dbconnection?
+                        options.dbconnection:$.env('dbconnection');
+                log.debug("loading database implementation %s", DB);
+                if(typeof(DB)=='string'){
+                    log.debug("resolving database implementation %s", DB);
+                    DB = $.resolve(DB);
+                }
+                dbclient = new $M.Client($.extend({
+                    //initialize the database connection
+                    db: new DB(dbconnection)
+    			},options));
+            }catch(e){
+                log.error('direct connection not available', e).
+                    exception(e);
+                //try the rest client
+                dbclient = new $M.RestClient(options);
             }
-            dbclient = new $M.Client($.extend({
-                //initialize the database connection
-                db: new DB(dbconnection)
-			},options));
         }
         return dbclient;
     };
@@ -5123,10 +5198,12 @@ Claypool.Server={
  * $Rev: 265 $
  * 
  *
- *   -   Server (Servlet) Patterns  -
+ *   -   Server (Servlet-ish) Patterns  -
  */
 };
 (function($, $$, $$Web){
+    
+    var log;
     
     $.router( "hijax:server", {
         event:          'claypool:serve',
@@ -5134,8 +5211,32 @@ Claypool.Server={
         routerKeys:     'urls',
         hijaxKey:       'request',
         eventNamespace: "Claypool:Server:HijaxServerController",
-        target:     function(event, request){ 
-            return request.url;//request/response object
+        target:     function(event, request, response){ 
+            log = log||$.logger('Claypool.Server');
+            log.debug('targeting request event');
+            event.request = request;
+            event.response = response;
+            event.write = function(str){
+                log.debug('writing response.body : %s', str);
+                response.body = str+''; 
+                return this;
+            };
+            event.writeln = function(str){
+                log.debug('writing line to response.body : %s', str);
+                response.body += str+'';
+                return this;
+            };
+            return request.requestURL+'';
+        },
+        normalize:  function(event){
+            //adds request parameters to event.params()
+            //normalized state map
+            return $.extend( {}, {
+                    parameters:event.request.parameters,
+                    method: event.request.method,
+                    body: event.request.body,
+                    headers: $.extend(event.response.headers, event.request.headers)
+            });
         }
     });
     
@@ -5153,14 +5254,15 @@ Claypool.Server={
     /**
      * @constructor
      */
+    
     $$Web.Servlet = function(options){
         $$.extend(this, $$.MVC.Controller);
         $.extend(true, this, options);
         this.logger = $.logger("Claypool.Server.Servlet");
     };
     
-    $.extend( $$Web.Servlet.prototype,
-        $$.MVC.Controller.prototype,{
+    $.extend( $$Web.Servlet.prototype, 
+              $$.MVC.Controller.prototype, {
         /**
          * Describe what this method does
          * @private
@@ -5170,47 +5272,30 @@ Claypool.Server={
          */
         //We reduce to a single response handler function because it's not easy to
         //support the asynch stuff on the server side
-        handle: function(event, data, request, response){
+        
+        handle: function(event){
             //data is just the routing info that got us here
             //the request and response is really all we care about
-            response = $.extend(true, response, event, {
-                write: function(str){response.body = str; return this;},
-                append: function(str){response.body += str;return this;}
-            });
-            response.headers.status = 200;
-            try{
-                switch(request.method.toUpperCase()){
-                    case 'GET':
-                        this.logger.debug("Handling GET request");
-                        this.handleGet(request, response);
-                        break;
-                    case 'POST':
-                        this.logger.debug("Handling POST request");
-                        this.handlePost(request, response);
-                        break;
-                    case 'PUT':
-                        this.logger.debug("Handling PUT request");
-                        this.handlePut(request, response);
-                        break;
-                    case 'DELETE':
-                        this.logger.debug("Handling DELETE request");
-                        this.handleDelete(request, response);
-                        break;
-                    case 'HEAD':
-                        this.logger.debug("Handling HEAD request");
-                        this.handleHead(request, response);
-                        break;
-                    case 'OPTIONS':
-                        this.logger.debug("Handling OPTIONS request");
-                        this.handleOptions(request, response);
-                        break;
-                    default:
-                        this.logger.debug("Unknown Method: %s, rendering error response.",  request.method);
-                        this.handleError(request, response, "Unknown Method: " + request.method );
-                }
-            } catch(e) {
-                this.logger.exception(e);
-                this.handleError(request, response, "Caught Exception in Servlet handler", e);
+            var method = event.params('method').toUpperCase(); 
+            event.params('headers').status = 200;
+             
+            this.logger.debug("Handling %s request", method);
+            switch(method){
+                case 'GET':
+                    this.handleGet(event, event.response);break;
+                case 'POST':
+                    this.handlePost(event, event.response);break;
+                case 'PUT':
+                    this.handlePut(event, event.response);break;
+                case 'DELETE':
+                    this.handleDelete(event, event.response);break;
+                case 'HEAD':
+                    this.handleHead(event, event.response);break;
+                case 'OPTIONS':
+                    this.handleOptions(event, event.response); break;
+                default:
+                    this.logger.debug("Unknown Method: %s, rendering error response.",  method );
+                    this.handleError(event, "Unknown Method: " + method, new Error() );
             }
         },
         /**
@@ -5220,7 +5305,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handleGet: function(request, response){
+        handleGet: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5230,7 +5315,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handlePost: function(request, response){
+        handlePost: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5240,7 +5325,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handlePut: function(request, response){
+        handlePut: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5250,7 +5335,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handleDelete: function(request, response){
+        handleDelete: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5260,7 +5345,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handleHead: function(request, response){
+        handleHead: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5270,7 +5355,7 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handleOptions: function(request, response){
+        handleOptions: function(event){
             throw new $$.MethodNotImplementedError();
         },
         /**
@@ -5280,24 +5365,15 @@ Claypool.Server={
          * @returns Describe what it returns
          * @type String
          */
-        handleError: function(request, response, msg, e){
+        handleError: function(event, msg, e){
             this.logger.warn("The default error response should be overriden");
-            response.headers.status = 300;
-            response.body = msg?msg:"Unknown internal error\n";
-            response.body += e&&e.msg?e.msg:(e?e:"\nUnpsecified Error.");
-        },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        resolve: function(data){
-            this.logger.warn("The default resolve response is meant to be overriden to allow the rendering of a custom view.");
-            return data.response;
+            event.headers.status = 300;
+            event.response.body = msg?msg:"Unknown internal error\n";
+            event.response.body += e&&e.msg?e.msg+'':(e?e+'':"\nUnpsecified Error.");
         }
     });
+    
+    
     
 })(  jQuery, Claypool, Claypool.Server );
 
@@ -5324,67 +5400,51 @@ Claypool.Server={
     
     $.extend($Web.RestServlet.prototype, 
             $Web.Servlet.prototype,{
-        handleGet: function(request, response){
+        handleGet: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id'),
-                ids,
+			    domain = event.params('domain'),
+                id = event.params('id'),
+                ids = id?id.split(','):[],
                 select;
+                
             log.debug("Handling GET for %s %s", domain, id);
             if(!domain && !id){
                 //response is an array of all domain names
                 this.db.get({
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
-            }else if(domain && !id){
-                log.debug("Handling GET for %s %s", domain, request.params);
-                for(var param in request.parameters){
-                    log.debug('param[%s]=%s', param, request.parameters[param]);
-                }
-                if(request.parameters&&('id' in request.parameters)){
-                    log.debug("LIST OF ITEMS!!!");
+            }else if(domain && (ids.length > 1 || !id)){
+                log.debug("Handling GET for %s %s", domain, id);
+                if(ids.length > 1){
                     //response is batch get of items by id
-                    ids = request.parameters.id.split(',');
-                    select = 'select * from `'+domain+'` where itemName() in (\''+
-                        ids.join("','")+
-                    '\')';
-                    log.debug("%s",select);
-                    this.db.find({
-                        select: select,
+                    this.db.get({
+                        id: ids,
+                        domain:domain,
                         async: false,
                         success: function(result){
-                            response.headers.status = 200;
-                            response.body = _this.js2json(
-                                $.extend(result, response.params())
-                            );
+                            handleSuccess(event, result, _this);
                         },
-	                    error: function(result){
-	                        handleError(result, response, _this);
-	                    }
+                        error: function(result){
+                            handleError(event, result, _this);
+                        }
                     });
                 }else{
-                    log.debug("LIST OF ITEM NAMES!!!", domain, id);
+                    log.debug("getting list of item ids for domain %s", domain, id);
                     //response is list of item names for the domain
-                    this.db.find({
-                        select: "select itemName() from `"+domain+"`",
+                    this.db.get({
+                        domain:domain,
                         async: false,
                         success: function(result){
-                            response.headers.status = 200;
-                            response.body = _this.js2json(
-                                $.extend(result, response.params())
-                            );
+                            handleSuccess(event, result, _this);
                         },
 	                    error: function(result){
-	                        handleError(result, response, _this);
+	                        handleError(event, result, _this);
 	                    }
                     });
                 }
@@ -5396,13 +5456,10 @@ Claypool.Server={
                     async: false,
                     dataType:'text',
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && id && id == 'metadata'){
@@ -5412,67 +5469,55 @@ Claypool.Server={
                     async: false,
                     dataType:'text',
                     success:function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         },
-        handlePost: function(request, response){
+        handlePost: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id'),
+			    domain = event.params('domain'),
+                id = event.params('id'),
                 item,
                 items,
                 query;
             log.debug("Handling POST for %s %s", domain, id).
-                debug("Reading POST body %s", request.body);
+                debug("Reading POST body %s", event.body);
             
             if(domain && id){
                 //create a new record(s)
-                log.debug('saving single object', request.body);
-                item = this.json2js(request.body);
+                log.debug('saving single object', event.request.body);
+                item = this.json2js(event.request.body);
                 this.db.save({
                     domain: domain,
                     id:id,
                     data:item,
                     async: false,
-                    replace: ('update' in request.parameters)?false:true,
+                    replace: ('update' in event.request.parameters)?false:true,
                     success: function(result){
-                        var body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('response %s', body);
-                        response.headers.status = 200;
-                        response.body = body;
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && !id){
                 log.debug('saving array of objects (bulk save)');
-                items = this.json2js(request.body);
+                items = this.json2js(event.request.body);
     			this.db.save({
                     domain: domain,
                     data: items,
                     async: false,
 					batch: true,
-                    replace: ('update' in request.parameters)?false:true,
+                    replace: ('update' in event.request.parameters)?false:true,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('resultset %s', response.body);
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(!domain && !id){
@@ -5480,8 +5525,8 @@ Claypool.Server={
                 //serialization used to build a query
                 //dynamically - use the content-type
                 //header
-                query = request.body;
-                if(request.contentType.match('application/json')){
+                query = event.request.body;
+                if(event.request.contentType.match('application/json')){
                     query = js2query(this.json2js(query));
                 }
                 log.debug('executing query \n%s', query);
@@ -5489,22 +5534,18 @@ Claypool.Server={
                     select:query,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
-                        log.debug('resultset %s', response.body);
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
             
         },
-        handlePut: function(request, response){
+        handlePut: function(event){
             var _this = this,
-			    domain = response.params('domain');
+			    domain = event.params('domain');
             log.debug("Handling PUT for %s %s", domain);
             if(domain){
                 //create a new domain
@@ -5512,21 +5553,18 @@ Claypool.Server={
                     domain: domain,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         },
-        handleDelete: function(request, response){
+        handleDelete: function(event){
             var _this = this,
-			    domain = response.params('domain'),
-                id = response.params('id');
+			    domain = event.params('domain'),
+                id = event.params('id');
             log.debug("Handling DELETE for %s %s", domain, id);
 
             if(domain && id){
@@ -5536,13 +5574,10 @@ Claypool.Server={
                     id:id,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }else if(domain && !id){
@@ -5551,29 +5586,39 @@ Claypool.Server={
                     domain: domain,
                     async: false,
                     success: function(result){
-                        response.headers.status = 200;
-                        response.body = _this.js2json(
-                            $.extend(result, response.params())
-                        );
+                        handleSuccess(event, result, _this);
                     },
                     error: function(result){
-                        handleError(result, response, _this);
+                        handleError(event, result, _this);
                     }
                 });
             }
         }
     });
     
-    var handleError = function(result, response, servlet){
-        var body =  servlet.js2json(result);
+    var handleSuccess = function(event, result, servlet){
+        var body =  servlet.js2json(result, null, 4);
+        log.debug('succeeded. %s', body);
+        event.response.headers = {
+            status:         200,
+            'Content-Type': 'text/javascript'
+        };
+        event.response.body = body;
+    };
+    
+    
+    var handleError = function(event, result, servlet){
+        var body =  servlet.js2json(result, null, 4);
         log.error('failed. %s', body);
-        response.headers.status = result.$code?result.$code:500;
-        response.body = body?body:
-              "{'db$error':{"+
-                "'$code'  : 500,"+
-                "'$type'  : 'UnknownClaypoolWrapperError',"+
-                "'$msg'   : 'unknown error, check network'"+
-               "}}";
+        event.response.headers ={
+            status : result.code?result.code:500,
+            'Content-Type': 'text/javascript'
+        };
+        event.response.body = body?body:"{'error':{"+
+            "'code'  : 500,"+
+            "'type'  : 'UnknownClaypoolRestError',"+
+            "'msg'   : 'unknown error, check network'"+
+        "}}";
     };
     
     
@@ -5602,7 +5647,7 @@ Claypool.Server={
     };
     $.extend($$Web.WebProxyServlet.prototype, 
         $$Web.Servlet.prototype,{
-        handleGet: function(request, response){
+        handleGet: function(event, response){
             var options = _proxy.route(request, this);
             var proxyURL = options.proxyURL,
                 params   = options.params;
@@ -5614,7 +5659,7 @@ Claypool.Server={
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    beforeSend:function(xhr){_proxy.beforeSend(event.request, response, xhr);},
                     success:function(text){_proxy.success(response, text);},
                     error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
                     complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
@@ -5622,8 +5667,8 @@ Claypool.Server={
             }
             return response;
         },
-        handlePost:function(request, response){
-            var options = _proxy.route(request, this);
+        handlePost:function(event, response){
+            var options = _proxy.route(event.request, this);
             var proxyURL = options.proxyURL,
                 params   = options.params;
             if(proxyURL && proxyURL.length && proxyURL.length > 0){
@@ -5634,7 +5679,7 @@ Claypool.Server={
                     async:false,
                     data:params,
                     url:proxyURL[0].payload.rewrite+'',
-                    beforeSend:function(xhr){_proxy.beforeSend(request, response, xhr);},
+                    beforeSend:function(xhr){_proxy.beforeSend(event.request, response, xhr);},
                     success:function(text){_proxy.success(response, text);},
                     error: function(xhr, status, e){_proxy.error(response, xhr, status, e);},
                     complete: function(xhr, status){_proxy.complete(response, proxyURL, xhr, status);}
@@ -5834,7 +5879,7 @@ Claypool.Server={
      */
     //TODO : what is the useful static plugin that could be derived from Claypool.Server?
     //      console ?
-    var $log;
+    var log;
     
     var console;
     
@@ -5844,43 +5889,66 @@ Claypool.Server={
             console.run(command);
         },
         serve: function(request, response){ 
-            $log = $log||$.logger("Claypool.Server");
-            $log.info("Handling global request routing for request: %s ", request.requestURL).
+            var prop;
+            log = log||$.logger("Claypool.Server");
+            log.info("Handling global request routing for request: %s ", request.requestURL).
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
-            $.extend( response.headers, { contentType:'text/html', status: 404 });
+            $.extend( response.headers, { 'Content-Type':'text/html', status: -1 });
             response.body = "<html><head></head><body>"+
                 "Not Found :\n\t"+request.requestURL+
             "</body></html>";
             try{
-                $(document).trigger("claypool:serve",[
-                    {url:request.requestURL},
-                    request, response
-                ]);
+                log.debug('serving request event');
+                $(document).trigger("claypool:serve",[ request, response ]);
+                
+                log.debug('finished serving request event');
+                //Hope for the best
+                if(response.headers.status === -1){
+                    response.headers.status = 200;
+                }
             }catch(e){
-                $log.error("Error Handling Request.").exception(e);
+                log.error("Error Handling Request.").exception(e);
                 response.headers["Content-Type"] = "text/html";
                 response.headers.status = 500;
-                response.body = "<html><head></head><body>"+e||"Unknown Error"+"</body></html>";
+                response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
+                
+                response.body += "<h2>Error Details</h2>";
+                for(prop in e){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+e[prop]+'</span><br/>';
+                }
+                response.body += "<h2>General Request Details</h2>";
+                for(prop in request){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+request[prop]+'</span><br/>';
+                } 
+                response.body += "<h2>Request Header Details</h2>";
+                for(prop in request.headers){
+                    response.body += 
+                        '<strong>'+prop+'</strong><br/>'+
+                        '<span>'+request.headers[prop]+'</span><br/>';
+                }
+                response.body += "</body></html>";
             }
         },
 		servlet: function(target){
+            log = log||$.logger("Claypool.Server");
+            log.debug('Applying servlet pattern to %s', target);
             $$.extend(target, $$Web.Servlet);
         },
+        
         proxy: function(options){
             return $.invert([{ 
-                id:options.id||'proxy_'+$.guid(),    
+                id:options.id||'proxy_'+$.uuid(),    
                 clazz:"Claypool.Server.WebProxyServlet", 
                 options:[{
-                    rewriteMap:options.rewrite
+                    rewriteMap:options.rewrites
                 }]
             }]);
         }
-		/*,
-        //TODO this is deprecated
-        render: function(request, response){
-            $log.debug("Finished Handling global request : %s  response %o", request.requestURL, response);
-        }*/
     });
     
     /**@global*/

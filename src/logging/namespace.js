@@ -30,8 +30,8 @@ Claypool.Logging={
         getLogger: function(category){
             if(!$$Log.loggerFactory){
                 $$Log.loggerFactory = new $$Log.Factory();
-                $$Log.loggerFactory.updateConfig();
-            }else if($$Log.updated){
+            }
+            if($$Log.updated){
                 $$Log.loggerFactory.updateConfig();
                 $$Log.updated = false;
             }

@@ -42,7 +42,7 @@
             if(!this.configuration){
                 //Only warn about lack of configuration once
                 if(!this.attemptedConfigure){
-                    this.logger.warn("Claypool Logging was not initalized correctly.  Logging will not occur unless initialized.");
+                    this.logger.warn("Claypool Logging was not initalized correctly. Logging will not occur unless initialized.");
                 }
                 this.attemptedConfigure = true;
                 return new $$Log.NullLogger();
@@ -62,6 +62,7 @@
                 }
                 //try the special 'root' category
                 rootLoggerConf = this.find('root');
+                this.logger.debug('root logging category is set to %s', rootLoggerConf);
                 if(rootLoggerConf !== null){
                     //The level is set by the closest subcategory, but we still want the 
                     //full category to display when we log the messages

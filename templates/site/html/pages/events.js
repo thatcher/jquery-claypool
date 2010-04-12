@@ -5,7 +5,7 @@
                 <h3>events</h3>
                     <div style='width:auto;overflow-x:auto;text-align:center;'>
                     
-                        {_('.*', events).map(function(index){
+                        {$(events).map(function(index){
                             return [{
                                 div:{
                                     $class:'event column span-6 colborder',
@@ -27,7 +27,7 @@
                                                 $:this.location
                                             }
                                         }},
-                                        _.e4x(this.description)
+                                        $.e4x(this.description)
                                     ]
                                 }
                             }, (index%6==5)?

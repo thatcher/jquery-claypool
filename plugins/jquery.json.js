@@ -6,21 +6,18 @@
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  * 
- * jQuery.jsPath JSON  
- * 
- * Basic JSON Utilities for jquery-jspath
+ * jQuery.json  
  *
- *         depends on jquery-jspath 
- * ( http://github.com/thatcher/jquery-jspath )
  */
-(function(_){
+(function($){
 
+    
 	/**
 	 * @param {Object} js 
 	 * @param {Object} filter
 	 * @param {Object} indentValue
 	 */ 
-	_.json = _.js2json = function(js, filter, indentValue){
+	$.json = $.js2json = function(js, filter, indentValue){
 	    return __JSON__.stringify(js, filter, indentValue||'');
 	};
     
@@ -28,7 +25,7 @@
      * @param {Object} filter
      * @param {Object} indentValue
      */
-    _.fn.json = _.fn.js2json = function( filter, indentValue){
+    $.fn.json = $.fn.js2json = function( filter, indentValue){
         var i, str='[';
         for(i=0;i<this.length;i++){
             str += __JSON__.stringify(this[i], filter, indentValue||'');
@@ -43,14 +40,14 @@
 	 * @param {Object} json
 	 * @param {Object} filter
 	 */
-	_.eval = _.json2js = function(json, filter){
+	$.eval = $.json2js = function(json, filter){
 	    return JSON.parse(json, filter);
 	};
     
     /** 
      * @param {Object} filter
      */
-    _.fn.eval = _.fn.json2js = function(filter){
+    $.fn.eval = $.fn.json2js = function(filter){
         var i,js = [];
 	    for(i=0;i<this.length;i++){
             js[i] = JSON.parse(this[i], filter);
@@ -62,15 +59,15 @@
      * @param {Object} js
      * @param {Object} filter
      */
-	_.strip = _.stripjs = function(js, filter){
-	    return _.eval(_.js2json(js, filter, ''));
+	$.strip = $.stripjs = function(js, filter){
+	    return $.eval($.js2json(js, filter, ''));
 	};
     
     /**
      * @param {Object} filter
      */
-    _.fn.strip = _.fn.stripjs = function(filter){
-	    return _.eval(this.js2json(filter, ''));
+    $.fn.strip = $.fn.stripjs = function(filter){
+	    return $.eval(this.js2json(filter, ''));
 	};
 	
 	
@@ -201,15 +198,15 @@
                 return isFinite(value) ? String(value) : 'null';
 
             case 'boolean':
+            case 'null':
+
+                return String(value);
+            
             case 'xml':
 
                 return '"'+value.toXMLString().
                             replace('\n', '\\\n', 'g').
-                            replace('"','\\"','g')+'"';
-            case 'null':
-
-                return String(value);
-                
+                            replace('"','\\"','g')+'"';    
             case 'object':
 
                 if (!value) {
@@ -382,4 +379,4 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 	};
 	var browser = Browser();
 
-})(jsPath);
+})(jQuery);

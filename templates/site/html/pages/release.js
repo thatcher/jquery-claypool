@@ -22,7 +22,7 @@
             <div id='cover' 
                  class='column span-3 colborder'>
                     {(function(){
-                        return _.e4x([
+                        return $.e4x([
                             {a:{
                                 $href:this.zip,
                                 img:{ 
@@ -45,7 +45,7 @@
             <div id='media' 
                  class='column span-12'>
                 <ol class='clear'>
-                    {_('.*', release.artifacts).map(function(index, note){
+                    {$(release.artifacts).map(function(index, note){
                         return {li:{
                             $class:'quiet small',
                             $style:'margin-bottom:0;font-size:11px;',
@@ -54,7 +54,7 @@
                                     $href:this.url,
                                     $:this.label
                                 }},
-                                _.e4x(this.description)
+                                $.e4x(this.description)
                             ]}};
                     }).e4x()}
                     
@@ -63,7 +63,7 @@
             
             <div id='description' class='column span-22'>
                 <div class='column span-18 push-3'>
-                    {_.e4x(release.description)}
+                    {$.e4x(release.description)}
                     <div class='column'>
                         <h5>
                             <a href='#'>
@@ -73,7 +73,7 @@
                     </div>
                     <div class='column'>
                         <ul class='clear'>
-                            {_('.*', release.notes).map(function(index, note){
+                            {$(release.notes).map(function(index, note){
                                 return {li:note};
                             }).e4x()}
                         </ul>

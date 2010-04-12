@@ -19,50 +19,48 @@
  *        For server-side xml to javascript utilities see 
  *            - ( http://github.com/thatcher/jquery-e4x ) -
  *        for xml to js plugins that are MUCH faster
- * 
- *          depends on jquery-jspath 
- *  ( http://github.com/thatcher/jquery-jspath )
  */
-(function(_){
-    _.objtree = function(opts){
+
+(function($){
+    $.objtree = function(opts){
         ObjTree.prototype.xmlDecl = opts.xmlDecl||ObjTree.prototype.xmlDecl;
         ObjTree.prototype.attr_prefix = opts.attr_prefix||ObjTree.prototype.attr_prefix;
         ObjTree.prototype.ns_colon = opts.ns_colon||ObjTree.prototype.ns_colon;
         ObjTree.prototype.mixed_content_name = opts.ns_colon||ObjTree.prototype.mixed_content_name;
     };
     
-    _.xml2js = function(xml, opts){
-        var objtree = _.extend(new ObjTree(), opts||{});
+    $.xml2js = function(xml, opts){
+        var objtree = $.extend(new ObjTree(), opts||{});
         var obj = objtree.parseXML(xml);
     };
     
-    _.dom2js = function(dom, opts){
-        var objtree = _.extend(new ObjTree(), opts||{});
+    $.dom2js = function(dom, opts){
+        var objtree = $.extend(new ObjTree(), opts||{});
         return objtree.parseDOM(dom);
     };
     
-    _.x = _.js2xml =  function(js, opts){
-        var objtree = _.extend(new ObjTree(), opts||{});
+    $.x = $.js2xml =  function(js, opts){
+        var objtree = $.extend(new ObjTree(), opts||{});
         return objtree.writeXML(js);
     };
     
-    _.fn.x = function(i){
+    $.fn.x = function(i){
         var xml = '';
         if(i && this[i]){
-            xml = _.js2xml(this[i]);
+            xml = $.js2xml(this[i]);
         }else{
             for (i = 0; i < this.length; i++) {
-                xml += _.js2xml(this[i]);
+                xml += $.js2xml(this[i]);
             }
         }
         return xml;
     };
     
-    _.escape = function(xml){
+    $.escape = function(xml){
         return ObjTree.prototype.xml_escape(xml);  
     };
     
-    _.e3x = function(xml, model){
+    $.e3x = function(xml, model){
         var t = $(xml).clone();
         $('.e3x', t).each(function(){
             var result,
@@ -70,7 +68,7 @@
             with(model||{}){
                 eval('result = '+e3x);
             }
-            $(this).html(_.x(result.__$__));
+            $(this).html($.x(result.__$__));
         });
         return t;
     };
@@ -340,4 +338,4 @@
     };
 
 
-})(jsPath);
+})(jQuery);

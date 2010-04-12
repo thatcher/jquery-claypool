@@ -1,3 +1,5 @@
+<e4x>
+
 <block id='main'>
     <div id='examples'>
         <h3><a href={$.env('root')+'examples'}>&lt; examples</a></h3>
@@ -19,7 +21,7 @@
                 </div>
                 <div class='column'>
                     <ul class='clear'>
-                        {_('.*', example.notes).map(function(index, note){
+                        {$(example.notes).map(function(index, note){
                             return {li:note};
                         }).e4x()}
                     </ul>
@@ -28,4 +30,4 @@
         </div>
     </div>
  </block>
- 
+ </e4x>

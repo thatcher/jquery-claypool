@@ -1,6 +1,6 @@
-var Site = {
+var ClaypoolJS = {
 /**
- * Site Claypool @VERSION - 
+ * ClaypoolJS  - 
  *
  * Copyright (c) 2008-2009 ClaypoolJS
  *
@@ -22,10 +22,10 @@ var Site = {
 	//via $.$, which will create the instance the first time
 	//eg $.$('#fooModel') will return a new MyApp.Models.Foo
     $.scan([
-       "Site.Models", 
-       "Site.Views", 
-       "Site.Services"
+       "ClaypoolJS.Models", 
+       "ClaypoolJS.Views", 
+       "ClaypoolJS.Services"
     ]);
 	
-})(jQuery, Site);
+})(jQuery, ClaypoolJS);
     

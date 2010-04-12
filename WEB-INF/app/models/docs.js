@@ -1,14 +1,14 @@
 /**
  * @author thatcher
  */
-(function($, $M, _){ 
+(function($, $M){ 
     
     var log,
         cache;
     
     $M.Docs = function(options){
         $.extend(true, this, options);
-        log = $.logger('Site.Models.Docs');
+        log = $.logger('ClaypoolJS.Models.Docs');
         cache = {};
     };
     
@@ -20,11 +20,11 @@
                 $.ajax({
                     type:'GET',
                     url:url,
-                    datatype:'json',
+                    dataType:'text',
                     async:false,
                     success: function(json){
                         log.debug('Loaded data %s',json); 
-                        cache[url] = _.json2js(json)._;
+                        cache[url] = $.json2js(json)._;
                     },
                     error:function(xhr, status, e){
                         log.error('failed to load data %s', url).
@@ -34,8 +34,19 @@
             }
 			
             return cache[url];
+        },
+        forRelease: function(release){
+            var docs = this.get(),
+                doc;
+            for(i=0;i<docs.length;i++){
+                if(docs[i].id == release.doc){
+                    doc = docs[i];
+                    break;
+                }
+            }
+            return doc||{};
         }
     });
     
-})(jQuery, Site.Models, jsPath);
+})(jQuery, ClaypoolJS.Models);
  

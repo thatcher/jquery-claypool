@@ -1,28 +1,28 @@
 /**
  * @author thatcher
  */
-(function($, $M, _){ 
+(function($, $M){ 
     
     var data,
         log;
         
     $M.Examples = function(options){
         $.extend(true, this, options);
-        log = $.logger('Site.Models.Examples');
+        log = $.logger('ClaypoolJS.Models.Examples');
     };
     
     $.extend($M.Examples.prototype,{
-        get: function(){
+        get: function(id){
             var url = $.env('data')+'examples/metadata.json';
             if(!data){
                 $.ajax({
                     type:'GET',
                     url:url,
-                    datatype:'json',
+                    dataType:'text',
                     async:false,
                     success: function(json){
                         log.debug('Loaded data %s',json); 
-                        data = _.json2js(json)._;
+                        data = $.json2js(json)._;
                     },
                     error:function(xhr, status, e){
                         log.error('failed to load data %s',url).
@@ -30,9 +30,19 @@
                     }
                 });
             }
+            if(id){
+                //find the example based on the id passed
+                for(i=0;i<data.length;i++){
+                    if(data[i].id == id){
+                        return data[i]; 
+                    }
+                }
+                log.warn('Example id %s not found', id);
+                return null;
+            }
             return data;
         }
     });
     
-})(jQuery, Site.Models, jsPath);
+})(jQuery, ClaypoolJS.Models);
  

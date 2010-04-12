@@ -350,7 +350,7 @@ Claypool.Logging={
                     test = Envjs;
                     return new $$Log.SysOutAppender(options);
                 }catch(e){
-                    print(e);
+                    //swallow
                 }
                 $.extend(true, this, options);
                 this.formatter = new $$Log.FireBugFormatter(options);

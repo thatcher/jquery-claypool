@@ -3,47 +3,47 @@
  * Copyright (c) 2008-2009 ClaypoolJS
  *
  */
-(function($, _){
+(function($){
 
     var log;
     
-    
-    $.filters([
-        {
-            id        : "#contentNegotiationFilter",
-            target    : "Site.Views.*",
-            around    : "(render)",
-            advice    : function(invocation){
-                log = log||$.logger('Site.Filters.ContentNegotiation');
-                log.debug('Intercepted call to render');
-                var model = invocation.arguments[0],
-                    view = invocation.object;
-                if(model.parameters && model.parameters.fo == 'json'){
-                    view.write(_.json(model, null, '\t'));
-                    //do not proceed
-                }else if(model.parameters && model.parameters.fo == 'xml'){
-                    view.write(_.x({x:model}));
-                    //do not proceed
-                }else{
-                    invocation.proceed();
-                }
-            }
-        },
-        {
-            id        : "#requestResponseParamFilter",
-            target    : "Site.Services.*",
-            before    : "(handleGet|handlePost|handleDelete|handlePut)",
-            advice    : function(request, response){
-                log = log||$.logger('Site.Filters.ContentNegotiation');
-                log.debug('Intercepted call to handleHTTPMethod');
-                response.m({
-                    parameters:request.parameters,
-                    requestHeaders:request.headers,
-                    responseHeaders: response.headers
-                });
+    $.filters([{
+        id        : "#requestResponseParamFilter",
+        target    : "ClaypoolJS.Services.*",
+        before    : "([a-z]*)",
+        advice    : function(event){
+            log = log||$.logger('ClaypoolJS.Filters');
+            log.debug('Adding normalized event state to event scoped model');
+            var params = event.params('parameters');
+            
+            event.
+                m({admin:('admin' in params)?true:false }).
+                m(event.params());
+        }
+    },{
+        id        : "#contentNegotiationFilter",
+        target    : "ClaypoolJS.Views.*",
+        around    : "(render)",
+        advice    : function(invocation){
+            log = log||$.logger('ClaypoolJS.Filters');
+            log.debug('Intercepted call to render');
+            var model = invocation.arguments[0],
+                view = invocation.object;
+            if(model.parameters.fo == 'json'){
+                model.headers['Content-Type']='text/javascript';
+                return view.write($.json(model, null, '\t'));
+                //do not proceed
+            }else if(model.parameters.fo == 'xml'){
+                model.headers['Content-Type']='application/xml';
+                return view.write($.x({x:model}));
+                //do not proceed
+            }else{
+                if('template' in model)
+                    model.template += '?'+new Date().getTime();
+                return invocation.proceed();
             }
         }
-    ]);
+    }]);
 
-})(jQuery, jsPath);
+})(jQuery);
     

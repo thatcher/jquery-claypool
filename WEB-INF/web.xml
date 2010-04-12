@@ -41,19 +41,10 @@
           <param-name>dispatch-function</param-name>
           <param-value>ClaypoolServerHandler</param-value>
         </init-param>  
-        <!-- Set to false for production releases -->
-        <init-param>
-          <param-name>active-reload</param-name>
-          <param-value>true</param-value>
-        </init-param>
         <load-on-startup>2</load-on-startup>
     </servlet>  
     
     <!-- jsx urls are routed to the dynamic service -->
-    <servlet-mapping>
-        <servlet-name>rhino-dispatcher</servlet-name>
-        <url-pattern>/jsx/</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rhino-dispatcher</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -106,7 +97,7 @@
     
     <!-- The index.jsp file simply re-routes to our jquery-claypool welcome page s-->
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>WEB-INF/forward.jsp</welcome-file>
     </welcome-file-list>
     
     <!--

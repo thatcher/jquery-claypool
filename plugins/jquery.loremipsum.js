@@ -5,7 +5,7 @@
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  * 
- * jQuery.jsPath Lorimipsum 
+ * jQuery Lorimipsum 
  * 
  * 	Ported with love (and little change or effort) from the 
  *	Django Python Application Framework (djangoproject.com)
@@ -13,12 +13,8 @@
  *	"""
  *	Utility functions for generating "lorem ipsum" Latin text.
  *	"""
- *
- *          depends on jquery-jspath 
- *  ( http://github.com/thatcher/jquery-jspath )
  */
-var jsPath = jsPath||jQuery;
-(function($, _){
+(function($){
     
 	var COMMON_P = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
@@ -58,7 +54,7 @@ var jsPath = jsPath||jQuery;
 
     
 
-	_.words = function(count, common){
+	$.words = function(count, common){
 	    /*"""
 	    Returns a string of `count` lorem ipsum words separated by a single space.
 	
@@ -79,29 +75,29 @@ var jsPath = jsPath||jQuery;
 	        word_list = word_list.slice(0,count);
 	    } return word_list.join(' ');
 	};
-    _.fn.words = function(){
+    $.fn.words = function(){
         var args = arguments;
         this.each(function(){
-            this.$ = _.words.apply(_,args);
+            this.text( $.words.apply($,args) );
         });
     };
 
-	_.titled = function(count, common){
+	$.titled = function(count, common){
 		//a convience function to upper case the resulting words
 		var title = [],
-		    words = _.words(count, common);
+		    words = $.words(count, common);
 		$.each(words.split(' '), function(pos, word){
 			title.push(word.charAt(0).toUpperCase()+word.slice(1));
 		}); return title.join(' ');
 	};
-    _.fn.titled = function(){
+    $.fn.titled = function(){
         var args = arguments;
         this.each(function(){
-            this.$ = _.titled.apply(_,args);
+            this.text( $.titled.apply($, args) );
         });
     };
     
-	 _.sentence = function(common){
+	 $.sentence = function(common){
 	    /*"""
 	    Returns a randomly generated sentence of lorem ipsum text.
 	
@@ -113,7 +109,7 @@ var jsPath = jsPath||jQuery;
         common = common?true:false;
 	    var sections = [],
 	        range = randomNumber(8,15);
-        sections = _.words(range, common).split(' ');
+        sections = $.words(range, common).split(' ');
 	    for(var i=0;i<sections.length-1;i++){
 	    	if(Math.random() < 0.15){
                 sections[i] += ',';
@@ -123,14 +119,14 @@ var jsPath = jsPath||jQuery;
 	    //# Convert to sentence case and add end punctuation.
 	    return (s.charAt(0).toUpperCase() + s.slice(1) + '.');
 	};
-    _.fn.sentence = function(){
+    $.fn.sentence = function(){
         var args = arguments;
         this.each(function(){
-            this.$ = _.sentence.apply(_,args);
+            this.text( $.sentence.apply($,args) );
         });
     };
 
-	_.paragraph = function(common){
+	$.paragraph = function(common){
 	    /*"""
 	    Returns a randomly generated paragraph of lorem ipsum text.
 	
@@ -144,19 +140,19 @@ var jsPath = jsPath||jQuery;
             paragraph.push(COMMON_P);
         }else{
     	    for(i=0;i<range;i++){
-    	    	paragraph.push(_.sentence());
+    	    	paragraph.push($.sentence());
     	    } 
         }
         return paragraph.join(' ');
 	};
-    _.fn.paragraph = function(){
+    $.fn.paragraph = function(){
         var args = arguments;
         this.each(function(){
-            this.$ = _.paragraph.apply(_,args);
+            this.$ = $.paragraph.apply(_,args);
         });
     };
 
-	_.paragraphs = function(count, common){
+	$.paragraphs = function(count, common){
 	    /*"""
 	    Returns a list of paragraphs as returned by paragraph().
 	
@@ -170,13 +166,13 @@ var jsPath = jsPath||jQuery;
 	        if (common && i == 0)
 	            paras = paras.concat(COMMON_P);
 	        else
-	            paras = paras.concat(_.paragraph());
+	            paras = paras.concat($.paragraph());
 	    } return paras;
 	};
-    _.fn.paragraphs = function(){
+    $.fn.paragraphs = function(){
         var args = arguments;
         this.each(function(){
-            this.$ = _.paragraphs.apply(_,args);
+            this.$ = $.paragraphs.apply(_,args);
         });
     };
 	
@@ -197,4 +193,4 @@ var jsPath = jsPath||jQuery;
 	var randomLetter = function(letters){
 		return letters.charAt(randomNumber(0, letters.length-1));
 	};
-})(jQuery, jsPath);
+})(jQuery);

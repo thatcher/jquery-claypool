@@ -420,9 +420,16 @@
             item: function(result, data){
                 var xml = $$.x(result);
                 //case specific response elements
-                var item = {},
+                var empty = true,
+                    item = {},
                     attributes = xml..*::Attribute;
                 $$.attributes(item, attributes);
+                for(var prop in item){
+                    empty = false;
+                    break;
+                }
+                if(empty)
+                    return $$.meta({db$data:[]}, xml, data);
                 return $$.meta({db$data:[item]}, xml, data);
             },
             attributes: function(item, attributes){
@@ -669,6 +676,7 @@ function getStringToSign(method, requestUri, data) {
 var encoder;
 if(encodeURIComponent('=')=='%3d'){
      encoder = function(s){
+        if (s){
          return java.net.URLEncoder.encode(s, "UTF-8")
                      .replaceAll("\\+", "%20")
                      .replaceAll("\\%21", "!")
@@ -676,6 +684,9 @@ if(encodeURIComponent('=')=='%3d'){
                      .replaceAll("\\%28", "(")
                      .replaceAll("\\%29", ")")
                      .replaceAll("\\%7E", "~");
+        }else{
+            return s;
+        }
     };
 
 }else{

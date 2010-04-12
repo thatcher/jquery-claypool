@@ -1,14 +1,14 @@
 /**
  * @author thatcher
  */
-(function($, $M, _){ 
+(function($, $M){ 
     
     var data,
         log;
         
     $M.News = function(options){
         $.extend(true, this, options);
-        log = $.logger('Site.Models.News');
+        log = $.logger('ClaypoolJS.Models.News');
     };
     
     $.extend($M.News.prototype,{
@@ -18,11 +18,11 @@
                 $.ajax({
                     type:'GET',
                     url:url,
-                    datatype:'json',
+                    dataType:'text',
                     async:false,
                     success: function(json){
                         log.debug('Loaded data %s',json); 
-                        data = _.json2js(json)._;
+                        data = $.json2js(json)._;
                     },
                     error:function(xhr, status, e){
                         log.error('failed to load data %s',url).
@@ -31,8 +31,12 @@
                 });
             }
             return data;
+        },
+        recent: function(){
+            var all = this.get();
+            return all.slice(0,all.length>2?3:all.length);
         }
     });
     
-})(jQuery, Site.Models, jsPath);
+})(jQuery, ClaypoolJS.Models);
  

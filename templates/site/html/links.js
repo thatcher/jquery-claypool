@@ -7,4 +7,5 @@
 			
     <link 	rel="shortcut icon" 
 			href={$.env('root')+"images/favicon.ico"} />
+            
 </block>

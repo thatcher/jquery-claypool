@@ -11,46 +11,23 @@
 	$.env({
 	    defaults:{
             root:'/',
-            data:'/data/',
-			context_dir:cwd,
+            data:'data/',
             app_dir:'/WEB-INF/jsx/',
-			templates:'file:'+cwd+'/templates/',
-	        rest: {
-	            SERVICE: "Any",
-	            URL: "/rest",
-	            AJAX: "jQuery"
-	        }
+			templates:'templates/'
 	    },
 	    //-------------------------------------------------------------------------------------//
 	    //  -   DEVELOPMENT CONFIGURATION   -
 	    //______________________________________________________________________________________//
 	    dev:{
 	        server:{
-                monitorTemplates:'true',
-	            db: {
-	                DRIVER 	: "org.sqlite.JDBC",
-	                PROVIDER:"JDBC",
-	                DIALECT:"SQLite",
-	                HOST:"jdbc:sqlite:claypool.db",
-	                NAME:"example",
-	                USER:"sa",
-	                PASS:""
-	            }
 	        }
 	    },
 	    //-------------------------------------------------------------------------------------//
-	    //  -   PRODUCTION CONFIGURATION   -
+	    //  -   TEST CONFIGURATION   -
 	    //______________________________________________________________________________________//
-	    prod:{
+	    version2:{
 	        server:{
-	            db: {
-	                DRIVER 	: "com.mysql.jdbc.Driver",
-	                PROVIDER:"JDBC",
-	                DIALECT:"MySQL",
-	                HOST:"jdbc:mysql://127.0.0.1:3306/claypool",
-	                USER:"example",
-	                PASS:"example"
-	            }
+                templates:'http://2.latest.jquery-claypool.appspot.com/templates/'
 	        }
 	    },
 	    //-------------------------------------------------------------------------------------//
@@ -58,7 +35,7 @@
 	    //______________________________________________________________________________________//
 	    appengine:{
 	        server:{
-	            templates:'http://jquery-claypool.appspot.com/templates/'
+	            templates:'http://www.claypooljs.com/templates/'
 	        }
 	    }
 	}); 

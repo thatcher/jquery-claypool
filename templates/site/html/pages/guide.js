@@ -13,7 +13,7 @@
                     Guides
                 </h4>
                 <ul>
-                    {_('.*', docs[0].guides).map(function(index, value){
+                    {$(docs[0].guides).map(function(index, value){
                         return {li:
                         (id.match(value))?
                             ({strong:value}):
@@ -25,7 +25,7 @@
                     }).e4x()}
                 </ul>
                 
-    			{_('.*', doc.sections).map(function(){
+    			{$(doc.sections).map(function(){
                     return {div:{$:[
     				    {h4:{
                             a:{
@@ -35,8 +35,7 @@
                         }},
     				    {ul:{
                             $class:'subsections',
-                            $:
-    					    _('.*',this.subsections).map(function(){
+                            $:$(this.subsections).map(function(){
                                 return {li:{
                                     a:{
                                         $:this.name,
@@ -53,7 +52,7 @@
                     Project
                 </h4>
                 <ul>
-                    {_('.*', docs[0].apis['project/conventions']).map(function(index, value){
+                    {$(docs[0].apis['project/conventions']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+docs[0].version+
@@ -69,7 +68,7 @@
                     {doc.label + ' ' + doc.version}
                 </h2>
                 <hr/>
-                {_('.*', doc.sections).map(function(){
+                {$(doc.sections).map(function(){
                     return {div:{
                         $id:this.name.replace(' ','_'),
                         $:[
@@ -80,13 +79,12 @@
     						},
     						$:this.name
     					}},
-    					_.e4x(this.description),
-                        {ul:{$:
-    						_('.*',this.subsections).map(function(){
+    					$.e4x(this.description),
+                        {ul:{$:$(this.subsections).map(function(){
     		            return {li:{$:[
     	                            {hr:{$id:this.name.replace(' ','_')}},
     	                            {h3:{$:this.name }},
-    	                            _.e4x(this.description)
+    	                            $.e4x(this.description)
     	                        ]}};
     		                })
                         }}
@@ -98,7 +96,7 @@
                      alt={doc.label} />
                 <strong>releases</strong>
                 <ul>
-                    {_('.*', releases).map(function(){
+                    {$(releases).map(function(){
                         return {li:{$:[
                             {a:{
                                 $href:$.env('root')+'doc/guides/'+this.id+'/'+doc.id,
@@ -118,7 +116,7 @@
                     Plugins
                 </h4>
                 <ul>
-                    {_('.*', docs[0].apis['plugins/user']).map(function(index, value){
+                    {$(docs[0].apis['plugins/user']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+docs[0].version+
@@ -135,7 +133,7 @@
                     Extension Points
                 </h4>
                 <ul>
-                    {_('.*', docs[0].apis['plugins/developer']).map(function(index, value){
+                    {$(docs[0].apis['plugins/developer']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+docs[0].version+

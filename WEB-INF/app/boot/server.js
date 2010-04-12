@@ -25,12 +25,7 @@ jQuery.noConflict();
         $.boot(function(){
           //you can do additional initialization here
             log.info("Successfully Initialized Application");
-            //preload all application data
-            $.$('#docsModel').get();
-            $.$('#releasesModel').get();
-            $.$('#newsModel').get();
-            $.$('#eventsModel').get();
-            $.$('#examplesModel').get();
+           
         });
     });    
     

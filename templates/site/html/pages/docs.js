@@ -9,7 +9,7 @@
                     Guides
                 </h2>
                 <ul>
-                    {_('.*', docs[0].guides).map(function(index, value){
+                    {$(docs[0].guides).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/guides/'+docs[0].version+'/'+value,
@@ -50,7 +50,7 @@
                     Plugins
                 </h2>
                 <ul style='text-align:right;'>
-                    {_('.*', docs[0].apis['plugins/user']).map(function(index, value){
+                    {$(docs[0].apis['plugins/user']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+
@@ -64,7 +64,7 @@
                     Extension Points
                 </h2>
                 <ul style='text-align:right;'>
-                    {_('.*', docs[0].apis['plugins/developer']).map(function(index, value){
+                    {$(docs[0].apis['plugins/developer']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+
@@ -115,7 +115,7 @@
                      Project 
                 </h2>
                 <ul style='text-align:left;'>
-                    {_('.*', docs[0].apis['project/conventions']).map(function(index, value){
+                    {$(docs[0].apis['project/conventions']).map(function(index, value){
                         return {li:{
                             a:{
                                 $href:$.env('root')+'doc/apis/'+docs[0].version+

@@ -12,7 +12,7 @@
        <div id='recentnews' class='column span-12 colborder' >
             <h3>recent <a href={$.env('root')+'news'}>news</a></h3>
             <ul class='recent_news'>
-                {_('.*', news).map(function(){
+                {$(news).map(function(){
                     return {li: {
                         div: {
                             $class: 'clear',
@@ -21,7 +21,7 @@
                                         em: this.date
                                     }]
                                 }}, 
-                                _.e4x(this.description)]
+                                $.e4x(this.description)]
                         }
                     }};
                 }).e4x()} 
@@ -35,7 +35,7 @@
                 <h3>recent <a href={$.env('root')+'releases'}>releases</a></h3>
                 <ul>
                 
-                    {_('.*', recent).map(function(){
+                    {$(recent).map(function(){
                         return {li:{ $:[
                             {strong:{
                                 a:{
@@ -59,7 +59,7 @@
                                     $height:'70px'
                                 }
                             }},
-                            {p:_.e4x(this.description).text().toString().substring(0,128)+'...'}
+                            {p:$.e4x(this.description).text().toString().substring(0,128)+'...'}
                         ]}};
                     }).e4x()}
 
@@ -68,7 +68,7 @@
             <div id='upcomingevents'>
                 <h3>upcoming <a href={$.env('root')+'events'}>events</a></h3>
                 <ul>
-                    {_('.*',events).map(function(){
+                    {$(events).map(function(){
                         return {li:{ $:[
                             {a:{
                                 $href:this.url,
@@ -85,7 +85,7 @@
                                 }
                             }},
                             {strong:this.location},
-                            _.e4x(this.description).text().toString().substring(0,128)+'...'
+                            $.e4x(this.description).text().toString().substring(0,128)+'...'
                         ]}};
                     }).e4x()}
 

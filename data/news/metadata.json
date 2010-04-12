@@ -40,11 +40,11 @@
             </p>
         </>
     },{
-        title:_.titled(2,false),
+        title:$.titled(2,false),
         date:'May 30th, 2009',
         calendar:'05/30/2009',
         description:<>
-            <p>{_.paragraph(1, false)}</p>
+            <p>{$.paragraph(1, false)}</p>
             <p></p>
         </>
     }

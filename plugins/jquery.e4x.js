@@ -5,31 +5,27 @@
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  * 
- * jQuery.jsPath E4X Templates  
+ * jQuery E4X Templates  
  * 
  * A Django Style Templating language leveraging the 
- * power of e4x and jQuery and jQuery.jsPath
- * 
- *         depends on jquery-jspath 
- * ( http://github.com/thatcher/jquery-jspath )
+ * power of e4x and jQuery 
  */
  
-(function($, _){
+(function($){
  
     var cache = {},
 		stateMapCache = {},
 		blockMapCache = {},
 		log;
-	
-    _.e4x = function(o){
-        return new XMLList(_.x(o));
-    };
     
-    _.fn.e4x = function(){
-        return new XMLList(_(this).x());
+    $.fn.e4x = function(){
+        return new XMLList($(this).x());
     };
     
     $.e4x = function(url, model, is_root){
+        if(arguments.length == 1){
+            return new XMLList($.x(arguments[0]));
+        }
         var e4x, nullfunction = function(){return this;};
         log = $.logger?$.logger('jQuery.E4X'):{
             debug:nullfunction,
@@ -86,19 +82,12 @@
 		
     	var extend = function(url){
     		return $.e4x(url, model, deep);
-    	}
+    	};
         
-        //DEPRECATED: replace {{_: and }}: with {"{ and }"} respectively 
-        //so that we evaluate dynamic content on the second pass
-        //of the cached template
-        if(!deep){
-            text = text.replace(/(\{\{_\:|\}\}\:)/g, function(){
-		        return (arguments[0].indexOf('{')>-1)?'{"{':'}"}';
-		    });
-        }
         
         var evaluated;
         with(model){
+            log.debug('evaluating as e4x \n%s',text);
             eval("evaluated = (function(){"+
                 "return new XMLList("+text+");"+
             "})();"); 
@@ -112,21 +101,26 @@
 			block, id; 
 			
 		if(deep){
+            log.debug('checking blocks');
 			//first loop through and make sure we know
 			//which blocks are part of the final cascade
 			for each(block in blocks){
+                log.debug('checking block')
 				if( !block.@id ){
 					//if it doesn't have an id it's not
 					//a valid block and we throw it out
 					//with the bath water
 					delete block;
 				}else{
-					id = block.@id .toString();
+					id = block.@id.toString();
+                    log.debug('checking block id %s', id);
 					if(!blockMap[id]){
+                        log.debug('block %s not yet defined', id);
 						//store the default block
 						blockMap[id] = block.*.copy();
 						delete block.*;
 					}else{
+                        log.debug('block %s already defined', id);
 						//replace the default block
 						blockMap[id] = block.*.copy();
 						delete block.*;
@@ -136,14 +130,18 @@
 			}
 			//now loop through the final remaining blocks
 			if(evaluated.elements().length() > 0){
-                compiled = evaluated.*[0].copy();
+                log.debug('replacing compiled blocks');
+                compiled = evaluated.elements()[0].copy();
                 delete evaluated;
                 
                 blocks = compiled..block;
+                log.debug('beginning with %s compiled blocks', blocks.length());
                 while(blocks.length() > 0){
                     
+                    log.debug('replacing blocks');
                     for each(block in blocks){
-                        id = block.@id. toString();
+                        id = block.@id.toString();
+                        log.debug('replacing block id %s', id);
                         //step 2: check block
                         if(!blockMap[id]){
                             //step 2: deleting block 
@@ -172,4 +170,4 @@
 		
     };
 
-})(jQuery, jsPath);
+})(jQuery);

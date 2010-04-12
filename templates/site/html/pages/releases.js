@@ -6,7 +6,7 @@
                 <div class='first column span-10 colborder'>
                     <ul>
                     
-                        {_('.*', releases).map(function(index){
+                        {$(releases).map(function(index){
                             return {li:{
                                 div:{
                                     $class:'span-9 column',
@@ -53,11 +53,11 @@
                 <div class='last column span-10'>
                     <ul>
                     
-                        {_('.*', releases).map(function(index){
+                        {$(releases).map(function(index){
                             return {li:{
                                 div:{
                                     $class:'span-10',
-                                    $:[_.e4x(this.description)]
+                                    $:[$.e4x(this.description)]
                                 }
                             }};
                         }).e4x()}

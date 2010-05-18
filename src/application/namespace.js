@@ -78,5 +78,14 @@ Claypool.Application={
     
 	//Register the Application Context
 	$.register($$App, CONTEXT_PRIORITY);
+    
+    
+    $$.Commands = {
+    // An object literal plugin point for providing plugins on
+    // the Claypool namespace.  This object literal is reserved for
+    // commands which have been integrated as well established
+    // and have been included in the jQuery-Clayool repository
+    // as official
+    };
 	
 })(  jQuery, Claypool, Claypool.Application );

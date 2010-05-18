@@ -3,7 +3,7 @@ Claypool.Server={
 /*
  * Claypool.Server @VERSION@ - A Web 1.6180339... Javascript Application Framework
  *
- * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
+ * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
@@ -14,6 +14,8 @@ Claypool.Server={
  *   -   Server (Servlet-ish) Patterns  -
  */
 };
+
+
 (function($, $$, $$Web){
     
     var log;
@@ -44,14 +46,22 @@ Claypool.Server={
         normalize:  function(event){
             //adds request parameters to event.params()
             //normalized state map
-            return $.extend( {}, {
-                    parameters:event.request.parameters,
-                    method: event.request.method,
-                    body: event.request.body,
-                    headers: $.extend(event.response.headers, event.request.headers)
-            });
+            return {
+                parameters:event.request.parameters,
+                method: event.request.method,
+                /*body: event.request.body,*/
+                headers: $.extend(event.response.headers, event.request.headers)
+            };
         }
     });
     
+    
+    $$.Services = {
+        // An object literal plugin point for providing plugins on
+        // the Claypool namespace.  This object literal is reserved for
+        // services which have been integrated as well established
+        // and have been included in the jQuery-Clayool repository
+        // as official
+    };
     
 })(  jQuery, Claypool, Claypool.Server );

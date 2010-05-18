@@ -12,12 +12,12 @@
         log = $.logger('Claypool.Server.RestServlet');
         //they must provide a object which implements
         //the methods js2json and json2js
-        //we include jsPath's json plugin as a default implementation
+        //we include $'s json plugin as a default implementation
         //when present
-        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
-            jsPath.js2json:options.js2json;
-        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
-            jsPath.json2js:options.json2js;
+        this.js2json = $.js2json&&$.isFunction($.js2json)?
+            $.js2json:options.js2json;
+        this.json2js = $.json2js&&$.isFunction($.json2js)?
+            $.json2js:options.json2js;
     };
     
     $.extend($Web.RestServlet.prototype, 
@@ -223,7 +223,7 @@
         log.debug('succeeded. %s', body);
         event.response.headers = {
             status:         200,
-            'Content-Type': 'text/javascript'
+            'Content-Type': 'text/javascript; charset=utf-8'
         };
         event.response.body = body;
     };
@@ -234,7 +234,7 @@
         log.error('failed. %s', body);
         event.response.headers ={
             status : result.code?result.code:500,
-            'Content-Type': 'text/javascript'
+            'Content-Type': 'text/javascript; charset=utf-8'
         };
         event.response.body = body?body:"{'error':{"+
             "'code'  : 500,"+

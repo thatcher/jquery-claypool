@@ -8,12 +8,12 @@
     $M.RestClient = function(options){
         //they must provide a object which implements
         //the methods js2json and json2js
-        //we include jsPath's json plugin as a default implementation
+        //we include $'s json plugin as a default implementation
         //when present
-        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
-            jsPath.js2json:options.js2json;
-        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
-            jsPath.json2js:options.json2js;
+        this.js2json = $&&$.js2json&&$.isFunction($.js2json)?
+            $.js2json:options.js2json;
+        this.json2js = $&&$.json2js&&$.isFunction($.json2js)?
+            $.json2js:options.json2js;
         $.extend(true, this, options);
         this.resturl = $.env('resturl')?$.env('resturl'):'/rest/';
 		log = $.logger('Claypool.Models.RestClient');

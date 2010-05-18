@@ -1,33 +1,22 @@
 
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
 (function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    //TODO : what is the useful static plugin that could be derived from Claypool.Server?
-    //      console ?
-    var log;
-    
-    var console;
+
+    var log,
+        console;
     
     $.extend($, {
-        '>' : function(command){
-            console = console || new $$Web.Console();
-            console.run(command);
-        },
+        /**
+         * 
+         * @param {Object} request
+         * @param {Object} response
+         */
         serve: function(request, response){ 
             var prop;
             log = log||$.logger("Claypool.Server");
             log.info("Handling global request routing for request: %s ", request.requestURL).
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
-            $.extend( response.headers, { 'Content-Type':'text/html', status: -1 });
+            $.extend( response.headers, { 'Content-Type':'text/html; charset=utf-8', status: -1 });
             response.body = "<html><head></head><body>"+
                 "Not Found :\n\t"+request.requestURL+
             "</body></html>";
@@ -42,7 +31,7 @@
                 }
             }catch(e){
                 log.error("Error Handling Request.").exception(e);
-                response.headers["Content-Type"] = "text/html";
+                response.headers["Content-Type"] = "text/html; charset=utf-8";
                 response.headers.status = 500;
                 response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
                 
@@ -67,12 +56,19 @@
                 response.body += "</body></html>";
             }
         },
+        /**
+         * 
+         * @param {Object} target
+         */
 		servlet: function(target){
             log = log||$.logger("Claypool.Server");
             log.debug('Applying servlet pattern to %s', target);
             $$.extend(target, $$Web.Servlet);
         },
-        
+        /**
+         * 
+         * @param {Object} options
+         */
         proxy: function(options){
             return $.invert([{ 
                 id:options.id||'proxy_'+$.uuid(),    

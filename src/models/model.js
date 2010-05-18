@@ -152,15 +152,7 @@
                         }else if (this.fields[field].type == 'xmllist'){
                             //serializes a e4x xml blob
                             serialized[field] = model[field].toString();
-                        }/**else if (this.fields[field].type == 'jsam'){
-                            //serializes as an array of jsam paths
-                            //requires jsPath plugin
-                            multi = jsPath('..*', model[field], {resultType:"JSAM", pathStyle:"DOT"});
-                            serialized[field] = [];
-                            for(i=0;i<multi.length;i++){
-                                serialized[field][i] = multi[i];
-                            }
-                        }*/
+                        }
                     }else{
                         serialized[field] = model[field];
                     }
@@ -176,7 +168,7 @@
                     if(this.fields[field].type){
                         if(this.fields[field].type == 'json'){
                             //deserializes a json blob
-                            deserialized[field] = jsPath.json2js(model[field]);
+                            deserialized[field] = $.json2js(model[field]);
                         }else if (this.fields[field].type == 'html'){
                             //deserializes a dom html blob
                             deserialized[field] = $(model[field]);

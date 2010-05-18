@@ -10,13 +10,14 @@
         'label':'usage',
         'description': <>
         <p>
-            {_.paragraph()} 
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-            {_.sentence()} 
+            <strong>scan</strong> is a common pattern in application frameworks
+            to allow the developers to simply register some application paths
+            and allow the framework to 'discover' the application components
+            there.
+        </p>
+        <p>
+            Scanning is encouraged as the default approach to building applications
+            since it helps to enforce strong convention.
         </p>
     </>
  },{
@@ -24,16 +25,23 @@
         'label':'options',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            <table>
+                <tbody>
+                    <tr class="option">
+                        <th>scan paths</th>
+                        <td class="type">
+                            <a href="/Types#Array">Function</a>
+                        </td>
+                        <td class="default"/>
+                    </tr>
+                    <tr>
+                        <td class="desc" colspan="3">
+                            The array of object literal scan paths specified 
+                            as dot delimited strings.
+                        </td>
+                   </tr>
+               </tbody>
+           </table>
         </p>
     </>
  },{
@@ -41,17 +49,27 @@
         'label':'examples',
         'description':<>
         <p>
-            {_.paragraph()} 
-            
-            <pre class='box'>
-            <code>.
-        {_.words(2, false)}
-            </code>
-            </pre>
-        
-            
-            {_.sentence()} 
+            Adds every function on the specified literals as application 
+            objects.  Once scanned they become available via $.$()
         </p>
+           
+<pre class='box'>
+MyApp = &amp;#x7B;
+    Models:&amp;#x7B;&#x7D;,
+    Views:&amp;#x7B;&#x7D;,
+    Controllers:&amp;#x7B;&#x7D;
+&#x7D;;
+
+(function($)&amp;#x7B;
+
+    $.scan([
+       "MyApp.Models",
+       "MyApp.Views",
+       "MyApp.Controllers"
+    ]);
+
+&#x7D;)(jQuery);
+</pre>
     </> 
 }]
 

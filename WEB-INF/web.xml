@@ -32,10 +32,6 @@
         <init-param>
           <param-name>script-base</param-name>
           <param-value>/WEB-INF/</param-value>
-        </init-param> 
-        <init-param>
-          <param-name>shell</param-name>
-          <param-value>shell.js</param-value>
         </init-param>   
         <init-param>
           <param-name>dispatch-function</param-name>

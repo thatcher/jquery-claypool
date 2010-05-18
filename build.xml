@@ -21,7 +21,7 @@
 			   location="${JAVA_LIB_DIR}/log4j-1.2.15.jar" 
 			   description="Log4j Logging API" />
     <property  name="YUI_MIN_JAR" 
-			   location="${JAVA_LIB_DIR}/yuicompressor-2.4.1.jar" 
+			   location="${JAVA_LIB_DIR}/../yuicompressor-2.4.1.jar" 
 			   description="YUI Compressor" />
 
     <property  name="PREFIX"         
@@ -295,7 +295,7 @@
             <fileset dir="${CLAYPOOL_SERVER}" includes="servlet.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="rest.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="proxy.js" />
-            <fileset dir="${CLAYPOOL_SERVER}" includes="console.js" />
+            <fileset dir="${CLAYPOOL_SERVER}" includes="manage.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="error.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="plugin.js" />
         </concat>

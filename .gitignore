@@ -1,3 +1,4 @@
 *~
 server/logs/*.log
 server/logs/*.log.*
+build/*.js

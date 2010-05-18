@@ -25,16 +25,21 @@
         target    : "ClaypoolJS.Views.*",
         around    : "(render)",
         advice    : function(invocation){
+
+            var model = invocation.arguments[0],
+                event = invocation.arguments[1],
+                view = invocation.object;
+                
             log = log||$.logger('ClaypoolJS.Filters');
             log.debug('Intercepted call to render');
             var model = invocation.arguments[0],
                 view = invocation.object;
             if(model.parameters.fo == 'json'){
-                model.headers['Content-Type']='text/javascript';
+                event.response.headers['Content-Type']='text/plain';
                 return view.write($.json(model, null, '\t'));
                 //do not proceed
             }else if(model.parameters.fo == 'xml'){
-                model.headers['Content-Type']='application/xml';
+                event.response.headers['Content-Type']='text/xml';
                 return view.write($.x({x:model}));
                 //do not proceed
             }else{

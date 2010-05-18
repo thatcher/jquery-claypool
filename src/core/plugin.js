@@ -135,14 +135,27 @@
          * @type String
          */
          env: function(){
+             var applocation,
+                 automap;
              //an environment is set or defined by calling
              //$.env('defaults', 'client.dev')
-             if(arguments.length == 2){
+             if(arguments.length == 2 ){
                  //env is not necessarily flat so deep extension may be necessary
                  env = $.extend( true, env||{}, 
                      $.config('env.'+arguments[0]),
                      $.config('env.'+arguments[1]));
                  return env;
+             }else if (arguments.length === 0){
+                //automatic environment detection via location introspection
+                //is based on an excellent contribution from
+                //Gabriel Birke
+                automap = $.config('env.automap');
+                //attempt to auto-configure environment based on window location
+                for(applocation in automap){
+                    if(new RegExp(applocation).exec(window.location)){
+                        return $.env('defaults', automap[applocation]);
+                    }
+                }
              }else{
                  if(arguments.length === 1 && !(typeof(arguments[0])=='string')){
                     //a convenience method for defining environments
@@ -151,6 +164,7 @@
                  }
                  return env[arguments[0]]||null;
              }
+             return null;
          },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}

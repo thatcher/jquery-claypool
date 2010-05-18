@@ -7,7 +7,7 @@ jQuery.noConflict();
     
     //The environments are described in environments.js
     try{
- 	   $.env('defaults', "dev.client");
+ 	   $.env();
  	}catch(e){
  	   log.error("Environmental selection is invalid!").exception(e);
  	}
@@ -22,7 +22,7 @@ jQuery.noConflict();
                 $('#mini-app').text('Mini-App(loading)'+(countdown--));
                 if(countdown === 0){
                     clearInterval(interval);
-                    //Simulates definition of new app via runtime script load
+                    //Simulates definition of new app added via runtime script load
                     $.logging([{category:'Test.Controllers', level:'DEBUG'}]);
                     Test = {Models:{},Views:{},Controllers:{}};
                     (function($, $C){

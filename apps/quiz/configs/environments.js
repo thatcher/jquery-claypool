@@ -4,6 +4,10 @@
 	//  -   ENVIRONMENTAL CONFIGURATION   -
 	//______________________________________________________________________________________//
 	$.env({
+        automap:{
+            'http://localhost':     'dev.client',
+            'claypooljs':           'prod.client'
+        },
 	    defaults:{
 			templates:'apps/quiz/views/templates/',
             root:'/',

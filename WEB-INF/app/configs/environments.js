@@ -9,6 +9,12 @@
 	//  -   ENVIRONMENTAL CONFIGURATION   -
 	//______________________________________________________________________________________//
 	$.env({
+        automap:{
+            'file:///opt':          'dev.server',
+            'file:///base':         'appengine.server',
+            'http://localhost':     'dev.client',
+            'claypooljs\.com':      'prod.client'
+        },
 	    defaults:{
             root:'/',
             data:'data/',

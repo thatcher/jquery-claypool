@@ -55,7 +55,9 @@
 							var name;
 							name = arguments[0].substring(2,arguments[0].length-1);
 							params.push(name);
-							return '(\\w+)';
+                            //the claypool 'word' class is an extension of the standard word which
+                            //includes - and .
+							return '([\\w\\-\\.]+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
                         this.add(String($.uuid()) , {

@@ -380,7 +380,13 @@ Claypool.MVC = {
                     //by providing a '.name' on the view
                     view = this.v();
                     //If a writer is provided, the default view method is 'render'
-                    viewMethod = $.isFunction(this.write)?"render":"update";
+                    viewMethod = $.isFunction(this.write)?
+                        //since claypool 1.1.4 we prefer 'write' as the default 
+                        //server-side view action since jquery.tmpl is being
+                        //introduced an adds $.fn.render
+                        ($.isFunction($.render)?"write":"render"):
+                        //live dom modification should prefer the method 'update'
+                        "update";
                     if(view.indexOf(".") > -1){
                         viewMethod = view.split('.');
                         view = viewMethod[0];
@@ -391,13 +397,24 @@ Claypool.MVC = {
                     view = $.$(view);
                     if(view){
                         if($.isFunction(view[viewMethod])){
-                            //if a 'writer' is provided the view is called with both args
-                            if(this.write){
-                                view.write = this.write;
-                                view.writeln = this.writeln;
-                                view[viewMethod](this.m());
-                            }else{
-                                view[viewMethod](this.m());
+                            switch(viewMethod){
+                                case "write":
+                                case "writeln":
+                                    //calls event.write/event.writeln on the return
+                                    //value from view.write/view.writeln
+                                    this[viewMethod](view[viewMethod](this.m(), this));
+                                    break;
+                                case "render":
+                                    //pre 1.1.4 the api called render and the
+                                    //view invoked 'write' but jquery.fn.tmpl
+                                    //uses render
+                                    view.write = this.write;
+                                    view.writeln = this.writeln;
+                                    view[viewMethod](this.m(), this);
+                                    break;
+                                default:
+                                    //of course allow the users preference for view method
+                                    view[viewMethod](this.m(), this);
                             }
                             _this.logger.debug("Cascading callbacks");
                             while(callbackStack.length > 0){ (callbackStack.pop())(); }

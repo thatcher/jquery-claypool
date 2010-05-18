@@ -166,15 +166,7 @@ Claypool.Models = {
                         }else if (this.fields[field].type == 'xmllist'){
                             //serializes a e4x xml blob
                             serialized[field] = model[field].toString();
-                        }/**else if (this.fields[field].type == 'jsam'){
-                            //serializes as an array of jsam paths
-                            //requires jsPath plugin
-                            multi = jsPath('..*', model[field], {resultType:"JSAM", pathStyle:"DOT"});
-                            serialized[field] = [];
-                            for(i=0;i<multi.length;i++){
-                                serialized[field][i] = multi[i];
-                            }
-                        }*/
+                        }
                     }else{
                         serialized[field] = model[field];
                     }
@@ -190,7 +182,7 @@ Claypool.Models = {
                     if(this.fields[field].type){
                         if(this.fields[field].type == 'json'){
                             //deserializes a json blob
-                            deserialized[field] = jsPath.json2js(model[field]);
+                            deserialized[field] = $.json2js(model[field]);
                         }else if (this.fields[field].type == 'html'){
                             //deserializes a dom html blob
                             deserialized[field] = $(model[field]);
@@ -639,12 +631,12 @@ Claypool.Models = {
     $M.RestClient = function(options){
         //they must provide a object which implements
         //the methods js2json and json2js
-        //we include jsPath's json plugin as a default implementation
+        //we include $'s json plugin as a default implementation
         //when present
-        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
-            jsPath.js2json:options.js2json;
-        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
-            jsPath.json2js:options.json2js;
+        this.js2json = $&&$.js2json&&$.isFunction($.js2json)?
+            $.js2json:options.js2json;
+        this.json2js = $&&$.json2js&&$.isFunction($.json2js)?
+            $.json2js:options.json2js;
         $.extend(true, this, options);
         this.resturl = $.env('resturl')?$.env('resturl'):'/rest/';
 		log = $.logger('Claypool.Models.RestClient');

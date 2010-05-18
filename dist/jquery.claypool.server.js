@@ -3,7 +3,7 @@ Claypool.Server={
 /*
  * Claypool.Server @VERSION@ - A Web 1.6180339... Javascript Application Framework
  *
- * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
+ * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *
@@ -14,6 +14,8 @@ Claypool.Server={
  *   -   Server (Servlet-ish) Patterns  -
  */
 };
+
+
 (function($, $$, $$Web){
     
     var log;
@@ -44,15 +46,23 @@ Claypool.Server={
         normalize:  function(event){
             //adds request parameters to event.params()
             //normalized state map
-            return $.extend( {}, {
-                    parameters:event.request.parameters,
-                    method: event.request.method,
-                    body: event.request.body,
-                    headers: $.extend(event.response.headers, event.request.headers)
-            });
+            return {
+                parameters:event.request.parameters,
+                method: event.request.method,
+                /*body: event.request.body,*/
+                headers: $.extend(event.response.headers, event.request.headers)
+            };
         }
     });
     
+    
+    $$.Services = {
+        // An object literal plugin point for providing plugins on
+        // the Claypool namespace.  This object literal is reserved for
+        // services which have been integrated as well established
+        // and have been included in the jQuery-Clayool repository
+        // as official
+    };
     
 })(  jQuery, Claypool, Claypool.Server );
 
@@ -203,12 +213,12 @@ Claypool.Server={
         log = $.logger('Claypool.Server.RestServlet');
         //they must provide a object which implements
         //the methods js2json and json2js
-        //we include jsPath's json plugin as a default implementation
+        //we include $'s json plugin as a default implementation
         //when present
-        this.js2json = jsPath&&jsPath.js2json&&$.isFunction(jsPath.js2json)?
-            jsPath.js2json:options.js2json;
-        this.json2js = jsPath&&jsPath.json2js&&$.isFunction(jsPath.json2js)?
-            jsPath.json2js:options.json2js;
+        this.js2json = $.js2json&&$.isFunction($.js2json)?
+            $.js2json:options.js2json;
+        this.json2js = $.json2js&&$.isFunction($.json2js)?
+            $.json2js:options.json2js;
     };
     
     $.extend($Web.RestServlet.prototype, 
@@ -414,7 +424,7 @@ Claypool.Server={
         log.debug('succeeded. %s', body);
         event.response.headers = {
             status:         200,
-            'Content-Type': 'text/javascript'
+            'Content-Type': 'text/javascript; charset=utf-8'
         };
         event.response.body = body;
     };
@@ -425,7 +435,7 @@ Claypool.Server={
         log.error('failed. %s', body);
         event.response.headers ={
             status : result.code?result.code:500,
-            'Content-Type': 'text/javascript'
+            'Content-Type': 'text/javascript; charset=utf-8'
         };
         event.response.body = body?body:"{'error':{"+
             "'code'  : 500,"+
@@ -567,102 +577,143 @@ Claypool.Server={
     };
     
 })(  jQuery, Claypool, Claypool.Server );
-
-
-
 /**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
+ * @author thatcher
  */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.ConsoleServlet = function(options){
-        $$.extend( this, $$Web.Servlet);
+(function($, $$, $S){
+
+    var log,
+        db;
+    
+    $S.Manage = function(options){
         $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.ConsoleServlet");
+        log = $.logger('Claypool.Services.Manage');
+        db = $$.Models.Factory();
     };
     
-    $.extend($$Web.ConsoleServlet.prototype, 
-        $$Web.Servlet.prototype, {
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        handlePost: function(request, response){
-            var retval = "ok";
-            try{
-                this.logger.info("Executing command :\n%s", request.body);
-                retval = eval(String(request.body));
-                retval = (retval===undefined)?"ok":retval;
-                this.logger.info("Finished Executing command :\n%s", request.body);
-                response.body = retval||"error: see server logs.";
-            }catch(e){
-                this.logger.error("Error executing command. \n\n%s", request.body).
-                    exception(e);
-                response.body = e.toString();
+    $.extend($S.Manage.prototype, {
+        handle:function(event){
+            var command = event.params('command'),
+                target = event.params('target');
+            log.debug("handling command %s %s", command, target);
+            $$.Commands[command](target, event);
+            if(!('dumpdata' == command)){
+                event.response.headers =  {
+                    status:   302,
+                    "Location": '/rest/'
+                };
             }
-            response.body = retval;
-            response.headers["Content-Type"] = "text/plain";
-            response.headers.status = 200;
-            return response;
         }
     });
-        
     
-})(  jQuery, Claypool, Claypool.Server );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    $$Web.Console = function(options){
-        $.extend(true, this, options);
-        this.logger = $.logger("Claypool.Server.Console");
-    };
-    
-    $.extend($$Web.Console.prototype, {
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
-        run: function(command){
-            var _this = this;
-            $.ajax({ 
-                type:'POST',  
-                url:'console/',   
-                processData:false,  
-                contentType:'text', 
-                data:command,
-                success:function(response){
-                    _this.logger.info(response);
+    $.extend( true, $$.Commands, {
+        reset: function(targets){
+            var domains;
+            db.get({
+                async: false,
+                success: function(result){
+                    domains = result.domains;
+                    log.debug('loaded domains');
                 },
                 error: function(xhr, status, e){
-                    _this.logger.error("Error sending command (%s)", s).exception(e);
+                    log.error('failed to get db domains');
                 }
             });
+            //drops domains (tables) for each model
+            $(domains).each(function(index, domain){
+                db.destroy({
+                    domain: domain,
+                    async: false,
+                    success: function(result){
+                        log.info('destroyed domain %s', domain);
+                    },
+                    error: function(xhr, status, e){
+                        log.error('failed to delete domain %s', domain);
+                    }
+                });
+            });
+        },
+        syncdb: function(targets){
+            //creates domain (tables) for each model
+            var data,
+                data_url = $.env('data')+'dump.json?'+$.uuid(),
+                domain;
+                
+            log.info('loading initial data from %s', data_url);
+            $.ajax({
+                type:'get',
+                async:false,
+                url:data_url,
+                dataType:'text',
+                success:function(_data){
+                    data = $.json2js(_data);
+                    log.info('loaded initial data');
+                },
+                error:function(xhr, status, e){
+                    log.error('failed [%s] to load initial data %s', status, e);
+                }
+            });
+            
+            for(domain in data){
+                db.create({
+                    domain: domain,
+                    async:false,
+                    success:function(result){
+                        log.info('created domain %s', domain);
+                    }
+                });
+                db.save({
+                    async:false,
+                    batch:true,
+                    domain: domain,
+                    data:data[domain],
+                    success: function(){
+                        log.info('batch save successful %s ', domain);
+                    },
+                    error: function(){
+                        log.error('batch save failed %s', domain);
+                    }
+                });
+            }
+        },
+        dumpdata: function(targets, event){
+            var data = {};
+            var domains;
+                
+            db.get({
+                async: false,
+                success: function(result){
+                    domains = result.domains;
+                    log.debug('loaded domains');
+                },
+                error: function(xhr, status, e){
+                    log.error('failed to get db domains');
+                }
+            });
+            
+            $(domains).each(function(i, domain){
+                db.find({
+                    select:"new Query('"+domain+"')",
+                    async: false,
+                    success: function(result){
+                        log.info('found %s entries in %s', result.data.length, domain);
+                        data[domain] = result.data;
+                    },
+                    error: function(xhr, status, e){
+                        ok(false, 'failed load entries from %s', domain);
+                    }
+                });
+            });
+            
+            event.write($.js2json(data, null, '    '));
+            event.response.headers =  {
+                status:   200,
+                'Content-Type':'application/json'
+            };
         }
     });
-        
-    
-})(  jQuery, Claypool, Claypool.Server );
 
+})(jQuery, Claypool, Claypool.Services);
 
 /**
  * Descibe this class
@@ -679,35 +730,24 @@ Claypool.Server={
 	
 })(  jQuery, Claypool, Claypool.Server );
 
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
 (function($, $$, $$Web){
-    /**
-     * @constructor
-     */
-    //TODO : what is the useful static plugin that could be derived from Claypool.Server?
-    //      console ?
-    var log;
-    
-    var console;
+
+    var log,
+        console;
     
     $.extend($, {
-        '>' : function(command){
-            console = console || new $$Web.Console();
-            console.run(command);
-        },
+        /**
+         * 
+         * @param {Object} request
+         * @param {Object} response
+         */
         serve: function(request, response){ 
             var prop;
             log = log||$.logger("Claypool.Server");
             log.info("Handling global request routing for request: %s ", request.requestURL).
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
-            $.extend( response.headers, { 'Content-Type':'text/html', status: -1 });
+            $.extend( response.headers, { 'Content-Type':'text/html; charset=utf-8', status: -1 });
             response.body = "<html><head></head><body>"+
                 "Not Found :\n\t"+request.requestURL+
             "</body></html>";
@@ -722,7 +762,7 @@ Claypool.Server={
                 }
             }catch(e){
                 log.error("Error Handling Request.").exception(e);
-                response.headers["Content-Type"] = "text/html";
+                response.headers["Content-Type"] = "text/html; charset=utf-8";
                 response.headers.status = 500;
                 response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
                 
@@ -747,12 +787,19 @@ Claypool.Server={
                 response.body += "</body></html>";
             }
         },
+        /**
+         * 
+         * @param {Object} target
+         */
 		servlet: function(target){
             log = log||$.logger("Claypool.Server");
             log.debug('Applying servlet pattern to %s', target);
             $$.extend(target, $$Web.Servlet);
         },
-        
+        /**
+         * 
+         * @param {Object} options
+         */
         proxy: function(options){
             return $.invert([{ 
                 id:options.id||'proxy_'+$.uuid(),    

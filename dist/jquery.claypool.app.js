@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.2 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.4 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -288,7 +288,9 @@ var Claypool={
 							var name;
 							name = arguments[0].substring(2,arguments[0].length-1);
 							params.push(name);
-							return '(\\w+)';
+                            //the claypool 'word' class is an extension of the standard word which
+                            //includes - and .
+							return '([\\w\\-\\.]+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
                         this.add(String($.uuid()) , {
@@ -783,14 +785,27 @@ var Claypool={
          * @type String
          */
          env: function(){
+             var applocation,
+                 automap;
              //an environment is set or defined by calling
              //$.env('defaults', 'client.dev')
-             if(arguments.length == 2){
+             if(arguments.length == 2 ){
                  //env is not necessarily flat so deep extension may be necessary
                  env = $.extend( true, env||{}, 
                      $.config('env.'+arguments[0]),
                      $.config('env.'+arguments[1]));
                  return env;
+             }else if (arguments.length === 0){
+                //automatic environment detection via location introspection
+                //is based on an excellent contribution from
+                //Gabriel Birke
+                automap = $.config('env.automap');
+                //attempt to auto-configure environment based on window location
+                for(applocation in automap){
+                    if(new RegExp(applocation).exec(window.location)){
+                        return $.env('defaults', automap[applocation]);
+                    }
+                }
              }else{
                  if(arguments.length === 1 && !(typeof(arguments[0])=='string')){
                     //a convenience method for defining environments
@@ -799,6 +814,7 @@ var Claypool={
                  }
                  return env[arguments[0]]||null;
              }
+             return null;
          },
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
@@ -893,6 +909,15 @@ var Claypool={
     
 	//Register the Application Context
 	$.register($$App, CONTEXT_PRIORITY);
+    
+    
+    $$.Commands = {
+    // An object literal plugin point for providing plugins on
+    // the Claypool namespace.  This object literal is reserved for
+    // commands which have been integrated as well established
+    // and have been included in the jQuery-Clayool repository
+    // as official
+    };
 	
 })(  jQuery, Claypool, Claypool.Application );
 

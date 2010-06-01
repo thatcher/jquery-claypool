@@ -165,14 +165,19 @@
                  return env[arguments[0]]||null;
              }
              return null;
-         },
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
+        /* Deprecated: clashes with jQuery.cache and never used internally
+         * Not even a good plugin in jquery spirit, so not trying to provide
+         * equivalent with different name unless someone notices.
+         * Thanks to Olly Wenn for noting this conflict 
         cache: function(options){
             return new $$.SimpleCachingStrategy(options);
         } 
+        */
         
     });
     $.extend($$, plugins);

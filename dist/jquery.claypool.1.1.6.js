@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.4 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.6 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -815,14 +815,19 @@ var Claypool={
                  return env[arguments[0]]||null;
              }
              return null;
-         },
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
+        /* Deprecated: clashes with jQuery.cache and never used internally
+         * Not even a good plugin in jquery spirit, so not trying to provide
+         * equivalent with different name unless someone notices.
+         * Thanks to Olly Wenn for noting this conflict 
         cache: function(options){
             return new $$.SimpleCachingStrategy(options);
         } 
+        */
         
     });
     $.extend($$, plugins);
@@ -4517,7 +4522,10 @@ Claypool.Models = {
 	var log;
 	
     $M.Query = function(options){
-        $.extend(true, this, options,{
+        if(typeof(options) == 'string'){
+            options = {context: options};
+        }
+        $.extend(true, this, {
             context: '',
             selectors:[],
             expressions:[],
@@ -4525,7 +4533,7 @@ Claypool.Models = {
             limit:0,
             startPage:0,
             resultsPerPage: 20
-        });
+        }, options);
 		log = $.logger('Claypool.Models.Query');
     };
     var $Q = $M.Query;
@@ -4621,13 +4629,13 @@ Claypool.Models = {
        },
        isin: function(values){
            _compare(this,'@');
-           _value(this,value);
+           _value(this,values);
            //chain all methods
            return this;
        },
        isnotin: function(values){
            _compare(this,'!@');
-           _value(this,value);
+           _value(this,values);
            //chain all methods
            return this;
        },
@@ -5267,12 +5275,12 @@ Claypool.Server={
         normalize:  function(event){
             //adds request parameters to event.params()
             //normalized state map
-            return {
+            return $.extend({},event.request.parameters,{
                 parameters:event.request.parameters,
                 method: event.request.method,
                 /*body: event.request.body,*/
                 headers: $.extend(event.response.headers, event.request.headers)
-            };
+            });
         }
     });
     
@@ -5969,9 +5977,7 @@ Claypool.Server={
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
             $.extend( response.headers, { 'Content-Type':'text/html; charset=utf-8', status: -1 });
-            response.body = "<html><head></head><body>"+
-                "Not Found :\n\t"+request.requestURL+
-            "</body></html>";
+            response.body = "";
             try{
                 log.debug('serving request event');
                 $(document).trigger("claypool:serve",[ request, response ]);
@@ -5980,6 +5986,13 @@ Claypool.Server={
                 //Hope for the best
                 if(response.headers.status === -1){
                     response.headers.status = 200;
+                }
+                if(!response.body){
+                    response.headers.status = 404;
+                    response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
+                    response.body += "<p>"+
+                        "Not Found :\n\t"+request.requestURL+
+                    "</p></body></html>";
                 }
             }catch(e){
                 log.error("Error Handling Request.").exception(e);

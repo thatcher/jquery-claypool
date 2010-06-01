@@ -242,7 +242,10 @@ Claypool.Models = {
 	var log;
 	
     $M.Query = function(options){
-        $.extend(true, this, options,{
+        if(typeof(options) == 'string'){
+            options = {context: options};
+        }
+        $.extend(true, this, {
             context: '',
             selectors:[],
             expressions:[],
@@ -250,7 +253,7 @@ Claypool.Models = {
             limit:0,
             startPage:0,
             resultsPerPage: 20
-        });
+        }, options);
 		log = $.logger('Claypool.Models.Query');
     };
     var $Q = $M.Query;
@@ -346,13 +349,13 @@ Claypool.Models = {
        },
        isin: function(values){
            _compare(this,'@');
-           _value(this,value);
+           _value(this,values);
            //chain all methods
            return this;
        },
        isnotin: function(values){
            _compare(this,'!@');
-           _value(this,value);
+           _value(this,values);
            //chain all methods
            return this;
        },

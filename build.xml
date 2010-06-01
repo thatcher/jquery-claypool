@@ -11,17 +11,17 @@
     <property  name="RHINO_JAR" 
 			   location="${JAVA_LIB_DIR}/js.jar" 
 			   description="Rhino JS Engine" />
-    <property  name="JSLINT_JAR" 
-			   location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" 
-			   description="JSLint Syntax Checker" />
     <property  name="SERVLET_JAR" 
 			   location="../../lib/servlet-api.jar" 
 			   description="Javax Servlet API" />
     <property  name="LOG4J_JAR" 
 			   location="${JAVA_LIB_DIR}/log4j-1.2.15.jar" 
 			   description="Log4j Logging API" />
+    <property  name="JSLINT_JAR" 
+               location="${JAVA_LIB_DIR}/jslint4java-1.1.jar" 
+               description="JSLint Syntax Checker" />
     <property  name="YUI_MIN_JAR" 
-			   location="${JAVA_LIB_DIR}/../yuicompressor-2.4.1.jar" 
+			   location="${JAVA_LIB_DIR}/utils/yuicompressor-2.4.1.jar" 
 			   description="YUI Compressor" />
 
     <property  name="PREFIX"         

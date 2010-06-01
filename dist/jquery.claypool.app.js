@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.4 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.6 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -815,14 +815,19 @@ var Claypool={
                  return env[arguments[0]]||null;
              }
              return null;
-         },
+         }
         //TODO add plugin convenience methods for creating factory;
         //factory : function(){}
         //TODO add plugin convenience methods for creating context;
         //context : function(){}
+        /* Deprecated: clashes with jQuery.cache and never used internally
+         * Not even a good plugin in jquery spirit, so not trying to provide
+         * equivalent with different name unless someone notices.
+         * Thanks to Olly Wenn for noting this conflict 
         cache: function(options){
             return new $$.SimpleCachingStrategy(options);
         } 
+        */
         
     });
     $.extend($$, plugins);

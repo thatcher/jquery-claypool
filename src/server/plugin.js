@@ -17,9 +17,7 @@
                  debug("Dispatching request to Server Sevlet Container");
             response.headers = {};
             $.extend( response.headers, { 'Content-Type':'text/html; charset=utf-8', status: -1 });
-            response.body = "<html><head></head><body>"+
-                "Not Found :\n\t"+request.requestURL+
-            "</body></html>";
+            response.body = "";
             try{
                 log.debug('serving request event');
                 $(document).trigger("claypool:serve",[ request, response ]);
@@ -28,6 +26,13 @@
                 //Hope for the best
                 if(response.headers.status === -1){
                     response.headers.status = 200;
+                }
+                if(!response.body){
+                    response.headers.status = 404;
+                    response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
+                    response.body += "<p>"+
+                        "Not Found :\n\t"+request.requestURL+
+                    "</p></body></html>";
                 }
             }catch(e){
                 log.error("Error Handling Request.").exception(e);

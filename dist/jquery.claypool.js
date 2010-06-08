@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.6 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.1.7 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -5826,7 +5826,8 @@ Claypool.Server={
                 target = event.params('target');
             log.debug("handling command %s %s", command, target);
             $$.Commands[command](target, event);
-            if(!('dumpdata' == command)){
+            if(('reset' == command)||('syncdb' == command)){
+                log.debug('forwarding to rest service');
                 event.response.headers =  {
                     status:   302,
                     "Location": '/rest/'
@@ -5986,13 +5987,14 @@ Claypool.Server={
                 //Hope for the best
                 if(response.headers.status === -1){
                     response.headers.status = 200;
-                }
-                if(!response.body){
-                    response.headers.status = 404;
-                    response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
-                    response.body += "<p>"+
-                        "Not Found :\n\t"+request.requestURL+
-                    "</p></body></html>";
+                    if(!response.body){
+                        response.headers.status = 404;
+                        response.body = "<html><head></head><body><h1>jQuery-Claypool Server Error</h1>";
+                        response.body += "<p>"+
+                            "Not Found :\n\t"+request.requestURL+
+                        "</p></body></html>";
+                        
+                    }
                 }
             }catch(e){
                 log.error("Error Handling Request.").exception(e);

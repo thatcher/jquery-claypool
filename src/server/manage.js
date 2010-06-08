@@ -18,7 +18,8 @@
                 target = event.params('target');
             log.debug("handling command %s %s", command, target);
             $$.Commands[command](target, event);
-            if(!('dumpdata' == command)){
+            if(('reset' == command)||('syncdb' == command)){
+                log.debug('forwarding to rest service');
                 event.response.headers =  {
                     status:   302,
                     "Location": '/rest/'

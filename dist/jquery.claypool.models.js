@@ -12,6 +12,12 @@ Claypool.Models = {
  *
  */
 };
+
+
+/**
+ * store configuration for building indexes
+ **/
+Claypool.Configuration.index = [];
 /**
  * @author thatcher
  */
@@ -816,11 +822,11 @@ Claypool.Models = {
             //to treat it as json serialized or a native query
             if(options.select){
                 if(typeof options.select == 'object'){
-                    if(!(options.select instanceof Query)){
+                    if(!(options.select instanceof $M.Query)){
                         //using shorthand object notation to define the query
                         //so go ahead and create an internal Query object from
                         //it.
-                        options.select = new Query(options.select);
+                        options.select = new $M.Query(options.select);
                     }
                     //set the context for the query if its not a native
                     //query string
@@ -938,11 +944,21 @@ Claypool.Models = {
 (function($,$$,$M){
     
     $.extend($, {
+        db: function(options){
+            return new $M.Factory(options);
+        },
         model: function(name, fields, options){
             return new $M.Model(name, fields, options);
         },
         query: function(options){
             return new $M.Query(options);
+        },
+        index: function(){
+            if(arguments.length === 0){
+                return $.config('index');
+            }else{
+                return $.config('index', arguments[0]);
+            }
         }
     });
     

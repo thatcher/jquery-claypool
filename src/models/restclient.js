@@ -190,11 +190,11 @@
             //to treat it as json serialized or a native query
             if(options.select){
                 if(typeof options.select == 'object'){
-                    if(!(options.select instanceof Query)){
+                    if(!(options.select instanceof $M.Query)){
                         //using shorthand object notation to define the query
                         //so go ahead and create an internal Query object from
                         //it.
-                        options.select = new Query(options.select);
+                        options.select = new $M.Query(options.select);
                     }
                     //set the context for the query if its not a native
                     //query string

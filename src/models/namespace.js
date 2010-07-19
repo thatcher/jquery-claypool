@@ -12,3 +12,9 @@ Claypool.Models = {
  *
  */
 };
+
+
+/**
+ * store configuration for building indexes
+ **/
+Claypool.Configuration.index = [];

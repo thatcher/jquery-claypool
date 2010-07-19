@@ -46,7 +46,7 @@ Claypool.Server={
         normalize:  function(event){
             //adds request parameters to event.params()
             //normalized state map
-            return $.extend({},event.request.parameters,{
+            return $.extend({},event.request.parameters, {
                 parameters:event.request.parameters,
                 method: event.request.method,
                 /*body: event.request.body,*/

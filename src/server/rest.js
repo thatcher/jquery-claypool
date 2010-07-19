@@ -59,7 +59,8 @@
                 }else{
                     log.debug("getting list of item ids for domain %s", domain, id);
                     //response is list of item names for the domain
-                    this.db.get({
+                    log.error('GET IDS: %s', $.js2json(event.request.parameters,null,''));
+                    this.db.get($.extend({
                         domain:domain,
                         async: false,
                         success: function(result){
@@ -68,7 +69,7 @@
 	                    error: function(result){
 	                        handleError(event, result, _this);
 	                    }
-                    });
+                    }, event.request.parameters));
                 }
             }else if(domain && id && id!='metadata'){
                 //response is the record
@@ -149,7 +150,7 @@
                 //header
                 query = event.request.body;
                 if(event.request.contentType.match('application/json')){
-                    query = js2query(this.json2js(query));
+                    query = this.json2js(query);
                 }
                 log.debug('executing query \n%s', query);
                 this.db.find({
@@ -219,7 +220,7 @@
     });
     
     var handleSuccess = function(event, result, servlet){
-        var body =  servlet.js2json(result, null, 4);
+        var body =  servlet.js2json(result, null, '   ');
         log.debug('succeeded. %s', body);
         event.response.headers = {
             status:         200,
@@ -230,7 +231,7 @@
     
     
     var handleError = function(event, result, servlet){
-        var body =  servlet.js2json(result, null, 4);
+        var body =  servlet.js2json(result, null, '    ');
         log.error('failed. %s', body);
         event.response.headers ={
             status : result.code?result.code:500,

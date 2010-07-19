@@ -154,15 +154,14 @@
                            },
 						   params: function(param){
 						   	   if (arguments.length === 0) {
-							   	return t.map ? t.map : {};
-							   }
-							   else {
-							   	return t.map && t.map[param] ? t.map[param] : null;
+							   	   return t.map ? t.map : {};
+							   } else {
+							   	   return (t.map && (param in t.map)) ? t.map[param] : null;
 							   }
 						   }
                         });
                         //tack back on the extra event arguments
-                        target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
+                        target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
                     })(this);
                 }catch(e){
                     e = e?e:new Error();

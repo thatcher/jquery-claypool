@@ -46,7 +46,7 @@ Claypool.Server={
         normalize:  function(event){
             //adds request parameters to event.params()
             //normalized state map
-            return $.extend({},event.request.parameters,{
+            return $.extend({},event.request.parameters, {
                 parameters:event.request.parameters,
                 method: event.request.method,
                 /*body: event.request.body,*/
@@ -260,7 +260,8 @@ Claypool.Server={
                 }else{
                     log.debug("getting list of item ids for domain %s", domain, id);
                     //response is list of item names for the domain
-                    this.db.get({
+                    log.error('GET IDS: %s', $.js2json(event.request.parameters,null,''));
+                    this.db.get($.extend({
                         domain:domain,
                         async: false,
                         success: function(result){
@@ -269,7 +270,7 @@ Claypool.Server={
 	                    error: function(result){
 	                        handleError(event, result, _this);
 	                    }
-                    });
+                    }, event.request.parameters));
                 }
             }else if(domain && id && id!='metadata'){
                 //response is the record
@@ -350,7 +351,7 @@ Claypool.Server={
                 //header
                 query = event.request.body;
                 if(event.request.contentType.match('application/json')){
-                    query = js2query(this.json2js(query));
+                    query = this.json2js(query);
                 }
                 log.debug('executing query \n%s', query);
                 this.db.find({
@@ -420,7 +421,7 @@ Claypool.Server={
     });
     
     var handleSuccess = function(event, result, servlet){
-        var body =  servlet.js2json(result, null, 4);
+        var body =  servlet.js2json(result, null, '   ');
         log.debug('succeeded. %s', body);
         event.response.headers = {
             status:         200,
@@ -431,7 +432,7 @@ Claypool.Server={
     
     
     var handleError = function(event, result, servlet){
-        var body =  servlet.js2json(result, null, 4);
+        var body =  servlet.js2json(result, null, '    ');
         log.error('failed. %s', body);
         event.response.headers ={
             status : result.code?result.code:500,
@@ -637,7 +638,7 @@ Claypool.Server={
         syncdb: function(targets){
             //creates domain (tables) for each model
             var data,
-                data_url = $.env('data')+'dump.json?'+$.uuid(),
+                data_url = $.env('initialdata')+'dump.json?'+$.uuid(),
                 domain;
                 
             log.info('loading initial data from %s', data_url);

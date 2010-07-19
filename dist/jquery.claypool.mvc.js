@@ -256,15 +256,14 @@ Claypool.MVC = {
                            },
 						   params: function(param){
 						   	   if (arguments.length === 0) {
-							   	return t.map ? t.map : {};
-							   }
-							   else {
-							   	return t.map && t.map[param] ? t.map[param] : null;
+							   	   return t.map ? t.map : {};
+							   } else {
+							   	   return (t.map && (param in t.map)) ? t.map[param] : null;
 							   }
 						   }
                         });
                         //tack back on the extra event arguments
-                        target[t.payload.action||"handle"].apply(target,  [eventflow ].concat(extra) );
+                        target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
                     })(this);
                 }catch(e){
                     e = e?e:new Error();
@@ -784,7 +783,32 @@ Claypool.MVC = {
             return $(link).attr("href");
         },
         normalize:  function(event){
-            return {};
+            var link = event.target||event.currentTarget,
+                data = {};
+            while(link.tagName.toUpperCase()!='A'){
+                link = $(link).parent()[0];
+            }
+            var href = $(link).attr("href");
+            var params = href.split('?');
+            
+            params = params && params.length > 1 ? params[1] : '';
+            //now walk the params and split on &, then on =
+            $(params.split('&')).each(function(i, param){
+                var name_value = param.split('='),
+                    name = name_value[0],
+                    value = name_value[1],
+                    tmp;
+                if(name in data){
+                    if(!$.isArray(data[name])){
+                        tmp = data[name];
+                        data[name] = [tmp];
+                    }
+                    data[name].push(value);
+                }else{
+                    data[name] = value;
+                }
+            });
+            return data;
         }
     }).router( "hijax:button",{
         selector        : ':button',
@@ -810,7 +834,9 @@ Claypool.MVC = {
             return event.target.id;
         },
         normalize:  function(event){
-            return {};
+            var params = {};
+            params[event.target.name] = event.target.value;
+            return params;
         }
     }).router( "hijax:form",{
         selector        : 'form',
@@ -823,7 +849,21 @@ Claypool.MVC = {
             return event.target.action;
         },
         normalize:  function(event){
-            return {};
+            var params = {},
+                serialized = $(event.target).serializeArray();
+            $(serialized).each(function(i,object){
+                var tmp;
+                if(object.name in params){
+                    if(!$.isArray(params[object.name])){
+                        tmp = params[object.name];
+                        params[object.name] = [];
+                    }
+                    params[object.name].push(object.value);
+                } else {
+                    params[object.name] = object.value;
+                }
+            });
+            return params;
         }
     }).router( "hijax:event",{
         strategy        : 'all',

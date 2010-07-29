@@ -32,7 +32,7 @@
                 i, j, 
                 batch,
                 id;
-            if(options.batch){
+            if( options.batch ){
                 batch = [];
                 for(i=0;i<model.length;i++){
                     id = model[i].$id;
@@ -48,10 +48,10 @@
                         }
                     }));
                 }
-                if(flash.length === 0){
+                if( flash.length === 0 ){
                     model = batch;
                 }
-            }else{
+            } else {
                 for(var field in this.fields){
                     if(model[field] === undefined
                     && this.fields[field].generate){

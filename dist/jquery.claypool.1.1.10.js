@@ -4372,7 +4372,7 @@ Claypool.Configuration.index = [];
                 i, j, 
                 batch,
                 id;
-            if(options.batch){
+            if( options.batch ){
                 batch = [];
                 for(i=0;i<model.length;i++){
                     id = model[i].$id;
@@ -4388,10 +4388,10 @@ Claypool.Configuration.index = [];
                         }
                     }));
                 }
-                if(flash.length === 0){
+                if( flash.length === 0 ){
                     model = batch;
                 }
-            }else{
+            } else {
                 for(var field in this.fields){
                     if(model[field] === undefined
                     && this.fields[field].generate){
@@ -4938,7 +4938,7 @@ Claypool.Configuration.index = [];
         $.extend(true, this, options);
     };
    
-    $.each(['create','destroy','metadata','save','add','remove','get','find','js2query','next','previous'], 
+    $.each(['create','destroy','metadata','save','update','remove','get','find','js2query','next','previous'], 
         function(index, value){
             $M.Client.prototype[value] = function(options){
                this.db[value]($.extend(options,{
@@ -5020,9 +5020,8 @@ Claypool.Configuration.index = [];
                    options.data = this.serialize(options.data);
                 }
                 $.ajax($.extend({},options,{
-                    type: 'POST',
-                    url: (this.resturl+this.name+'/'+options.id)+
-                            (options.add?'?add':''),
+                    type: options.update?'POST':'PUT',
+                    url: (this.resturl+this.name+'/'+options.id),
                     data: this.js2json(options.data),
                     contentType:'application/json',
                     dataType:'json',
@@ -5047,9 +5046,8 @@ Claypool.Configuration.index = [];
 				}
                 
                 $.ajax($.extend({},options,{
-                    type: 'POST',
-                    url: (this.resturl+this.name +'/')+
-                            (options.add?'?add':''),
+                    type: options.update?'POST':'PUT',
+                    url: (this.resturl+this.name +'/'),
                     data: this.js2json(options.data),
                     contentType:'application/json',
                     processData:false,
@@ -5064,9 +5062,9 @@ Claypool.Configuration.index = [];
            }
             return this;
        },
-       add:function(options){
+       update:function(options){
            //saves additional fields to the object.
-           this.save($.extend({},options,{add:true}));
+           this.save($.extend({},options,{update: true}));
            return this;
        },
        remove: function(options){
@@ -5092,11 +5090,19 @@ Claypool.Configuration.index = [];
             return this;
        },
        get: function(options){
+           var ids,
+               params = {
+                   limit:options.limit ? Number(options.limit) : 1000,
+                   start:options.start ? Number(options.start) : 1,
+                   offset: options.offset ? Number(options.offset) : 0,
+                   from: options.from ? options.from : ''
+               };
            if(options.id && typeof options.id == 'string'){
                $.ajax($.extend({},options,{
                    type: 'GET',
                    url: this.resturl+this.name+'/'+options.id,
                    dataType:'json',
+                   data: params,
                    success: function(result){
                        _success('retrieved data by id from domain', options.success, result);
                    },
@@ -5106,10 +5112,11 @@ Claypool.Configuration.index = [];
                }));
            }else if(options.id&&options.id.length){
                //batch get of items specified by array of id
+               ids = options.id.join(',');
                $.ajax($.extend({},options,{
-                   type: 'GET',
+                   type: ids.length>1024?'POST':'GET',
                    url: this.resturl+this.name+'/',
-                   data:{id:options.id.join(',')},
+                   data: $.extend(params, {id:ids}),
                    dataType:'json',
                    success: function(result){
                        _success('successfully for data by ids from domain', options.success, result);
@@ -5124,6 +5131,7 @@ Claypool.Configuration.index = [];
                     type: 'GET',
                     url: this.resturl+this.name+'/',
                     dataType:'json',
+                    data: params,
                     success: function(result){
                         _success('loaded list of ids from domain', options.success, result);
                     },
@@ -5155,10 +5163,12 @@ Claypool.Configuration.index = [];
                 $.ajax($.extend({},options,{
                     type: 'POST',
                     url: this.resturl,
-                    data: (typeof options.select == 'string')?
-                        options.select:this.js2json(options.select),
+                    data: (typeof options.select == 'string') ?
+                        options.select : 
+                        this.js2json( $.extend(options.data||{}, options.select)),
                     contentType:(typeof options.select == 'string')?
-                        'text/plain':'application/json',
+                        'text/plain' :
+                        'application/json',
                     processData:false,
                     dataType:'json',
                     success: function(result){
@@ -5166,6 +5176,21 @@ Claypool.Configuration.index = [];
                     },
                     error: function(xhr, status, e){
                         _error('failed to save item to domain', options.error, xhr, status, e);
+                    }
+                }));
+            }else{
+                //rely on passed options to be sufficient
+                //get an array of items in the models domain
+                log.debug('performing simple parameter search');
+                $.ajax($.extend({},options,{
+                    type: 'GET',
+                    url: this.resturl,
+                    dataType:'json',
+                    success: function(result){
+                        _success('performed search', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('error performing search', options.error, xhr, status, e);
                     }
                 }));
             }
@@ -5334,7 +5359,7 @@ Claypool.Server={
             return $.extend({},event.request.parameters, {
                 parameters:event.request.parameters,
                 method: event.request.method,
-                /*body: event.request.body,*/
+                body: event.request.body,
                 headers: $.extend(event.response.headers, event.request.headers)
             });
         }
@@ -5512,13 +5537,28 @@ Claypool.Server={
             var _this = this,
 			    domain = event.params('domain'),
                 id = event.params('id'),
+                query = event.params('q'),
                 ids = id?id.split(','):[],
                 select;
                 
             log.debug("Handling GET for %s %s", domain, id);
-            if(!domain && !id){
+            if(query){
+                //treat as a search operation
+                log.debug('finding results with url constructed query %o', 
+                    event.params());
+                this.db.find($.extend({
+                    data:event.params('values'),
+                    async: false,
+                    success: function(result){
+                        handleSuccess(event, result, _this);
+                    },
+                    error: function(xhr, status, e){
+                        handleError(event, result, _this);
+                    }
+                }, event.params()));
+            }else if(!domain && !id){
                 //response is an array of all domain names
-                this.db.get({
+                this.db.get($.extend({
                     async: false,
                     success: function(result){
                         handleSuccess(event, result, _this);
@@ -5526,12 +5566,12 @@ Claypool.Server={
                     error: function(result){
                         handleError(event, result, _this);
                     }
-                });
+                }, event.params()));
             }else if(domain && (ids.length > 1 || !id)){
-                log.debug("Handling GET for %s %s", domain, id);
+                log.debug("Handling GET for %s %s", domain, ids);
                 if(ids.length > 1){
                     //response is batch get of items by id
-                    this.db.get({
+                    this.db.get($.extend(event.params(),{
                         id: ids,
                         domain:domain,
                         async: false,
@@ -5541,11 +5581,10 @@ Claypool.Server={
                         error: function(result){
                             handleError(event, result, _this);
                         }
-                    });
+                    }));
                 }else{
                     log.debug("getting list of item ids for domain %s", domain, id);
                     //response is list of item names for the domain
-                    log.error('GET IDS: %s', $.js2json(event.request.parameters,null,''));
                     this.db.get($.extend({
                         domain:domain,
                         async: false,
@@ -5555,7 +5594,7 @@ Claypool.Server={
 	                    error: function(result){
 	                        handleError(event, result, _this);
 	                    }
-                    }, event.request.parameters));
+                    }, event.params()));
                 }
             }else if(domain && id && id!='metadata'){
                 //response is the record
@@ -5590,6 +5629,7 @@ Claypool.Server={
             var _this = this,
 			    domain = event.params('domain'),
                 id = event.params('id'),
+                ids,
                 item,
                 items,
                 query;
@@ -5597,31 +5637,47 @@ Claypool.Server={
                 debug("Reading POST body %s", event.body);
             
             if(domain && id){
-                //create a new record(s)
-                log.debug('saving single object', event.request.body);
-                item = this.json2js(event.request.body);
-                this.db.save({
-                    domain: domain,
-                    id:id,
-                    data:item,
-                    async: false,
-                    replace: ('update' in event.request.parameters)?false:true,
-                    success: function(result){
-                        handleSuccess(event, result, _this);
-                    },
-                    error: function(result){
-                        handleError(event, result, _this);
-                    }
-                });
+                if(!event.params('body')){
+                    //just a 'get' on an array of ids (where array is very large)
+                    ids = id.split(',');
+                    
+                    //response is batch get of items by id
+                    this.db.get($.extend(event.params(),{
+                        id: ids,
+                        domain:domain,
+                        async: false,
+                        success: function(result){
+                            handleSuccess(event, result, _this);
+                        },
+                        error: function(result){
+                            handleError(event, result, _this);
+                        }
+                    }));
+                }else{
+                    //create a new record(s)
+                    log.debug('updating single object', event.request.body);
+                    item = this.json2js(event.request.body);
+                    this.db.update({
+                        domain: domain,
+                        id:id,
+                        data:item,
+                        async: false,
+                        success: function(result){
+                            handleSuccess(event, result, _this);
+                        },
+                        error: function(result){
+                            handleError(event, result, _this);
+                        }
+                    });
+                }
             }else if(domain && !id){
-                log.debug('saving array of objects (bulk save)');
+                log.debug('updating array of objects (bulk save)');
                 items = this.json2js(event.request.body);
-    			this.db.save({
+    			this.db.update({
                     domain: domain,
                     data: items,
                     async: false,
 					batch: true,
-                    replace: ('update' in event.request.parameters)?false:true,
                     success: function(result){
                         handleSuccess(event, result, _this);
                     },
@@ -5639,7 +5695,7 @@ Claypool.Server={
                     query = this.json2js(query);
                 }
                 log.debug('executing query \n%s', query);
-                this.db.find({
+                this.db.find($.extend({
                     select:query,
                     async: false,
                     success: function(result){
@@ -5648,15 +5704,47 @@ Claypool.Server={
                     error: function(result){
                         handleError(event, result, _this);
                     }
-                });
+                }, event.params()));
             }
             
         },
         handlePut: function(event){
             var _this = this,
-			    domain = event.params('domain');
+			    id = event.params('id');
+                domain = event.params('domain');
             log.debug("Handling PUT for %s %s", domain);
-            if(domain){
+            if(domain && id){
+                //create a new record(s)
+                log.debug('saving single object', event.request.body);
+                item = this.json2js(event.request.body);
+                this.db.save({
+                    domain: domain,
+                    id:id,
+                    data:item,
+                    async: false,
+                    success: function(result){
+                        handleSuccess(event, result, _this);
+                    },
+                    error: function(result){
+                        handleError(event, result, _this);
+                    }
+                });
+            }else if(domain && event.request.body){
+                log.debug('saving array of objects (bulk save)');
+                items = this.json2js(event.request.body);
+                this.db.save({
+                    domain: domain,
+                    data: items,
+                    async: false,
+                    batch: true,
+                    success: function(result){
+                        handleSuccess(event, result, _this);
+                    },
+                    error: function(result){
+                        handleError(event, result, _this);
+                    }
+                });
+            }else if(domain){
                 //create a new domain
                 this.db.create({
                     domain: domain,

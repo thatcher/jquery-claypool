@@ -68,9 +68,8 @@
                    options.data = this.serialize(options.data);
                 }
                 $.ajax($.extend({},options,{
-                    type: 'POST',
-                    url: (this.resturl+this.name+'/'+options.id)+
-                            (options.add?'?add':''),
+                    type: options.update?'POST':'PUT',
+                    url: (this.resturl+this.name+'/'+options.id),
                     data: this.js2json(options.data),
                     contentType:'application/json',
                     dataType:'json',
@@ -95,9 +94,8 @@
 				}
                 
                 $.ajax($.extend({},options,{
-                    type: 'POST',
-                    url: (this.resturl+this.name +'/')+
-                            (options.add?'?add':''),
+                    type: options.update?'POST':'PUT',
+                    url: (this.resturl+this.name +'/'),
                     data: this.js2json(options.data),
                     contentType:'application/json',
                     processData:false,
@@ -112,9 +110,9 @@
            }
             return this;
        },
-       add:function(options){
+       update:function(options){
            //saves additional fields to the object.
-           this.save($.extend({},options,{add:true}));
+           this.save($.extend({},options,{update: true}));
            return this;
        },
        remove: function(options){
@@ -140,11 +138,19 @@
             return this;
        },
        get: function(options){
+           var ids,
+               params = {
+                   limit:options.limit ? Number(options.limit) : 1000,
+                   start:options.start ? Number(options.start) : 1,
+                   offset: options.offset ? Number(options.offset) : 0,
+                   from: options.from ? options.from : ''
+               };
            if(options.id && typeof options.id == 'string'){
                $.ajax($.extend({},options,{
                    type: 'GET',
                    url: this.resturl+this.name+'/'+options.id,
                    dataType:'json',
+                   data: params,
                    success: function(result){
                        _success('retrieved data by id from domain', options.success, result);
                    },
@@ -154,10 +160,11 @@
                }));
            }else if(options.id&&options.id.length){
                //batch get of items specified by array of id
+               ids = options.id.join(',');
                $.ajax($.extend({},options,{
-                   type: 'GET',
+                   type: ids.length>1024?'POST':'GET',
                    url: this.resturl+this.name+'/',
-                   data:{id:options.id.join(',')},
+                   data: $.extend(params, {id:ids}),
                    dataType:'json',
                    success: function(result){
                        _success('successfully for data by ids from domain', options.success, result);
@@ -172,6 +179,7 @@
                     type: 'GET',
                     url: this.resturl+this.name+'/',
                     dataType:'json',
+                    data: params,
                     success: function(result){
                         _success('loaded list of ids from domain', options.success, result);
                     },
@@ -203,10 +211,12 @@
                 $.ajax($.extend({},options,{
                     type: 'POST',
                     url: this.resturl,
-                    data: (typeof options.select == 'string')?
-                        options.select:this.js2json(options.select),
+                    data: (typeof options.select == 'string') ?
+                        options.select : 
+                        this.js2json( $.extend(options.data||{}, options.select)),
                     contentType:(typeof options.select == 'string')?
-                        'text/plain':'application/json',
+                        'text/plain' :
+                        'application/json',
                     processData:false,
                     dataType:'json',
                     success: function(result){
@@ -214,6 +224,21 @@
                     },
                     error: function(xhr, status, e){
                         _error('failed to save item to domain', options.error, xhr, status, e);
+                    }
+                }));
+            }else{
+                //rely on passed options to be sufficient
+                //get an array of items in the models domain
+                log.debug('performing simple parameter search');
+                $.ajax($.extend({},options,{
+                    type: 'GET',
+                    url: this.resturl,
+                    dataType:'json',
+                    success: function(result){
+                        _success('performed search', options.success, result);
+                    },
+                    error: function(xhr, status, e){
+                        _error('error performing search', options.error, xhr, status, e);
                     }
                 }));
             }

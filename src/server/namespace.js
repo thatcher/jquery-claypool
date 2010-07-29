@@ -49,7 +49,7 @@ Claypool.Server={
             return $.extend({},event.request.parameters, {
                 parameters:event.request.parameters,
                 method: event.request.method,
-                /*body: event.request.body,*/
+                body: event.request.body,
                 headers: $.extend(event.response.headers, event.request.headers)
             });
         }

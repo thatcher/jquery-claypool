@@ -215,25 +215,25 @@ Claypool.Server={
         //the methods js2json and json2js
         //we include $'s json plugin as a default implementation
         //when present
-        this.js2json = $.js2json&&$.isFunction($.js2json)?
+        this.js2json = $.js2json && $.isFunction($.js2json)?
             $.js2json:options.js2json;
-        this.json2js = $.json2js&&$.isFunction($.json2js)?
+        this.json2js = $.json2js && $.isFunction($.json2js)?
             $.json2js:options.json2js;
     };
     
-    $.extend($Web.RestServlet.prototype, 
-            $Web.Servlet.prototype,{
-        handleGet: function(event){
-            var _this = this,
-			    domain = event.params('domain'),
-                id = event.params('id'),
-                query = event.params('q'),
-                ids = id?id.split(','):[],
+    $.extend( $Web.RestServlet.prototype, 
+              $Web.Servlet.prototype, {
+        handleGet: function( event ){
+            var _this=  this,
+			    domain= event.params( 'domain' ),
+                id=     event.params( 'id' ),
+                query=  event.params( 'q' ),
+                ids=    id ? id.split( ',' ) : [],
                 select;
                 
             log.debug("Handling GET for %s %s", domain, id);
-            if(query){
-                //treat as a search operation
+            if( query ){
+                //treat as a 'find' operation
                 log.debug('finding results with url constructed query %o', 
                     event.params());
                 this.db.find($.extend({

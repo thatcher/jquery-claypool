@@ -128,20 +128,25 @@
                                var target, action, controller;
                                if(arguments.length === 0){
                                    return c;
-                               }else if(arguments.length > 0 && typeof(arguments[0] == "string")){
-                                    //expects "target{.action}"
-                                    target = arguments[0].split(".");
-                                    c = target[0];
-                                    v  = c.match('Controller') ? c.replace('Controller', 'View') : null;
-                                    v  = c.match('Service') ? c.replace('Service', 'View') : v;
-                                    action = (target.length>1&&target[1].length>0)?target[1]:"handle";
-                                    controller = _this.find(target[0]);
-                                    if(controller === null){
-                                        controller = $.$(target[0]);
-                                        //cache it for speed on later use
-                                        _this.add(target[0], controller);
-                                    }
-                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
+                               }else if(arguments.length > 0 && typeof(arguments[0]) == "string"){
+                                   //allow forwarded controller to have extra params info passed
+                                   //along with it.  .c('#fooController', { extra: 'info' });
+                                   if(arguments.length > 1 && $.isPlainObject(arguments[1])){
+                                       t.map = $.extend(true, t.map||{}, arguments[1]);
+                                   }
+                                   //expects "target{.action}"
+                                   target = arguments[0].split(".");
+                                   c = target[0];
+                                   v  = c.match('Controller') ? c.replace('Controller', 'View') : null;
+                                   v  = c.match('Service') ? c.replace('Service', 'View') : v;
+                                   action = (target.length>1&&target[1].length>0)?target[1]:"handle";
+                                   controller = _this.find(target[0]);
+                                   if(controller === null){
+                                       controller = $.$(target[0]);
+                                       //cache it for speed on later use
+                                       _this.add(target[0], controller);
+                                   }
+                                   controller[action||"handle"].apply(controller,  [this].concat(extra) );
                                }
                                return this;//chain
                            },

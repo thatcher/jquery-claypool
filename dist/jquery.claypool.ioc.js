@@ -379,18 +379,35 @@ Claypool.IoC={
          * @returns Describe what it returns
          * @type String
          */
-        create: function(id){
-            var configuration;
-            var instance;
-            var _this = this;
-            try{
-                this.logger.debug("Looking for configuration for instance %s", id);
-                configuration = this.find(id);
+        create: function(id, namespace){
+	        var configuration,
+            	instance,
+            	_this = this,
+				remote, folder, file;
+            try{	
+				namespace = namespace||'';
+				if(!this.find(namespace)){
+					this.logger.debug("Adding cache for namespace %s", namespace);
+					this.add(namespace, new $$.SimpleCachingStrategy());
+				}
+                this.logger.debug("Looking for configuration for instance %s%s", namespace, id);
+                configuration = this.find(namespace).find(id);
                 if(configuration === null){
-                    this.logger.warn("No known configuration for instance %s", id);
+                    this.logger.warn("No known configuration for instance %s%s", namespace, id);
+					remote = id.match(/#([a-z]+([A-Z]?[a-z]+)+)([A-Z][a-z]+)+/);
+					if(remote){
+						/*folder = $.env('lazyload')+remote.pop().toLowerCase()+'s';
+						file = remote[1].toLowerCase()+'.js';
+						_this.logger.debug('attempting to lazyload %s from %s%s',
+							id, folder, file)
+						$.getScript(folder+file, function(){
+							$.scan
+						});*/
+						//Work In Progress
+					}
                     return null;
                 }else{
-                    this.logger.debug("Found configuration for instance %s", id);
+                    this.logger.debug("Found configuration for instance %s%s", namespace, id);
                     instance = new $$IoC.Instance(configuration.id, configuration);
                     if(configuration.active&&configuration.selector){
                         this.logger.debug("Attaching contructor to an active selector");
@@ -440,11 +457,24 @@ Claypool.IoC={
                         if(iocconf.scan && iocconf.factory){
                             this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
                             iocConfiguration = iocConfiguration.concat(
-                                iocconf.factory.scan(iocconf.scan)
+                                iocconf.factory.scan(iocconf.scan, iocconf.namespace)
                             );
                         }else{
-                            this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
-                            this.add( iocconf.id, iocconf );
+                            this.logger.debug("IoC Configuration for Id: %s%s", 
+								iocconf.namespace||'', iocconf.id );
+							if(iocconf.namespace){
+								//namespaced app configs
+								if(!this.find(iocconf.namespace)){
+									this.add(iocconf.namespace, new $$.SimpleCachingStrategy());
+								}
+								this.find(iocconf.namespace).add(iocconf.id, iocconf);
+							}else{
+								//non-namespaced app configs
+								if(!this.find('')){
+									this.add('', new $$.SimpleCachingStrategy());
+								}
+								this.find('').add(iocconf.id, iocconf);
+							}
                         }
                     }catch(e){
                         this.logger.exception(e);
@@ -463,16 +493,17 @@ Claypool.IoC={
 
 
 /**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
+ * Holds references to application managed objects or 
+ * uses the factory to create them the first time.
+ * @thatcher 
+ * @requires core, logging
  */
 (function($, $$, $$IoC){
     /**
      * @constructor
-     *      stores instances and uses an instance factory to
-     *      create new instances if one can't be found (for lazy instantiation patterns)
+     * stores instances and uses an instance factory to
+     * create new instances if one can't be found 
+	 * (for lazy instantiation patterns)
      */
     $$IoC.Container = function(options){
         $$.extend(this, $$.Application.ContextContributor);
@@ -480,9 +511,11 @@ Claypool.IoC={
         this.factory = null;
         this.logger = $.logger("Claypool.IoC.Container");
         this.logger.debug("Configuring Claypool IoC Container");
-        /**Register first so any changes to the container managed objects 
+        /**
+		Register first so any changes to the container managed objects 
         are immediately accessible to the rest of the application aware
-        components*/
+        components
+		*/
         this.factory = new $$IoC.Factory();
         this.factory.updateConfig();
     };
@@ -490,24 +523,35 @@ Claypool.IoC={
     $.extend( $$IoC.Container.prototype,
         $$.Application.ContextContributor.prototype,{
         /**
-         * Describe what this method does
+         * Checks cache for existing instance and delegates to factory
+		 * factory if none currently exists
          * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
+         * @param {String} id Application ID
+         * @returns Application managed instance
+         * @type Object
          */
         get: function(id){
-            var instance;
-            var _this = this;
-            try{
-                this.logger.debug("Search for a container managed instance :%s", id);
-                instance = this.find(id);
+            var instance,
+				ns,
+				_this=this;
+            try{	
+				//support for namespaces
+				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+				//namespaced app cache
+				if(!this.find(ns[0])){
+					this.add(ns[0], new $$.SimpleCachingStrategy());
+				}
+                this.logger.debug("Searching for a container managed instance :%s", id);
+                instance = this.find(ns[0]).find(ns[1]);
                 if(!instance){
                     this.logger.debug("Can't find a container managed instance :%s", id);
-                    instance = this.factory.create(id);
+					//note order of args is id, namespace to ensure backward compat
+					//with claypool 1.x apps
+                    instance = this.factory.create(ns[1], ns[0]);
                     if(instance){
                         this.logger.debug("Storing managed instance %s in container", id);
-                        this.add(id, instance);
+                        this.find(ns[0]).add(ns[1], instance);
                         //The container must be smart enough to replace active objects bound to dom 
                         if(instance._this["@claypool:activeobject"]){
                             $(document).bind('claypool:postcreate:'+instance.id,  function(event, reattachedObject, id){
@@ -516,7 +560,7 @@ Claypool.IoC={
                             });
                             $(document).bind('claypool:postdestroy:'+instance.id,  function(){
                                 _this.logger.info("Removed Active Object Inside IoC Container");
-                                _this.remove(id);
+                                _this.find(ns[0]).remove(ns[1]);
                             });
                         }else{
                             //trigger notification of new id in ioc container
@@ -525,8 +569,8 @@ Claypool.IoC={
                             $(document).trigger("claypool:ioc:"+id,[id, this]);
                         }
                         //is safer than returning instance._this becuase the the object may be modified
-                        //during the event hooks above, eg an aspect may have been attached.
-                        return this.find(id)._this;
+                        //during the event hooks above
+                        return this.find(ns[0]).find(ns[1])._this;
                     }
                 }else{
                     this.logger.debug("Found container managed instance :%s", id);
@@ -662,21 +706,45 @@ Claypool.IoC={
 	 */
     $.extend($, {
         scan  : function(){
-            var scanPaths,
-			    i;
+            var scanPaths, ns;
             if(arguments.length === 0){
                 return $.config('ioc');
             }else{
                 scanPaths = [];
-                for(i = 0;i<arguments[0].length;i++){
-                    scanPaths.push({
-                        scan:arguments[0][i], 
-						factory:$$.MVC.Factory.prototype
-					}); 
-			    }
+				if($.isPlainObject(arguments[0])){
+					//namespaced application paths
+					//eg { my: 'MyApp', abc: "OtherApp"}
+					//or { my: 'MyApp', abc: ["OtherApp.Services", "OtherApp.Models"]}
+					for(ns in arguments[0]){
+						_scan(arguments[0][ns], ns);
+					}
+				}else if($.isArray(arguments[0])){
+					//no namespace array of paths to scan
+					_scan(arguments[0]);
+				}else if(typeof arguments[0] == 'string'){
+					//no namespace single path
+					_scan(arguments[0]);
+				}
 				return $.config('ioc', scanPaths);
-				 
             }
+			function _scan(path, namespace){
+				var i;
+				if($.isArray(path)){
+					for(i = 0;i < path.length; i++){
+	                    scanPaths.push({
+	                        scan:path[i], 
+							factory:$$.MVC.Factory.prototype,
+							namespace: namespace?namespace:null
+						}); 
+				    }
+				}else{
+					scanPaths.push({
+                        scan:path, 
+						factory:$$.MVC.Factory.prototype,
+						namespace: namespace?namespace:null
+					});
+				}
+			}
         },
 		invert: function(){
             if(arguments.length === 0){

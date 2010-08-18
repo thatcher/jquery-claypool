@@ -52,15 +52,22 @@
              * @type String
              */
             get: function(id){//id is #instance or $Class (ie Function)
-                var aspect;
+                var aspect, ns;
                 try{
+					//support for namespaces
+					ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+						[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+					//namespaced app cache
+					if(!this.find(ns[0])){
+						this.add(ns[0], new $$.SimpleCachingStrategy());
+					}
                     this.logger.debug("Search for a container managed aspect :%s", id);
-                    aspect = this.find(id);
+                    aspect = this.find(ns[0]).find(ns[1]);
                     if(aspect===undefined||aspect===null){
                         this.logger.debug("Can't find a container managed aspect :%s", id);
-                        aspect = this.factory.create(id);
+                        aspect = this.factory.create(ns[1], ns[0]);
                         if(aspect !== null){
-                            this.add(id, aspect);
+                            this.find(ns[0]).add(ns[1], aspect);
                             return aspect;
                         }
                     }else{

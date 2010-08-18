@@ -54,6 +54,10 @@
                             $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
                                 _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
                                 var instance = iocContainer.find(id);
+								aopconf.literal = {
+									scope: 'global',
+									object: '#'+targetRef
+								};
                                 aopconf.target = instance._this;
                                 _this.add(aopconf.id, aopconf);
                                 //replace the ioc object with the aspect attached
@@ -88,7 +92,11 @@
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
                                             id : aopconf.id+$.uuid(),
-                                            target : namespace[prop]
+                                            target : namespace[prop],
+                                            literal: {
+												scope: aopconf.target.substring(0, aopconf.target.length - 2),
+												object: prop
+											}
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
                                             aopconf.target, prop, genconf.id);
@@ -98,7 +106,15 @@
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
+								aopconf.literal = { 
+									scope: aopconf.target.split('.').length > 1?
+										aopconf.target.substring(0, aopconf.target.lastIndexOf('.')):
+										aopconf.target,
+									object: aop.target.split('.').pop()
+								};
+								
                                 aopconf.target =  $.resolve(aopconf.target);
+								
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }
@@ -121,7 +137,7 @@
          * @returns Describe what it returns
          * @type String
          */
-        create: function(id){//id is #instance or $Class
+        create: function(id, namespace){//id is #instance or $Class
             var configuration;
             var _continuation;
             var aspect = this.aspectCache.find(id);

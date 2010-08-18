@@ -43,6 +43,7 @@
                 var pointcut, cutline;//new method , old method
                 try{
                     _this.logger.info( "Weaving Advice %s for Aspect %s", methodName, _this.id );
+                    
                     _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
                     cutline = _this.hasPrototype ? 
                         _this.target.prototype[methodName] : 
@@ -53,6 +54,11 @@
                     }else{ 
                         _this.target.prototype[methodName] = pointcut;
                     }
+					if(_this.literal.method){
+						_this.literal.method.push(methodName);
+					} else {
+						_this.literal.method = [methodName];
+					}
                     return { 
                         pointcut:pointcut,
                         cutline:cutline

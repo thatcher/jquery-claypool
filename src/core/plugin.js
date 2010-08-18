@@ -20,7 +20,8 @@
 	     * @type String
 	     */
         $:function(id, value){
-            var a,i;
+            var a,i; 
+			//support for namespaces
             if(value === undefined){
                 //search the contexts in priority order
                 a = null;
@@ -29,9 +30,6 @@
                     if(a){return a;}
                 } return null;
             }else{
-                if(globalContext[0]().find(id)){
-                    globalContext[0]().remove(id);
-                }
                 globalContext[0]().put(id, value);
             }
         },

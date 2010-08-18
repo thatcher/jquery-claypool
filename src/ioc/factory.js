@@ -64,18 +64,35 @@
          * @returns Describe what it returns
          * @type String
          */
-        create: function(id){
-            var configuration;
-            var instance;
-            var _this = this;
-            try{
-                this.logger.debug("Looking for configuration for instance %s", id);
-                configuration = this.find(id);
+        create: function(id, namespace){
+	        var configuration,
+            	instance,
+            	_this = this,
+				remote, folder, file;
+            try{	
+				namespace = namespace||'';
+				if(!this.find(namespace)){
+					this.logger.debug("Adding cache for namespace %s", namespace);
+					this.add(namespace, new $$.SimpleCachingStrategy());
+				}
+                this.logger.debug("Looking for configuration for instance %s%s", namespace, id);
+                configuration = this.find(namespace).find(id);
                 if(configuration === null){
-                    this.logger.warn("No known configuration for instance %s", id);
+                    this.logger.warn("No known configuration for instance %s%s", namespace, id);
+					remote = id.match(/#([a-z]+([A-Z]?[a-z]+)+)([A-Z][a-z]+)+/);
+					if(remote){
+						/*folder = $.env('lazyload')+remote.pop().toLowerCase()+'s';
+						file = remote[1].toLowerCase()+'.js';
+						_this.logger.debug('attempting to lazyload %s from %s%s',
+							id, folder, file)
+						$.getScript(folder+file, function(){
+							$.scan
+						});*/
+						//Work In Progress
+					}
                     return null;
                 }else{
-                    this.logger.debug("Found configuration for instance %s", id);
+                    this.logger.debug("Found configuration for instance %s%s", namespace, id);
                     instance = new $$IoC.Instance(configuration.id, configuration);
                     if(configuration.active&&configuration.selector){
                         this.logger.debug("Attaching contructor to an active selector");
@@ -125,11 +142,24 @@
                         if(iocconf.scan && iocconf.factory){
                             this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
                             iocConfiguration = iocConfiguration.concat(
-                                iocconf.factory.scan(iocconf.scan)
+                                iocconf.factory.scan(iocconf.scan, iocconf.namespace)
                             );
                         }else{
-                            this.logger.debug("IoC Configuration for Id: %s", iocconf.id);
-                            this.add( iocconf.id, iocconf );
+                            this.logger.debug("IoC Configuration for Id: %s%s", 
+								iocconf.namespace||'', iocconf.id );
+							if(iocconf.namespace){
+								//namespaced app configs
+								if(!this.find(iocconf.namespace)){
+									this.add(iocconf.namespace, new $$.SimpleCachingStrategy());
+								}
+								this.find(iocconf.namespace).add(iocconf.id, iocconf);
+							}else{
+								//non-namespaced app configs
+								if(!this.find('')){
+									this.add('', new $$.SimpleCachingStrategy());
+								}
+								this.find('').add(iocconf.id, iocconf);
+							}
                         }
                     }catch(e){
                         this.logger.exception(e);

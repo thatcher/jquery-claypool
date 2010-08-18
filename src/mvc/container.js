@@ -33,15 +33,25 @@
          * @type String
          */
         get: function(id){
-            var controller;
-            try{
+            var controller,
+				ns;
+            try{	
                 this.logger.debug("Search for a container managed controller : %s", id);
-                controller = this.find(id);
+				//support for namespaces
+				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+				//namespaced app cache
+				if(!this.find(ns[0])){
+					this.add(ns[0], new $$.SimpleCachingStrategy());
+				}
+                controller = this.find(ns[0]).find(ns[1]);
                 if(controller===undefined||controller===null){
                     this.logger.debug("Can't find a container managed controller : %s", id);
-                    controller = this.factory.create(id);
+					//recall order of args for create is id, namespace so we maintain
+					//backward compatability
+                    controller = this.factory.create( ns[1], ns[0]);
                     if(controller !== null){
-                        this.add(id, controller);
+                        this.find(ns[0]).add(ns[1], controller);
                         return controller._this;
                     }else{
                         return null;

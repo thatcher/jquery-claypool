@@ -79,6 +79,7 @@ Claypool.AOP={
                 var pointcut, cutline;//new method , old method
                 try{
                     _this.logger.info( "Weaving Advice %s for Aspect %s", methodName, _this.id );
+                    
                     _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
                     cutline = _this.hasPrototype ? 
                         _this.target.prototype[methodName] : 
@@ -89,6 +90,11 @@ Claypool.AOP={
                     }else{ 
                         _this.target.prototype[methodName] = pointcut;
                     }
+					if(_this.literal.method){
+						_this.literal.method.push(methodName);
+					} else {
+						_this.literal.method = [methodName];
+					}
                     return { 
                         pointcut:pointcut,
                         cutline:cutline
@@ -331,6 +337,10 @@ Claypool.AOP={
                             $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
                                 _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
                                 var instance = iocContainer.find(id);
+								aopconf.literal = {
+									scope: 'global',
+									object: '#'+targetRef
+								};
                                 aopconf.target = instance._this;
                                 _this.add(aopconf.id, aopconf);
                                 //replace the ioc object with the aspect attached
@@ -365,7 +375,11 @@ Claypool.AOP={
                                         //extend the original aopconf replacing the id and target
                                         genconf = $.extend({}, aopconf, {
                                             id : aopconf.id+$.uuid(),
-                                            target : namespace[prop]
+                                            target : namespace[prop],
+                                            literal: {
+												scope: aopconf.target.substring(0, aopconf.target.length - 2),
+												object: prop
+											}
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
                                             aopconf.target, prop, genconf.id);
@@ -375,7 +389,15 @@ Claypool.AOP={
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
+								aopconf.literal = { 
+									scope: aopconf.target.split('.').length > 1?
+										aopconf.target.substring(0, aopconf.target.lastIndexOf('.')):
+										aopconf.target,
+									object: aop.target.split('.').pop()
+								};
+								
                                 aopconf.target =  $.resolve(aopconf.target);
+								
                                 this.add(aopconf.id, aopconf);
                                 this.create(aopconf.id);//this creates the aspect
                             }
@@ -398,7 +420,7 @@ Claypool.AOP={
          * @returns Describe what it returns
          * @type String
          */
-        create: function(id){//id is #instance or $Class
+        create: function(id, namespace){//id is #instance or $Class
             var configuration;
             var _continuation;
             var aspect = this.aspectCache.find(id);
@@ -517,15 +539,22 @@ Claypool.AOP={
              * @type String
              */
             get: function(id){//id is #instance or $Class (ie Function)
-                var aspect;
+                var aspect, ns;
                 try{
+					//support for namespaces
+					ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+						[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+					//namespaced app cache
+					if(!this.find(ns[0])){
+						this.add(ns[0], new $$.SimpleCachingStrategy());
+					}
                     this.logger.debug("Search for a container managed aspect :%s", id);
-                    aspect = this.find(id);
+                    aspect = this.find(ns[0]).find(ns[1]);
                     if(aspect===undefined||aspect===null){
                         this.logger.debug("Can't find a container managed aspect :%s", id);
-                        aspect = this.factory.create(id);
+                        aspect = this.factory.create(ns[1], ns[0]);
                         if(aspect !== null){
-                            this.add(id, aspect);
+                            this.find(ns[0]).add(ns[1], aspect);
                             return aspect;
                         }
                     }else{

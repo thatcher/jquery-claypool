@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.1.11 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.2.rc1 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -670,7 +670,8 @@ var Claypool={
 	     * @type String
 	     */
         $:function(id, value){
-            var a,i;
+            var a,i; 
+			//support for namespaces
             if(value === undefined){
                 //search the contexts in priority order
                 a = null;
@@ -679,9 +680,6 @@ var Claypool={
                     if(a){return a;}
                 } return null;
             }else{
-                if(globalContext[0]().find(id)){
-                    globalContext[0]().remove(id);
-                }
                 globalContext[0]().put(id, value);
             }
         },
@@ -948,12 +946,20 @@ var Claypool={
         $$.Context.prototype,{
         get: function(id){
             /**we always look in the global first and then through contributors in order*/
-            var contextObject;
-            var contributor;
+            var contextObject,
+            	contributor,
+				ns;
             try{
+				//support for namespaces
+				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+				//namespaced app cache
+				if(!this.find(ns[0])){
+					this.add(ns[0], new $$.SimpleCachingStrategy());
+				}
                 this.logger.debug("Searching application context for object: %s" ,id);
                 contextObject = null;
-                contextObject = this.find(id);
+                contextObject = this.find(ns[0]).find(ns[1]);
                 if(contextObject !== null){
                     this.logger.debug("Found object in global application context. Object id: %s", id);
                     return contextObject;
@@ -975,10 +981,21 @@ var Claypool={
             }
         },
         put: function(id, object){
-            /**We may want to use a different strategy here so that 'put'
-            will look for a matching id and update the entry even in a contributor.*/
+			//support for namespaces
+			var ns, nscache;
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			nscache = this.find(ns[0]);
+			if(!nscache){
+				nscache = new $$.SimpleCachingStrategy();
+				this.add(ns[0], nscache);
+			}
+			if(nscache.find(ns[0])){
+				nscache.remove(ns[1]);
+			}
             this.logger.debug("Adding object to global application context %s", id);
-            this.add(id, object);
+            nscache.add(ns[1], object);
         }
     });
 

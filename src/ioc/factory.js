@@ -14,6 +14,7 @@
         $$.extend(this, $$.BaseFactory);
         $.extend(true, this, options);
         this.configurationId = 'ioc';
+		this.lazyLoadAttempts = {};
         this.logger = $.logger("Claypool.IoC.Factory");
     };
     
@@ -68,7 +69,8 @@
 	        var configuration,
             	instance,
             	_this = this,
-				remote, folder, file;
+				remote, folder, file,
+				literal;
             try{	
 				namespace = namespace||'';
 				if(!this.find(namespace)){
@@ -81,14 +83,60 @@
                     this.logger.warn("No known configuration for instance %s%s", namespace, id);
 					remote = id.match(/#([a-z]+([A-Z]?[a-z]+)+)([A-Z][a-z]+)+/);
 					if(remote){
-						/*folder = $.env('lazyload')+remote.pop().toLowerCase()+'s';
+						_this.logger.debug('resolving lazyload %s', id);
+						//holds reference to names eg ['MyApp','Model','FooBar']
+						literal = [  $$.Namespaces[namespace] ];
+						folder = namespace||'';
+						//now prepend appbase if specified otherwise use the root /
+						//and finally determine the intermediate package as 'models'
+						//'views', etc
+						literal[1] = remote.pop();
+						literal[1] = literal[1]+'s';
+						folder = ($.env('appbase')||'/')+folder+literal[1].toLowerCase()+'/';
+						//finally determine the script itself which should be the lowercase
+						//foobar from an id like abc#fooBarModel or #fooBarModel or #foobarModel etc
+						literal[2] = remote[1].substring(0,1).toUpperCase()+remote[1].substring(1);
 						file = remote[1].toLowerCase()+'.js';
-						_this.logger.debug('attempting to lazyload %s from %s%s',
-							id, folder, file)
-						$.getScript(folder+file, function(){
-							$.scan
-						});*/
+						_this.logger.debug('attempting to lazyload %s from %s%s', id, folder, file);
+						if(_this.lazyLoadAttempts[folder+file]){
+							//avoid danger of infinite recursion here
+							_this.logger.debug('already attempted to load %s%s', folder, file);
+							return null;
+						}else{
+							_this.lazyLoadAttempts[folder+file] = 1;
+							$.ajax({
+								async:false,
+								url:folder+file,
+								dataType:'text',
+								timeout:3000,
+								success: function(text){
+									_this.logger.info('lazyloaded %s ', literal.join('.'));
+									if(!$.env('debug')){
+										jQuery.globalEval(text);
+									}else{
+										eval(text);
+									}
+									var config = {
+										id: id,
+										namespace: namespace,
+										clazz: literal.join('.')
+									};
+									if(literal[1] == 'Views'){
+										config.selector = '#'+literal[2].substring(0,1).toLowerCase()+literal[2].substring(1);
+									}
+									_this.find(namespace).add(id, config);
+								},
+								error: function(xhr, status, e){
+									_this.logger.error('failed (%s) to load %s%s', xhr.status, folder, file).
+										exception(e);
+								}
+							});		
+							_this.logger.info('completed lazyloaded for %s%s ', id, namespace);
+							return _this.create(id, namespace);
+						}
 						//Work In Progress
+					}else{
+						logger.warn('id requested did not match those applicable for late loading %s', id);
 					}
                     return null;
                 }else{

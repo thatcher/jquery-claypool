@@ -12,13 +12,30 @@
         target    : "ClaypoolJS.Services.*",
         before    : "([a-z]*)",
         advice    : function(event){
-            log = log||$.logger('ClaypoolJS.Filters');
-            log.debug('Adding normalized event state to event scoped model');
+        	log = log||$.logger('ClaypoolJS.Filters');
+			var advisee = arguments[arguments.length - 1];
+			
+            log.debug('Adding normalized event state to event scoped model %s.%s',
+				advisee.target, advisee.method);
+				
             var params = event.params('parameters');
             
-            event.
-                m({admin:('admin' in params)?true:false }).
-                m(event.params());
+            event.m({ admin:('admin' in params)?true:false });
+
+			log.debug('m=>admin %s', event.m().admin);
+			event.m().reset();
+			log.debug('reset : m=>admin %s', event.m().admin);
+			
+            event.m({ admin:'jello' });
+			log.debug('m=>admin %s', event.m().admin);
+			event.m().reset();
+			log.debug('reset : m=>admin %s', event.m().admin);
+			
+            event.m({ admin:'pistachio' });
+			log.debug('m=>admin %s', event.m().admin);
+            event.m(event.params());
+
+			
         }
     },{
         id        : "#contentNegotiationFilter",
@@ -31,7 +48,8 @@
                 view = invocation.object;
                 
             log = log||$.logger('ClaypoolJS.Filters');
-            log.debug('Intercepted call to render');
+            log.debug('Intercepted call to render %s.%s', 
+				invocation.target, invocation.method);
             var model = invocation.arguments[0],
                 view = invocation.object;
             if(model.parameters.fo == 'json'){

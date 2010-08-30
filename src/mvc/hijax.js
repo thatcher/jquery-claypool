@@ -57,10 +57,12 @@
             return jQuery(this.forwardingList).each(function(){
                 var target, 
                     action, 
-                    defaultView;
+                    defaultView,
+					targetId;
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
                     target = $.$(this.payload.controller);
+					targetId = this.payload.controller;
                     //the default view for 'fooController' or 'fooService' is 'fooView' otherwise the writer
                     //is required to provide it before a mvc flow can be resolved.
                     defaultView = this.payload.controller.match('Controller') ?
@@ -71,10 +73,7 @@
                     this.map = $.extend(state, this.map);
                     (function(t){
                         var  _event = data.args[0],//the event is the first arg, 
-                            extra = [],//and then tack back on the original extra args.
-                            m = {flash:[], length:0},//each in flash should be {id:"", msg:""}
-                            v = defaultView,
-                            c = target;
+                            extra = [];//and then tack back on the original extra args.
                         for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                         var eventflow = $.extend( {}, _event, {
                            m: function(){
@@ -136,9 +135,12 @@
                                    }
                                    //expects "target{.action}"
                                    target = arguments[0].split(".");
-                                   c = target[0];
-                                   v  = c.match('Controller') ? c.replace('Controller', 'View') : null;
-                                   v  = c.match('Service') ? c.replace('Service', 'View') : v;
+								   //TODO: verify this was unintended and is bug. before this function
+								   //	   is called, internal 'c' is an object, after this function it 
+								   //      is a string (if next line was reincluded)
+                                   //c = target[0]; 
+                                   v  = target[0].match('Controller') ? target[0].replace('Controller', 'View') : null;
+                                   v  = target[0].match('Service') ? target[0].replace('Service', 'View') : v;
                                    action = (target.length>1&&target[1].length>0)?target[1]:"handle";
                                    controller = _this.find(target[0]);
                                    if(controller === null){
@@ -154,7 +156,10 @@
                            reset:function(){
                                m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
                                v = defaultView;
-                               c = target;
+                               c = targetId;
+							   m.reset = function resetm(){ m = {flash:[], length:0}; m.reset = resetm; return eventflow; };
+							   v.reset = function resetv(){ v = defaultView; v.reset = resetv; return eventflow; };
+							   c.reset = function resetc(){ c = targetId; c.reset = resetc; return eventflow; };
                                return this;//chain
                            },
 						   params: function(param){
@@ -165,6 +170,7 @@
 							   }
 						   }
                         });
+						eventflow.reset();
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
                     })(this);

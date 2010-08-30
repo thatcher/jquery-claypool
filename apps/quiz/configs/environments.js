@@ -12,6 +12,10 @@
 			templates:'apps/quiz/views/templates/',
             root:'/',
             data:'apps/quiz/models/data/',
+			appbase:{
+				'':'/apps/quiz/',
+				'a':'/apps/other/'
+			},
 	        rest: {
 	            SERVICE: "Any",
 	            URL: "/rest",

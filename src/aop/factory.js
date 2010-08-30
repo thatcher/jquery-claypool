@@ -93,10 +93,7 @@
                                         genconf = $.extend({}, aopconf, {
                                             id : aopconf.id+$.uuid(),
                                             target : namespace[prop],
-                                            literal: {
-												scope: aopconf.target.substring(0, aopconf.target.length - 2),
-												object: prop
-											}
+                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
                                         });
                                         this.logger.debug("Creating aspect id %s [%s] (%s)", 
                                             aopconf.target, prop, genconf.id);
@@ -106,13 +103,7 @@
                                 }
                             }else{
                                 this.logger.debug("Creating aspect id %s", aopconf.id);
-								aopconf.literal = { 
-									scope: aopconf.target.split('.').length > 1?
-										aopconf.target.substring(0, aopconf.target.lastIndexOf('.')):
-										aopconf.target,
-									object: aop.target.split('.').pop()
-								};
-								
+								aopconf._target = aopconf.target;
                                 aopconf.target =  $.resolve(aopconf.target);
 								
                                 this.add(aopconf.id, aopconf);

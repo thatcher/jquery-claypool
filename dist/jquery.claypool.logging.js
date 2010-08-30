@@ -347,8 +347,9 @@ Claypool.Logging={
         try{
             if(window&&window.console&&window.console.log){
                 try{
-                    test = Envjs;
-                    return new $$Log.SysOutAppender(options);
+                    if( 'Envjs' in window ){
+                    	return new $$Log.SysOutAppender(options);
+					}
                 }catch(e){
                     //swallow
                 }

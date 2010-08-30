@@ -206,6 +206,10 @@ Claypool.Server={
 (function($, $$, $M, $Web){
     
     var log;
+	
+	//TODO: event.response.* must be replaced with event.write, event.writeln,
+	//		and event.headers (headers are echoed based on request and new headers 
+	//		add onto, or overwrite, request headers with additional response headers)
     
     $Web.RestServlet = function(options){
         $$.extend(this, $Web.Servlet);

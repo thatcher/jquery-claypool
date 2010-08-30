@@ -26,9 +26,9 @@
          * Models, Views, and Controllers
          */
         -->
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/models/quiz.js"}><!--              --></script>
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/views/quiz.js"}><!--               --></script>
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/controllers/quiz.js"}><!--         --></script>
+        <!--script type="text/javascript" src={$.env('root')+"apps/quiz/models/quiz.js"}></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/views/quiz.js"}></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/controllers/quiz.js"}></script-->
         
         <!--
         /**

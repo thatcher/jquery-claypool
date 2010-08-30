@@ -14,6 +14,7 @@
     $.extend($M.Releases.prototype,{
         get: function(id){
             var url = $.env('data')+'releases/metadata.json';
+			log.debug('loading data from %s', url);
             if(!data){
                 $.ajax({
                     type:'GET',

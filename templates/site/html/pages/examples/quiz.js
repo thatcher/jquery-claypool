@@ -18,6 +18,7 @@
         -->
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/config.js"}><!--           --></script>
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/environments.js"}><!--     --></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/filters.js"}><!--          --></script>
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/logging.js"}><!--          --></script>
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/routes.js"}><!--           --></script>
         

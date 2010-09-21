@@ -10,18 +10,18 @@
 (function($){ 
     
    $.logging([
-        { category:"ClaypoolJS",                 level:"DEBUG" },
+        { category:"ClaypoolJS",                 level:"INFO" },
         { category:"ClaypoolJS.Models",          level:"INFO" },
         { category:"ClaypoolJS.Views",           level:"INFO" },
-        { category:"ClaypoolJS.Controllers",     level:"DEBUG" },
-        { category:"ClaypoolJS.Services",        level:"DEBUG" },
-        { category:"ClaypoolJS.Filters",         level:"DEBUG" },
-        { category:"Claypool",                   level:"WARN" },
-        { category:"Claypool.Server",            level:"INFO" },
-        { category:"Claypool.MVC",               level:"INFO" },
-        { category:"Claypool.IoC",               level:"INFO" },
-        { category:"Claypool.AOP",               level:"INFO" },
-        { category:"jQuery.E4X",                 level:"INFO" },
+        { category:"ClaypoolJS.Controllers",     level:"INFO" },
+        { category:"ClaypoolJS.Services",        level:"INFO" },
+        { category:"ClaypoolJS.Filters",         level:"INFO" },
+        { category:"Claypool",                   level:"ERROR" },
+        { category:"Claypool.Server",            level:"WARN" },
+        { category:"Claypool.MVC",               level:"WARN" },
+        { category:"Claypool.IoC",               level:"WARN" },
+        { category:"Claypool.AOP",               level:"WARN" },
+        { category:"jQuery.E4X",                 level:"WARN" },
         { category:"root",                       level:"ERROR" }
     ]);     
 	

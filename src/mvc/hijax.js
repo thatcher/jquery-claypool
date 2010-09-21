@@ -47,11 +47,14 @@
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
             var _this = this,
+            	_event = data.args[0],//the event is the first arg,
+                extra = [],//and then tack back on the original extra args.
                 state = {};
+            for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
             if(this.forwardingList.length > 0){
-                this.logger.debug('normalizing event state params');
+                this.logger.debug('normalizing event state params %s', _event);
                 if($.isFunction(this.normalize)){
-                    state = this.normalize(data.args[0]/*the event*/);
+                    state = this.normalize(_event/*the event*/);
                 }
             }
             return jQuery(this.forwardingList).each(function(){
@@ -72,9 +75,6 @@
                     //make params object represent the normalized state accentuated by route param map
                     this.map = $.extend(state, this.map);
                     (function(t){
-                        var  _event = data.args[0],//the event is the first arg, 
-                            extra = [];//and then tack back on the original extra args.
-                        for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
                         var eventflow = $.extend( {}, _event, {
                            m: function(){
                                if(arguments.length === 0){

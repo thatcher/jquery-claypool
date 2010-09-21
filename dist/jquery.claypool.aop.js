@@ -317,11 +317,12 @@ Claypool.AOP={
         /**
          * Describe what this method does
          * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
+         * @param {Object} lateTarget provided only if a lazy loaded app-managed object
+		 *					needs to have aop applied to it.
+         * @returns true if no errors occured
+         * @type Boolean
          */
-        updateConfig: function(){
+        updateConfig: function(lateTarget){
             var _this = this;
             var aopConfiguration;//entire config
             var aopconf;//unit of config
@@ -332,81 +333,102 @@ Claypool.AOP={
                 aopConfiguration = this.getConfig()||[];
                 this.logger.debug("AOP Configurations: %d", aopConfiguration.length);
                 for(i=0;i<aopConfiguration.length;i++){
-                    try{
-                        aopconf = aopConfiguration[i];
-                        //  resolve the advice which must be specified as an optionally
-                        //  namespaced string eg 'Foo.Bar.goop' 
-                        if(!$.isFunction(aopconf.advice)){
-                            aopconf.advice = $.resolve(aopconf.advice);
-                        }
-                        //If the adive is to be applied to an application managed instance
-                        //then bind to its lifecycle events to weave and unweave the
-                        //aspect 
-                        if(aopconf.target.match("^ref://")){
-                            targetRef = aopconf.target.substr(6,aopconf.target.length);
-                            $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
-                                _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
-                                var instance = iocContainer.find(id);
-								aopconf.literal = {
-									scope: 'global',
-									object: '#'+targetRef
-								};
-                                aopconf.target = instance._this;
-                                _this.add(aopconf.id, aopconf);
-                                //replace the ioc object with the aspect attached
-                                var aspect = _this.create(aopconf.id);
-                                instance._this = aspect.target;
-                                iocContainer.remove(id);
-                                iocContainer.add(id, instance);
-                                _this.logger.debug("Created aspect \n%s, \n%s");
+                    aopconf = aopConfiguration[i];
+					//in the case where we are late binding (lazy loading) an application
+					//instance, the aopconf.target property will still be a string (otherwise an object)
+					//and so we can easily update the aop engine by only checking only those entries
+					if(typeof(aopconf.target)=='string'){
+                    	try{
+	                        //  resolve the advice which must be specified as an optionally
+	                        //  namespaced string eg 'Foo.Bar.goop' 
+	                        if(!$.isFunction(aopconf.advice)){
+	                            aopconf.advice = $.resolve(aopconf.advice);
+	                        }
+	                        //If the adive is to be applied to an application managed instance
+	                        //then bind to its lifecycle events to weave and unweave the
+	                        //aspect.  This works without modification for lazy loaded app-managed
+							//objects.
+	                        if(aopconf.target.match("^ref://")){
+	                            targetRef = aopconf.target.substr(6,aopconf.target.length);
+	                            $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
+	                                _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
+	                                var instance, ns;
+									//support for namespaces
+									ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+										[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+									if(!iocContainer.find(ns[0])){
+										iocContainer.add(ns[0], new $$.SimpleCachingStrategy());
+									}
+	 								instance = iocContainer.find(ns[0]).find(ns[1]);
+									aopconf.literal = {
+										scope: 'global',
+										object: id
+									};
+		                            aopconf._target = aopconf.target;
+	                                aopconf.target = instance._this;
+	                                _this.add(aopconf.id, aopconf);
+	                                //replace the ioc object with the aspect attached
+	                                var aspect = _this.create(aopconf.id);
+	                                instance._this = aspect.target;
+	                                iocContainer.find(ns[0]).remove(ns[1]);
+	                                iocContainer.find(ns[0]).add(ns[1], instance);
+	                                _this.logger.debug("Created aspect \n%s, \n%s");
                                 
-                            }).bind("claypool:predestroy:"+targetRef, function(event, instance){
-                                _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
-                                var aspect = _this.aspectCache.find(aopconf.id);
-                                if(aspect&&aspect.unweave){
-                                    aspect.unweave();
-                                }
-                            });
-                        }else{
-                            /**
-                            *   This is an aspect for an entire class of objects or a generic
-                            *   instance.  We can apply it now so do it. We do like to be
-                            *   flexible enough to allowa namespaced class, and in either case,
-                            *   it's specified as a string so we have to resolve it
-                            */
-                            if(aopconf.target.match(/\.\*$/)){
-                                //The string ends with '.*' which implies the target is every function
-                                //in the namespace.  hence we resolve the namespace, look for every
-                                //function and create a new filter for each function.
-                                this.logger.debug("Broad aspect target %s", aopconf.target);
-                                namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
-                                for(prop in namespace){
-                                    if($.isFunction(namespace[prop])){
-                                        //extend the original aopconf replacing the id and target
-                                        genconf = $.extend({}, aopconf, {
-                                            id : aopconf.id+$.uuid(),
-                                            target : namespace[prop],
-                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
-                                        });
-                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
-                                            aopconf.target, prop, genconf.id);
-                                        this.add(genconf.id, genconf);
-                                        this.create(genconf.id);//this creates the aspect
-                                    }
-                                }
-                            }else{
-                                this.logger.debug("Creating aspect id %s", aopconf.id);
-								aopconf._target = aopconf.target;
-                                aopconf.target =  $.resolve(aopconf.target);
+	                            }).bind("claypool:predestroy:"+targetRef, function(event, instance){
+	                                _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
+	                                var aspect = _this.aspectCache.find(aopconf.id);
+	                                if(aspect&&aspect.unweave){
+	                                    aspect.unweave();
+	                                }
+	                            });
+	                        }else{
+	                            /**
+	                            *   This is an aspect for an entire class of objects or a generic
+	                            *   instance.  We can apply it now so do it. We do like to be
+	                            *   flexible enough to allow a namespaced class, and in either case,
+	                            *   it's specified as a string so we have to resolve it
+	                            */
+	                            if(aopconf.target.match(/\.\*$/)){
+	                                //The string ends with '.*' which implies the target is every function
+	                                //in the namespace.  hence we resolve the namespace, look for every
+	                                //function and create a new filter for each function.
+	                                this.logger.debug("Broad aspect target %s", aopconf.target);
+									
+									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+	                                	namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
+		                                for(prop in namespace){
+		                                    if($.isFunction(namespace[prop])){
+		                                        //extend the original aopconf replacing the id and target
+		                                        genconf = $.extend({}, aopconf, {
+		                                            id : aopconf.id+$.uuid(),
+		                                            target : namespace[prop],
+		                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
+		                                        });
+		                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
+		                                            aopconf.target, prop, genconf.id);
+		                                        this.add(genconf.id, genconf);
+		                                        this.create(genconf.id);//this creates the aspect
+		                                    }
+		                                }
+									}
+	                            }else{	
+									//Finally when we do have a late target, make sure we only bother with checking
+									//aop configs that match the late targets clazz
+									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+	                                	this.logger.debug("Creating aspect id %s", aopconf.id);
+										aopconf._target = aopconf.target;
+		                                aopconf.target =  $.resolve(aopconf.target);
 								
-                                this.add(aopconf.id, aopconf);
-                                this.create(aopconf.id);//this creates the aspect
-                            }
-                        }
-                    }catch(e){
-                        //Log the expection but allow other Aspects to be configured.
-                        this.logger.exception(e);
-                    }
+		                                this.add(aopconf.id, aopconf);
+		                                this.create(aopconf.id);//this creates the aspect
+									}
+	                            }
+	                        }
+	                    }catch(e){
+	                        //Log the expection but allow other Aspects to be configured.
+	                        this.logger.exception(e);
+	                    }
+					}
                 }
             }catch(e){
                 this.logger.exception(e);

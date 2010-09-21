@@ -1,8 +1,8 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.2.rc3 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.2.rc5 - A Web 1.6180339... Javascript Application Framework
  *
- * Copyright (c) 2008 Chris Thatcher (claypooljs.com)
+ * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * and GPL (GPL-LICENSE.txt) licenses.
  *

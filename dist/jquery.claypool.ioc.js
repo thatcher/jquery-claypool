@@ -384,7 +384,7 @@ Claypool.IoC={
 	        var configuration,
             	instance,
             	_this = this,
-				remote, folder, file,
+				remote, folder, file, appbase,
 				literal;
             try{	
 				namespace = namespace||'';
@@ -407,7 +407,14 @@ Claypool.IoC={
 						//'views', etc
 						literal[1] = remote.pop();
 						literal[1] = literal[1]+'s';
-						folder = ($.env('appbase')||'/')+folder+literal[1].toLowerCase()+'/';
+						//allows 'appbase' to be null for default case, a single string,
+						//or a map of appbases per namespace
+						appbase = $.env('appbase');
+						appbase = (appbase == null) ? '/' :
+							typeof(appbase)=='string' ?
+								appbase :
+								appbase[namespace];
+						folder = appbase+folder+literal[1].toLowerCase()+'/';
 						//finally determine the script itself which should be the lowercase
 						//foobar from an id like abc#fooBarModel or #fooBarModel or #foobarModel etc
 						literal[2] = remote[1].substring(0,1).toUpperCase()+remote[1].substring(1);
@@ -440,6 +447,15 @@ Claypool.IoC={
 										config.selector = '#'+literal[2].substring(0,1).toLowerCase()+literal[2].substring(1);
 									}
 									_this.find(namespace).add(id, config);
+									try{
+										//late bound (lazy loaded) application managed objects have to
+										//go through a process of iteration over the registered aop filters
+										//to see if any apply to it.  This call is sufficient to do that.
+										$$.Application["claypool:AOP"].factory.updateConfig(config);
+									}catch(e){
+										_this.logger.error('Failed in late binding to aop configuration').
+											exception(e);
+									}
 								},
 								error: function(xhr, status, e){
 									_this.logger.error('failed (%s) to load %s%s', xhr.status, folder, file).
@@ -451,7 +467,7 @@ Claypool.IoC={
 						}
 						//Work In Progress
 					}else{
-						logger.warn('id requested did not match those applicable for late loading %s', id);
+						_this.logger.warn('id requested did not match those applicable for late loading %s', id);
 					}
                     return null;
                 }else{

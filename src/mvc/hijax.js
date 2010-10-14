@@ -14,7 +14,7 @@
      * @constructor
      */
     $$MVC.HijaxController = function(options){
-		$$.extend(this, $$MVC.Controller);
+        $$.extend(this, $$MVC.Controller);
         /*defaults*/
         $.extend(true, this, {
             forwardingList:[],
@@ -47,7 +47,7 @@
             this.forwardingList = this.router[this.strategy||"all"]( data.pattern );
             this.logger.debug("Resolving matched paterns");
             var _this = this,
-            	_event = data.args[0],//the event is the first arg,
+                _event = data.args[0],//the event is the first arg,
                 extra = [],//and then tack back on the original extra args.
                 state = {};
             for(var i = 1; i < data.args.length; i++){extra[i-1]=data.args[i];}
@@ -61,11 +61,11 @@
                 var target, 
                     action, 
                     defaultView,
-					targetId;
+                    targetId;
                 try{
                     _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
                     target = $.$(this.payload.controller);
-					targetId = this.payload.controller;
+                    targetId = this.payload.controller;
                     //the default view for 'fooController' or 'fooService' is 'fooView' otherwise the writer
                     //is required to provide it before a mvc flow can be resolved.
                     defaultView = this.payload.controller.match('Controller') ?
@@ -75,102 +75,102 @@
                     //make params object represent the normalized state accentuated by route param map
                     this.map = $.extend(state, this.map);
                     (function(t){
-                        var eventflow = $.extend( {}, _event, {
-                           m: function(){
-                               if(arguments.length === 0){
-                                   return m;
-                               }else if(arguments.length === 1){
-                                   if(typeof(arguments[0]) == 'string'){
-                                       return m[arguments[0]];
-                                   }else if(arguments[0] instanceof Array){
-                                       m.length += arguments[0].length;
-                                       Array.prototype.push.apply(m,arguments[0]);
-                                   }else if(arguments[0] instanceof Object){
-                                       $.extend(true, m, arguments[0]);
-                                   }
-                               }else if(arguments.length === 2){
-                                   if(arguments[1] instanceof Array){
-                                       if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
-                                           m[arguments[0]] = [];
-                                       }
-                                       $.merge(m[arguments[0]], arguments[1]);
-                                   }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
-                                       m[arguments[0]] = arguments[1];
-                                   }else if(arguments[1] instanceof Object){
-                                       if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
-                                           m[arguments[0]] = {};
-                                       }
-                                       $.extend(true, m[arguments[0]], arguments[1]);
-                                   }
-                               }
-                               return this;//chain
-                           },
-                           v: function(view){
-                               if(!view){
-                                   return v;
-                               }
-                               if(view && typeof(view)=='string'){
-                                   view = view.split('.');
-                                   if(view.length === 1){
-                                       v = view;
-                                   }else if(view.length === 2){
-                                       if(view[0] !== ""){
-                                           v = view.join('.');
-                                       }else{
-                                           v = v.split('.')[0]+"."+view[1];
-                                       }
-                                   }
-                               }
-                               return this;//chain
-                           },
-                           c : function(){
-                               var target, action, controller;
-                               if(arguments.length === 0){
-                                   return c;
-                               }else if(arguments.length > 0 && typeof(arguments[0]) == "string"){
-                                   //allow forwarded controller to have extra params info passed
-                                   //along with it.  .c('#fooController', { extra: 'info' });
-                                   if(arguments.length > 1 && $.isPlainObject(arguments[1])){
-                                       t.map = $.extend(true, t.map||{}, arguments[1]);
-                                   }
-                                   //expects "target{.action}"
-                                   target = arguments[0].split(".");
-								   //TODO: verify this was unintended and is bug. before this function
-								   //	   is called, internal 'c' is an object, after this function it 
-								   //      is a string (if next line was reincluded)
-                                   //c = target[0]; 
-                                   v  = target[0].match('Controller') ? target[0].replace('Controller', 'View') : null;
-                                   v  = target[0].match('Service') ? target[0].replace('Service', 'View') : v;
-                                   action = (target.length>1&&target[1].length>0)?target[1]:"handle";
-                                   controller = _this.find(target[0]);
-                                   if(controller === null){
-                                       controller = $.$(target[0]);
-                                       //cache it for speed on later use
-                                       _this.add(target[0], controller);
-                                   }
-                                   controller[action||"handle"].apply(controller,  [this].concat(extra) );
-                               }
-                               return this;//chain
-                           },
-                           render:_this.renderer(),
-                           reset:function(){
-                               m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
-                               v = defaultView;
-                               c = targetId;
-							   m.reset = function resetm(){ m = {flash:[], length:0}; m.reset = resetm; return eventflow; };
-							   v.reset = function resetv(){ v = defaultView; v.reset = resetv; return eventflow; };
-							   c.reset = function resetc(){ c = targetId; c.reset = resetc; return eventflow; };
-                               return this;//chain
-                           },
-						   params: function(param){
-						   	   if (arguments.length === 0) {
-							   	   return t.map ? t.map : {};
-							   } else {
-							   	   return (t.map && (param in t.map)) ? t.map[param] : null;
-							   }
-						   }
+                        var m,v,c, eventflow = $.extend( {}, _event, {
+                            m: function(){
+                                if(arguments.length === 0){
+                                    return m;
+                                }else if(arguments.length === 1){
+                                    if(typeof(arguments[0]) == 'string'){
+                                        return m[arguments[0]];
+                                    }else if(arguments[0] instanceof Array){
+                                        m.length += arguments[0].length;
+                                        Array.prototype.push.apply(m,arguments[0]);
+                                    }else if(arguments[0] instanceof Object){
+                                        $.extend(true, m, arguments[0]);
+                                    }
+                                }else if(arguments.length === 2){
+                                    if(arguments[1] instanceof Array){
+                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
+                                            m[arguments[0]] = [];
+                                        }
+                                        $.merge(m[arguments[0]], arguments[1]);
+                                    }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
+                                        m[arguments[0]] = arguments[1];
+                                    }else if(arguments[1] instanceof Object){
+                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
+                                            m[arguments[0]] = {};
+                                        }
+                                        $.extend(true, m[arguments[0]], arguments[1]);
+                                    }
+                                }
+                                return this;//chain
+                            },
+                            v: function(view){
+                                if(!view){
+                                    return v;
+                                }
+                                if(view && typeof(view)=='string'){
+                                    view = view.split('.');
+                                    if(view.length === 1){
+                                        v = view;
+                                    }else if(view.length === 2){
+                                        if(view[0] !== ""){
+                                            v = view.join('.');
+                                        }else{
+                                            v = v.split('.')[0]+"."+view[1];
+                                        }
+                                    }
+                                }
+                                return this;//chain
+                            },
+                            c : function(){
+                                var target, action, controller;
+                                if(arguments.length === 0){
+                                    return c;
+                                }else if(arguments.length > 0 && typeof(arguments[0]) == "string"){
+                                    //allow forwarded controller to have extra params info passed
+                                    //along with it.  .c('#fooController', { extra: 'info' });
+                                    if(arguments.length > 1 && $.isPlainObject(arguments[1])){
+                                        t.map = $.extend(true, t.map||{}, arguments[1]);
+                                    }
+                                    //expects "target{.action}"
+                                    target = arguments[0].split(".");
+                                    //TODO: verify this was unintended and is bug. before this function
+                                    //      is called, internal 'c' is an object, after this function it 
+                                    //      is a string (if next line was reincluded)
+                                    //c = target[0]; 
+                                    v  = target[0].match('Controller') ? target[0].replace('Controller', 'View') : null;
+                                    v  = target[0].match('Service') ? target[0].replace('Service', 'View') : v;
+                                    action = (target.length>1&&target[1].length>0)?target[1]:"handle";
+                                    controller = _this.find(target[0]);
+                                    if(controller === null){
+                                        controller = $.$(target[0]);
+                                        //cache it for speed on later use
+                                        _this.add(target[0], controller);
+                                    }
+                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
+                                }
+                                return this;//chain
+                            },
+                            render:_this.renderer(),
+                            reset:function(){
+                                m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
+                                v = defaultView;
+                                c = targetId;
+                                m.reset = function resetm(){ m = {flash:[], length:0}; m.reset = resetm; return eventflow; };
+                                v.reset = function resetv(){ v = defaultView; v.reset = resetv; return eventflow; };
+                                c.reset = function resetc(){ c = targetId; c.reset = resetc; return eventflow; };
+                                return this;//chain
+                            },
+                            params: function(param){
+                                if (arguments.length === 0) {
+                                    return t.map ? t.map : {};
+                                } else {
+                                    return (t.map && (param in t.map)) ? t.map[param] : null;
+                                }
+                            }
                         });
-						eventflow.reset();
+                        eventflow.reset();
                         //tack back on the extra event arguments
                         target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
                     })(this);

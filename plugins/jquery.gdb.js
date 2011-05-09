@@ -48,7 +48,7 @@
             log.debug('creating domain %s', options.domain);
             var entity = new $G.Entity('jquery_gdb', options.domain);
             entity.setProperty('kind', options.domain);
-            entity.setProperty('timestamp', $.uuid());
+            entity.setProperty('timestamp', $$.uuid());
             
             var key = this.entityManager.put(entity);
             log.debug('created domain metadata entry %s (%s)', 
@@ -56,7 +56,7 @@
                 
             return options.success({
                 db:      version,
-                request:    $.uuid(),
+                request:    $$.uuid(),
                 domain:     options.domain,
                 cpu:        'n/a'
             });
@@ -78,7 +78,7 @@
                     
             return options.success({
                 db:      version,
-                request:    $.uuid(),
+                request:    $$.uuid(),
                 domain:     options.domain,
                 count:      count,
                 timestamp:  timestamp,
@@ -120,7 +120,7 @@
                 
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     domain:     options.domain,
                     cpu:        'n/a'
                 });
@@ -188,7 +188,7 @@
                     options.domain, options.id);
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     domain:     options.domain,
                     id:         options.id,
                     cpu:        'n/a'
@@ -224,7 +224,7 @@
                             try{
                                 log.warn('%s',jsPath.js2json(options.data[i], null, '\t'));
                             }catch(e){}
-                            id = 'gdb_'+$.uuid();
+                            id = 'gdb_'+$$.uuid();
                         }
                         log.debug('saving item %s to domain %s', id, options.domain);
                         //PutAttributes
@@ -237,7 +237,7 @@
                     }
                     return options.success({
                         db:      version,
-                        request:    $.uuid(),
+                        request:    $$.uuid(),
                         domain:     options.domain,
                         cpu:        'n/a'
                     });
@@ -259,7 +259,7 @@
                     this.entityManager.put(entity);
                     return options.success({
                         db:      version,
-                        request:    $.uuid(),
+                        request:    $$.uuid(),
                         domain:     options.domain,
                         id:         options.id,
                         cpu:        'n/a'
@@ -327,7 +327,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     cpu:        'n/a',
                     domains:    list
                 });
@@ -351,7 +351,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     cpu:        'n/a',
                     data:        list
                 });
@@ -370,7 +370,7 @@
                 
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     cpu:        'n/a',
                     domain:     options.domain,
                     id:         options.id,
@@ -399,7 +399,7 @@
                 }
                 return options.success({
                     db:      version,
-                    request:    $.uuid(),
+                    request:    $$.uuid(),
                     cpu:        'n/a',
                     domain:     options.domain,
                     id:         options.id,
@@ -448,7 +448,7 @@
             }
             return options.success({
                 db:      version,
-                request:    $.uuid(),
+                request:    $$.uuid(),
                 cpu:        'n/a',
                 data:        data
             });

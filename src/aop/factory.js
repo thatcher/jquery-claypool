@@ -107,7 +107,7 @@
 		                                    if($.isFunction(namespace[prop])){
 		                                        //extend the original aopconf replacing the id and target
 		                                        genconf = $.extend({}, aopconf, {
-		                                            id : aopconf.id+$.uuid(),
+		                                            id : aopconf.id+$$.uuid(),
 		                                            target : namespace[prop],
 		                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
 		                                        });

@@ -109,7 +109,7 @@ Claypool.AOP={
                 for(var f in targetObject){
                     if($.isFunction(targetObject[f])&&pattern.test(f)){
                         this.logger.debug( "Adding aspect to method %s", f );
-                        this.add($.uuid(), _weave(f));
+                        this.add($$.uuid(), _weave(f));
                         if(this.strategy==="first"){break;}
                     }
                 }
@@ -400,7 +400,7 @@ Claypool.AOP={
 		                                    if($.isFunction(namespace[prop])){
 		                                        //extend the original aopconf replacing the id and target
 		                                        genconf = $.extend({}, aopconf, {
-		                                            id : aopconf.id+$.uuid(),
+		                                            id : aopconf.id+$$.uuid(),
 		                                            target : namespace[prop],
 		                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
 		                                        });

@@ -118,6 +118,27 @@
         return this;
     };
     
+	//stupid ie8 added a console object but wont let you call
+	//apply on its methods!!! nice one ie8 :{
+    //this means logging messages need to have 9 params or less
+	function console_apply(fn, args){//a is args
+		if(fn.apply){
+			fn.apply(console, args);
+		}else if(args && args.length){
+			switch(args.length){
+				case 1: fn(args[0]);break;
+				case 2: fn(args[0], args[1]);break;
+				case 3: fn(args[0], args[1], args[2]);break;
+				case 4: fn(args[0], args[1], args[2], args[3]);break;
+				case 5: fn(args[0], args[1], args[2], args[3], args[4]);break;
+				case 6: fn(args[0], args[1], args[2], args[3], args[4], args[5]);break;
+				case 7: fn(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);break;
+				case 8: fn(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);break;
+				case 9: fn(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);break;
+			}
+		}
+	}
+
     $.extend( $$Log.ConsoleAppender.prototype, 
         $$Log.Appender$Interface, {
         /**
@@ -130,22 +151,22 @@
         append: function(level, category, message){
             switch(level){
                 case ("DEBUG"):
-                    console.log.apply(console, this.formatter.format(level, category, message));
+                    console_apply(console.log, this.formatter.format(level, category, message));
                     break;
                 case ("INFO"):
-                    console.info.apply(console, this.formatter.format(level, category, message));
+                    console_apply(console.info, this.formatter.format(level, category, message));
                     break;
                 case ("WARN"):
-                    console.warn.apply(console, this.formatter.format(level, category, message));
+                    console_apply(console.warn, this.formatter.format(level, category, message));
                     break;
                 case ("ERROR"):
-                    console.error.apply(console,this.formatter.format(level, category, message));
+                    console_apply(console.error,this.formatter.format(level, category, message));
                     break;
                 case ("EXCEPTION"):
                     //message is e
-                    console.error.apply(console, this.formatter.format(level, category, 
-                        message.message?[message.message]:[])); 
-                    console.trace();
+                    //console_apply(console.error, this.formatter.format(level, category, 
+                    //    message.message?[message.message]:[])); 
+                    console_apply(console.error, [printStackTrace({e:message}).join('\n')]);
                     break;
             }
         }

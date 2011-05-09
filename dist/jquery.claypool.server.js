@@ -705,7 +705,7 @@ Claypool.Server={
         syncdb: function(targets){
             //creates domain (tables) for each model
             var data,
-                data_url = $.env('initialdata')+'dump.json?'+$.uuid(),
+                data_url = $.env('initialdata')+'dump.json?'+$$.uuid(),
                 domain;
                 
             log.info('loading initial data from %s', data_url);
@@ -877,7 +877,7 @@ Claypool.Server={
          */
         proxy: function(options){
             return $.invert([{ 
-                id:options.id||'proxy_'+$.uuid(),    
+                id:options.id||'proxy_'+$$.uuid(),    
                 clazz:"Claypool.Server.WebProxyServlet", 
                 options:[{
                     rewriteMap:options.rewrites

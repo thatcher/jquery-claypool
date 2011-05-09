@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.2.rc6 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.2.8 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -293,7 +293,7 @@ var Claypool={
 							return '([\\w\\-\\.]+)';
 						});
                         /**pattern might be used more than once so we need a unique key to store the route*/
-                        this.add(String($.uuid()) , {
+                        this.add(String($$.uuid()) , {
                             pattern:new RegExp(pattern), 
                             payload:patternMap[i],
 							params : params
@@ -714,16 +714,6 @@ var Claypool={
          * @returns Describe what it returns
          * @type String
          */
-        uuid: function(){
-            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
-        },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
         resolve: function(namespacedName){
             var _resolver;
             var namespaces;
@@ -828,7 +818,18 @@ var Claypool={
         */
         
     });
-    $.extend($$, plugins);
+    $.extend($$, plugins, {
+		/**
+	     * Describe what this method does
+	     * @private
+	     * @param {String} paramName Describe this parameter
+	     * @returns Describe what it returns
+	     * @type String
+	     */
+	    uuid: function(){
+	        return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
+		}
+    });
     $.extend($, plugins);
     
     //Add an event listener for claypool loaded so we can initialize loggers

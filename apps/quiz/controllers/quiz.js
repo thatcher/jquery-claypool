@@ -28,7 +28,13 @@
 					  		Quiz.get('answers');
 						});  
 				});
-			});
+			});	
+			try{
+				throw new Error('ouch');
+			}catch(e){
+				log.error('this is a test')
+				   .exception(e);
+			}
         },
 		score:function(event){
 			var responses, score = {

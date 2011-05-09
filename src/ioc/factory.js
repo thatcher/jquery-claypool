@@ -85,8 +85,7 @@
 					if(remote){
 						_this.logger.debug('resolving lazyload %s', id);
 						//holds reference to names eg ['MyApp','Model','FooBar']
-						literal = [  $$.Namespaces[namespace] ];
-						folder = namespace||'';
+						literal = [  $$.Namespaces[namespace] ];x
 						//now prepend appbase if specified otherwise use the root /
 						//and finally determine the intermediate package as 'models'
 						//'views', etc
@@ -95,11 +94,20 @@
 						//allows 'appbase' to be null for default case, a single string,
 						//or a map of appbases per namespace
 						appbase = $.env('appbase');
-						appbase = (appbase == null) ? '/' :
+						if(appbase && namespace){
+						    //only use a namespace based folder if there is a namespace
+						    //and they havent specified an appbase
+						    folder = "";
+						}else if (namespace){
+						    folder = namespace + '/';
+						}else{
+						    folder = '';
+						}
+						appbase = (appbase === null) ? '/' :
 							typeof(appbase)=='string' ?
 								appbase :
 								appbase[namespace];
-						folder = appbase+folder+literal[1].toLowerCase()+'/';
+						folder = appbase+literal[1].toLowerCase()+'/';
 						//finally determine the script itself which should be the lowercase
 						//foobar from an id like abc#fooBarModel or #fooBarModel or #foobarModel etc
 						literal[2] = remote[1].substring(0,1).toUpperCase()+remote[1].substring(1);

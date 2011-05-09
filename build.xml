@@ -206,6 +206,7 @@
             <fileset dir="${CLAYPOOL_LOGGING}" includes="factory.js" />
             <fileset dir="${CLAYPOOL_LOGGING}" includes="error.js" />
             <fileset dir="${CLAYPOOL_LOGGING}" includes="plugin.js" />
+            <fileset dir="${CLAYPOOL_LOGGING}" includes="stacktrace.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
             <arg value="${BUILD_DIR}/logging.js" />

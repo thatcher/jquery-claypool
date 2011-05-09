@@ -20,16 +20,16 @@
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/environments.js"}><!--     --></script>
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/filters.js"}><!--          --></script>
         <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/logging.js"}><!--          --></script>
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/routes.js"}><!--           --></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/configs/routes.js"}>c</script>
         
         <!--
         /**
          * Models, Views, and Controllers
          */
         -->
-        <!--script type="text/javascript" src={$.env('root')+"apps/quiz/models/quiz.js"}></script>
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/views/quiz.js"}></script>
-        <script type="text/javascript" src={$.env('root')+"apps/quiz/controllers/quiz.js"}></script-->
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/models/quiz.js"}><!--          --></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/views/quiz.js"}><!--          --></script>
+        <script type="text/javascript" src={$.env('root')+"apps/quiz/controllers/quiz.js"}><!--    --></script>
         
         <!--
         /**

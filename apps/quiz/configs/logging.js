@@ -28,12 +28,12 @@
 (function($){ 
     
    $.logging([
-        { category:"Example",               level:"INFO" },
+        { category:"Example",               level:"DEBUG" },
         { category:"Example.Models",        level:"DEBUG" },
         { category:"Example.Views",         level:"DEBUG" },
         { category:"Example.Controllers",   level:"DEBUG" },
-        { category:"Claypool",              level:"WARN"  },
-        { category:"root",                  level:"WARN"  }
+        { category:"Claypool",              level:"DEBUG"  },
+        { category:"root",                  level:"DEBUG"  }
     ]);     
 	
 })(jQuery);

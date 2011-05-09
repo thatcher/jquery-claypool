@@ -77,7 +77,7 @@
          */
         proxy: function(options){
             return $.invert([{ 
-                id:options.id||'proxy_'+$.uuid(),    
+                id:options.id||'proxy_'+$$.uuid(),    
                 clazz:"Claypool.Server.WebProxyServlet", 
                 options:[{
                     rewriteMap:options.rewrites

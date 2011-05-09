@@ -64,16 +64,6 @@
          * @returns Describe what it returns
          * @type String
          */
-        uuid: function(){
-            return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
-        },
-        /**
-         * Describe what this method does
-         * @private
-         * @param {String} paramName Describe this parameter
-         * @returns Describe what it returns
-         * @type String
-         */
         resolve: function(namespacedName){
             var _resolver;
             var namespaces;
@@ -178,7 +168,18 @@
         */
         
     });
-    $.extend($$, plugins);
+    $.extend($$, plugins, {
+		/**
+	     * Describe what this method does
+	     * @private
+	     * @param {String} paramName Describe this parameter
+	     * @returns Describe what it returns
+	     * @type String
+	     */
+	    uuid: function(){
+	        return new Date().getTime()+"_"+(++guid)+"_"+Math.round(Math.random()*100000000);
+		}
+    });
     $.extend($, plugins);
     
     //Add an event listener for claypool loaded so we can initialize loggers

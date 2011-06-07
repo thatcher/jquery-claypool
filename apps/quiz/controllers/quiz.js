@@ -18,6 +18,7 @@
         show:function(event){
 			var params = event.params();
 			log.debug('Handling event %s, id: %s', event.target, params.id);
+			//abc.def.hij = '123';
 			event.v('.think').render(function(){
 				Quiz.get('questions',function(questions){			
 					event.
@@ -29,12 +30,6 @@
 						});  
 				});
 			});	
-			try{
-				throw new Error('ouch');
-			}catch(e){
-				log.error('this is a test')
-				   .exception(e);
-			}
         },
 		score:function(event){
 			var responses, score = {

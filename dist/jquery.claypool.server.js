@@ -129,7 +129,7 @@ Claypool.Server={
          * @type String
          */
         handleGet: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -139,7 +139,7 @@ Claypool.Server={
          * @type String
          */
         handlePost: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -149,7 +149,7 @@ Claypool.Server={
          * @type String
          */
         handlePut: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -159,7 +159,7 @@ Claypool.Server={
          * @type String
          */
         handleDelete: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -169,7 +169,7 @@ Claypool.Server={
          * @type String
          */
         handleHead: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -179,7 +179,7 @@ Claypool.Server={
          * @type String
          */
         handleOptions: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -783,22 +783,6 @@ Claypool.Server={
     });
 
 })(jQuery, Claypool, Claypool.Services);
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Web){
-	/**
-	 * @constructor
-	 */
-    //TODO There should be some useful errors so we can handle common issues
-    //like error pages for 500's, 404's etc
-	
-})(  jQuery, Claypool, Claypool.Server );
-
 (function($, $$, $$Web){
 
     var log,

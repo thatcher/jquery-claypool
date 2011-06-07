@@ -12,7 +12,7 @@
 	 */
     $$Log.Formatter$Interface = {
         format: function(level, category, objects){
-            throw new $.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 })(  jQuery, Claypool, Claypool.Logging );

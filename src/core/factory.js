@@ -9,7 +9,7 @@
 (function($, $$){
     
     $$.Factory$Interface = {
-        create: function(){ throw new $$.MethodNotImplementedError(); }
+        create: function(){ throw "MethodNotImplementedError"; }
     };
 
 })(jQuery, Claypool);
@@ -34,10 +34,10 @@
         configuration:null,//
         configurationUrl:null,//
         configurationType:null,//"json" or "xml"
-        getConfig: function(){ throw new $$.MethodNotImplementedError();},
-        loadConfig: function(){ throw new $$.MethodNotImplementedError();},
-        setConfig: function(){ throw new $$.MethodNotImplementedError();},
-        updateConfig: function(){ throw new $$.MethodNotImplementedError();}
+        getConfig: function(){ throw "MethodNotImplementedError";},
+        loadConfig: function(){ throw "MethodNotImplementedError";},
+        setConfig: function(){ throw "MethodNotImplementedError";},
+        updateConfig: function(){ throw "MethodNotImplementedError";}
     };
 })(jQuery, Claypool);
 
@@ -56,7 +56,7 @@
     	// relies heavily on convention to reduce the development overhead.  In
     	// the end, it's job is to simply walk a namespace and build the internal
     	// representation of the equivalent hand-wire configuration
-        scan:function(){ throw new $$.MethodNotImplementedError();}
+        scan:function(){ throw "MethodNotImplementedError"; }
     };
 })(jQuery, Claypool);
 
@@ -100,19 +100,14 @@
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
-                try{
-                	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
-                    if($$.Configuration[this.configurationId]){
-                        this.logger.debug("Found Claypool.Configuration");
-                        this.configuration = $$.Configuration[this.configurationId];
-                    }else if(!$$.Configuration){
-                        //it's not specified in js code so look for it remotely
-                        this.loadConfig();
-                    }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$.ConfigurationError(e);
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );      
+                this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
+                if($$.Configuration[this.configurationId]){
+                    this.logger.debug("Found Claypool.Configuration");
+                    this.configuration = $$.Configuration[this.configurationId];
+                }else if(!$$.Configuration){
+                    //it's not specified in js code so look for it remotely
+                    this.loadConfig();
                 }
             }
             return this.configuration;
@@ -131,31 +126,26 @@
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
-            try{
-                jQuery.ajax({
-                    type: "Get",
-                  url: this.configurationUrl,
-                  async: false,
-                  data:{},
-                  dataType: "json",
-        	        success: function(json){
-        	            if(_this.configurationUrl == './app/configs/config.js'){
-        	                $$.Configuration = $$.Configuration||{};
-        	                $.extend(true, $$.Configuration, json);
-        	            }else{
-        	                _this.setConfig(_this.configurationId,
-        	                    json?json:null
-    	                    );
-	                    }
-	                    if(options.callback){
-	                    	options.callback($$.Configuration);
-	                    }
-        	        }
-        	    });
-    	    }catch(e){
-    	        this.logger.exception(e);
-                throw new $$.ConfigurationError(e);
-    	    }
+            jQuery.ajax({
+                type: "Get",
+              url: this.configurationUrl,
+              async: false,
+              data:{},
+              dataType: "json",
+    	        success: function(json){
+    	            if(_this.configurationUrl == './app/configs/config.js'){
+    	                $$.Configuration = $$.Configuration||{};
+    	                $.extend(true, $$.Configuration, json);
+    	            }else{
+    	                _this.setConfig(_this.configurationId,
+    	                    json?json:null
+	                    );
+                    }
+                    if(options.callback){
+                    	options.callback($$.Configuration);
+                    }
+    	        }
+    	    });
         },
         /**
          * Describe what this method does
@@ -177,7 +167,7 @@
          * @type String
          */
         updateConfig: function(id){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         }
     });
 

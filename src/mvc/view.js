@@ -19,7 +19,7 @@
          * @type String
          */
         update: function(model){//refresh screen display logic
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -29,7 +29,7 @@
          * @type String
          */
         think: function(){//display activity occuring, maybe block
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 	

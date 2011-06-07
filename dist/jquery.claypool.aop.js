@@ -77,29 +77,25 @@ Claypool.AOP={
             }
             var _weave = function(methodName){
                 var pointcut, cutline, details;//new method , old method
-                try{
-                    _this.logger.debug( "Weaving Advice %s for Aspect %s", methodName, _this.id );
-                    
-                    _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
-                    cutline = _this.hasPrototype ? 
-                        _this.target.prototype[methodName] : 
-                        _this.target[methodName];
-                    pointcut = _this.advise(cutline, _this._target, methodName);
-                    if(!_this.hasPrototype){
-                        _this.target[methodName] = pointcut;
-                    }else{ 
-                        _this.target.prototype[methodName] = pointcut;
-                    }
-                    details = { 
-                        pointcut:pointcut,
-                        cutline:cutline,
-						method: methodName,
-						target: _this._target
-                    };
-					return details;
-                }catch(e){
-                    throw new $$AOP.WeaveError(e, "Weave");
+                _this.logger.debug( "Weaving Advice %s for Aspect %s", methodName, _this.id );
+                
+                _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
+                cutline = _this.hasPrototype ? 
+                    _this.target.prototype[methodName] : 
+                    _this.target[methodName];
+                pointcut = _this.advise(cutline, _this._target, methodName);
+                if(!_this.hasPrototype){
+                    _this.target[methodName] = pointcut;
+                }else{ 
+                    _this.target.prototype[methodName] = pointcut;
                 }
+                details = { 
+                    pointcut:pointcut,
+                    cutline:cutline,
+					method: methodName,
+					target: _this._target
+                };
+				return details;
             };
             //we dont want an aspect to be woven multiple times accidently so 
             //its worth a quick check to make sure the internal cache is empty.
@@ -124,18 +120,15 @@ Claypool.AOP={
          */
         unweave: function(){
             var aspect;
-            try{
-                for(var id in this.cache){
-                    aspect = this.find(id);
-                   if(!this.hasPrototype){
-                        this.target[this.method] = aspect.cutline;
-                    } else {
-                        this.target.prototype[this.method] = aspect.cutline;
-                    } this.hasPrototype = null;
-                } this.clear();
-            }catch(e){
-                throw new $$AOP.WeaveError(e, 'Unweave');
-            }
+            for(var id in this.cache){
+                aspect = this.find(id);
+               if(!this.hasPrototype){
+                    this.target[this.method] = aspect.cutline;
+                } else {
+                    this.target.prototype[this.method] = aspect.cutline;
+                } this.hasPrototype = null;
+            } 
+            this.clear();
             return true;
         },
         /**
@@ -146,7 +139,7 @@ Claypool.AOP={
          * @type String
          */
         advise: function(cutline){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
         
     });
@@ -175,16 +168,12 @@ Claypool.AOP={
             $$AOP.Aspect.prototype,{
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-                        //call the original function and then call the advice 
-                        //   aspect with the return value and return the aspects return value
-                        var returnValue = cutline.apply(this, arguments);//?should be this?
-                        return _this.advice.apply(_this, [returnValue, target, method]);
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "After");
-                }
+                return function() {
+                    //call the original function and then call the advice 
+                    //   aspect with the return value and return the aspects return value
+                    var returnValue = cutline.apply(this, arguments);//?should be this?
+                    return _this.advice.apply(_this, [returnValue, target, method]);
+                };
             }
         });
 
@@ -219,24 +208,20 @@ Claypool.AOP={
              */
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-						var args = [];
-						_this.logger.debug('cutline arguments length %s', arguments.length);
-						for(var i=0;i<arguments.length;i++){
-							args.push(arguments[i]);
-						}
-						args.push({
-							target: target,
-							method: method
-						});
-						_this.logger.debug('applying advice to %s.%s', target, method);
-                        _this.advice.apply(_this, args);
-                        return cutline.apply(this, arguments);//?should be this?
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "Before");
-                }
+                return function() {
+					var args = [];
+					_this.logger.debug('cutline arguments length %s', arguments.length);
+					for(var i=0;i<arguments.length;i++){
+						args.push(arguments[i]);
+					}
+					args.push({
+						target: target,
+						method: method
+					});
+					_this.logger.debug('applying advice to %s.%s', target, method);
+                    _this.advice.apply(_this, args);
+                    return cutline.apply(this, arguments);//?should be this?
+                };
             }
         });
         
@@ -270,23 +255,19 @@ Claypool.AOP={
              */
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-                        var invocation = { object: this, args: arguments};
-                        return _this.advice.apply(_this, [{ 
-                            object: invocation.object,
-                            arguments:  invocation.args, 
-							target: target, 
-							method: method,
-                            proceed :   function() {
-                                var returnValue = cutline.apply(invocation.object, invocation.args);
-                                return returnValue;
-                            }
-                        }] );
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "Around");
-                }
+                return function() {
+                    var invocation = { object: this, args: arguments};
+                    return _this.advice.apply(_this, [{ 
+                        object: invocation.object,
+                        arguments:  invocation.args, 
+						target: target, 
+						method: method,
+                        proceed :   function() {
+                            var returnValue = cutline.apply(invocation.object, invocation.args);
+                            return returnValue;
+                        }
+                    }] );
+                };
             }
         });
     
@@ -328,111 +309,102 @@ Claypool.AOP={
             var aopconf;//unit of config
             var i;
             var targetRef, namespace, prop, genconf;
-            try{
-                this.logger.debug("Configuring Claypool AOP AspectFactory");
-                aopConfiguration = this.getConfig()||[];
-                this.logger.debug("AOP Configurations: %d", aopConfiguration.length);
-                for(i=0;i<aopConfiguration.length;i++){
-                    aopconf = aopConfiguration[i];
-					//in the case where we are late binding (lazy loading) an application
-					//instance, the aopconf.target property will still be a string (otherwise an object)
-					//and so we can easily update the aop engine by only checking only those entries
-					if(typeof(aopconf.target)=='string'){
-                    	try{
-	                        //  resolve the advice which must be specified as an optionally
-	                        //  namespaced string eg 'Foo.Bar.goop' 
-	                        if(!$.isFunction(aopconf.advice)){
-	                            aopconf.advice = $.resolve(aopconf.advice);
-	                        }
-	                        //If the adive is to be applied to an application managed instance
-	                        //then bind to its lifecycle events to weave and unweave the
-	                        //aspect.  This works without modification for lazy loaded app-managed
-							//objects.
-	                        if(aopconf.target.match("^ref://")){
-	                            targetRef = aopconf.target.substr(6,aopconf.target.length);
-	                            $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
-	                                _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
-	                                var instance, ns;
-									//support for namespaces
-									ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-										[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-									if(!iocContainer.find(ns[0])){
-										iocContainer.add(ns[0], new $$.SimpleCachingStrategy());
-									}
-	 								instance = iocContainer.find(ns[0]).find(ns[1]);
-									aopconf.literal = {
-										scope: 'global',
-										object: id
-									};
-		                            aopconf._target = aopconf.target;
-	                                aopconf.target = instance._this;
-	                                _this.add(aopconf.id, aopconf);
-	                                //replace the ioc object with the aspect attached
-	                                var aspect = _this.create(aopconf.id);
-	                                instance._this = aspect.target;
-	                                iocContainer.find(ns[0]).remove(ns[1]);
-	                                iocContainer.find(ns[0]).add(ns[1], instance);
-	                                _this.logger.debug("Created aspect \n%s, \n%s");
-                                
-	                            }).bind("claypool:predestroy:"+targetRef, function(event, instance){
-	                                _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
-	                                var aspect = _this.aspectCache.find(aopconf.id);
-	                                if(aspect&&aspect.unweave){
-	                                    aspect.unweave();
-	                                }
-	                            });
-	                        }else{
-	                            /**
-	                            *   This is an aspect for an entire class of objects or a generic
-	                            *   instance.  We can apply it now so do it. We do like to be
-	                            *   flexible enough to allow a namespaced class, and in either case,
-	                            *   it's specified as a string so we have to resolve it
-	                            */
-	                            if(aopconf.target.match(/\.\*$/)){
-	                                //The string ends with '.*' which implies the target is every function
-	                                //in the namespace.  hence we resolve the namespace, look for every
-	                                //function and create a new filter for each function.
-	                                this.logger.debug("Broad aspect target %s", aopconf.target);
-									
-									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
-	                                	namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
-		                                for(prop in namespace){
-		                                    if($.isFunction(namespace[prop])){
-		                                        //extend the original aopconf replacing the id and target
-		                                        genconf = $.extend({}, aopconf, {
-		                                            id : aopconf.id+$$.uuid(),
-		                                            target : namespace[prop],
-		                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
-		                                        });
-		                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
-		                                            aopconf.target, prop, genconf.id);
-		                                        this.add(genconf.id, genconf);
-		                                        this.create(genconf.id);//this creates the aspect
-		                                    }
-		                                }
-									}
-	                            }else{	
-									//Finally when we do have a late target, make sure we only bother with checking
-									//aop configs that match the late targets clazz
-									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
-	                                	this.logger.debug("Creating aspect id %s", aopconf.id);
-										aopconf._target = aopconf.target;
-		                                aopconf.target =  $.resolve(aopconf.target);
-								
-		                                this.add(aopconf.id, aopconf);
-		                                this.create(aopconf.id);//this creates the aspect
-									}
-	                            }
-	                        }
-	                    }catch(e){
-	                        //Log the expection but allow other Aspects to be configured.
-	                        this.logger.exception(e);
-	                    }
-					}
-                }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$AOP.ConfigurationError(e);
+            
+            this.logger.debug("Configuring Claypool AOP AspectFactory");
+            aopConfiguration = this.getConfig()||[];
+            this.logger.debug("AOP Configurations: %d", aopConfiguration.length);
+            for(i=0;i<aopConfiguration.length;i++){
+                aopconf = aopConfiguration[i];
+				//in the case where we are late binding (lazy loading) an application
+				//instance, the aopconf.target property will still be a string (otherwise an object)
+				//and so we can easily update the aop engine by only checking only those entries
+				if(typeof(aopconf.target)=='string'){
+                    //  resolve the advice which must be specified as an optionally
+                    //  namespaced string eg 'Foo.Bar.goop' 
+                    if(!$.isFunction(aopconf.advice)){
+                        aopconf.advice = $.resolve(aopconf.advice);
+                    }
+                    //If the adive is to be applied to an application managed instance
+                    //then bind to its lifecycle events to weave and unweave the
+                    //aspect.  This works without modification for lazy loaded app-managed
+					//objects.
+                    if(aopconf.target.match("^ref://")){
+                        targetRef = aopconf.target.substr(6,aopconf.target.length);
+                        $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
+                            _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
+                            var instance, ns;
+							//support for namespaces
+							ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+								[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+							if(!iocContainer.find(ns[0])){
+								iocContainer.add(ns[0], new $$.SimpleCachingStrategy());
+							}
+								instance = iocContainer.find(ns[0]).find(ns[1]);
+							aopconf.literal = {
+								scope: 'global',
+								object: id
+							};
+                            aopconf._target = aopconf.target;
+                            aopconf.target = instance._this;
+                            _this.add(aopconf.id, aopconf);
+                            //replace the ioc object with the aspect attached
+                            var aspect = _this.create(aopconf.id);
+                            instance._this = aspect.target;
+                            iocContainer.find(ns[0]).remove(ns[1]);
+                            iocContainer.find(ns[0]).add(ns[1], instance);
+                            _this.logger.debug("Created aspect \n%s, \n%s");
+                        
+                        }).bind("claypool:predestroy:"+targetRef, function(event, instance){
+                            _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
+                            var aspect = _this.aspectCache.find(aopconf.id);
+                            if(aspect&&aspect.unweave){
+                                aspect.unweave();
+                            }
+                        });
+                    }else{
+                        /**
+                        *   This is an aspect for an entire class of objects or a generic
+                        *   instance.  We can apply it now so do it. We do like to be
+                        *   flexible enough to allow a namespaced class, and in either case,
+                        *   it's specified as a string so we have to resolve it
+                        */
+                        if(aopconf.target.match(/\.\*$/)){
+                            //The string ends with '.*' which implies the target is every function
+                            //in the namespace.  hence we resolve the namespace, look for every
+                            //function and create a new filter for each function.
+                            this.logger.debug("Broad aspect target %s", aopconf.target);
+							
+							if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+                            	namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
+                                for(prop in namespace){
+                                    if($.isFunction(namespace[prop])){
+                                        //extend the original aopconf replacing the id and target
+                                        genconf = $.extend({}, aopconf, {
+                                            id : aopconf.id+$$.uuid(),
+                                            target : namespace[prop],
+                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
+                                        });
+                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
+                                            aopconf.target, prop, genconf.id);
+                                        this.add(genconf.id, genconf);
+                                        this.create(genconf.id);//this creates the aspect
+                                    }
+                                }
+							}
+                        }else{	
+							//Finally when we do have a late target, make sure we only bother with checking
+							//aop configs that match the late targets clazz
+							if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+                            	this.logger.debug("Creating aspect id %s", aopconf.id);
+								aopconf._target = aopconf.target;
+                                aopconf.target =  $.resolve(aopconf.target);
+						
+                                this.add(aopconf.id, aopconf);
+                                this.create(aopconf.id);//this creates the aspect
+							}
+                        }
+                    }
+				}
             }
             return true;
         },
@@ -467,41 +439,36 @@ Claypool.AOP={
             }else{
                 //The aspect hasnt been created yet so look for the appropriate 
                 //configuration and create the aspect.
-                try{
-                    this.logger.debug("Looking for configuration for aspect %s", id);
-                    configuration = this.find(id);
-                    if(configuration === undefined || configuration === null){
-                        this.logger.debug("%s is not an Aspect.", id);
-                        return null;
-                    }else{
-                        this.logger.debug("Found configuration for instance %s", id);
-                        if(configuration.selector){
-                            this.logger.debug("Attaching contructor to an active selector");
-                            _this = this;
-                            _continuation = function(){
-                                aspect  = createWeave(configuration);
-                                _this.aspectCache.add(configuration.id+"#"+this.toString(), aspect);
-                                return aspect;
-                            };
-                            if(configuration.active){
-                                //Apply the weave to future dom objects matching the specific
-                                //selector.
-                                $(configuration.selector).livequery(_continuation);
-                            }else{
-                                //attach the aspect only to the current dom snapshot
-                                $(configuration.selector).each(_continuation);
-                            }
+                this.logger.debug("Looking for configuration for aspect %s", id);
+                configuration = this.find(id);
+                if(configuration === undefined || configuration === null){
+                    this.logger.debug("%s is not an Aspect.", id);
+                    return null;
+                }else{
+                    this.logger.debug("Found configuration for instance %s", id);
+                    if(configuration.selector){
+                        this.logger.debug("Attaching contructor to an active selector");
+                        _this = this;
+                        _continuation = function(){
+                            aspect  = createWeave(configuration);
+                            _this.aspectCache.add(configuration.id+"#"+this.toString(), aspect);
+                            return aspect;
+                        };
+                        if(configuration.active){
+                            //Apply the weave to future dom objects matching the specific
+                            //selector.
+                            $(configuration.selector).livequery(_continuation);
                         }else{
-                            //This is either a simple object or class
-                            aspect = createWeave(configuration);
-                            this.aspectCache.add(id, aspect);
+                            //attach the aspect only to the current dom snapshot
+                            $(configuration.selector).each(_continuation);
                         }
-                        /**remember this might not be fully initialized yet!*/
-                        return aspect;
+                    }else{
+                        //This is either a simple object or class
+                        aspect = createWeave(configuration);
+                        this.aspectCache.add(id, aspect);
                     }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$AOP.FactoryError(e);
+                    /**remember this might not be fully initialized yet!*/
+                    return aspect;
                 }
             }
         }
@@ -563,146 +530,29 @@ Claypool.AOP={
              */
             get: function(id){//id is #instance or $Class (ie Function)
                 var aspect, ns;
-                try{
-					//support for namespaces
-					ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-						[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-					//namespaced app cache
-					if(!this.find(ns[0])){
-						this.add(ns[0], new $$.SimpleCachingStrategy());
-					}
-                    this.logger.debug("Search for a container managed aspect :%s", id);
-                    aspect = this.find(ns[0]).find(ns[1]);
-                    if(aspect===undefined||aspect===null){
-                        this.logger.debug("Can't find a container managed aspect :%s", id);
-                        aspect = this.factory.create(ns[1], ns[0]);
-                        if(aspect !== null){
-                            this.find(ns[0]).add(ns[1], aspect);
-                            return aspect;
-                        }
-                    }else{
-                        this.logger.debug("Found container managed instance :%s", id);
+				//support for namespaces
+				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+				//namespaced app cache
+				if(!this.find(ns[0])){
+					this.add(ns[0], new $$.SimpleCachingStrategy());
+				}
+                this.logger.debug("Search for a container managed aspect :%s", id);
+                aspect = this.find(ns[0]).find(ns[1]);
+                if(aspect===undefined||aspect===null){
+                    this.logger.debug("Can't find a container managed aspect :%s", id);
+                    aspect = this.factory.create(ns[1], ns[0]);
+                    if(aspect !== null){
+                        this.find(ns[0]).add(ns[1], aspect);
                         return aspect;
                     }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$AOP.ContainerError(e);
+                }else{
+                    this.logger.debug("Found container managed instance :%s", id);
+                    return aspect;
                 }
                 return null;
             }
         });
-    
-})(  jQuery, Claypool, Claypool.AOP );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.ContainerError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.ContainerError",
-            message:"An error occured inside the aop container."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.ConfigurationError =  function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.ConfigurationError",
-            message:"An error occured updating the aop container configuration."
-        };
-        $.extend( this, new $$.ConfigurationError(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.FactoryError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.FactoryError",
-            message:"An error occured creating the aspect from the configuration."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.WeaveError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.WeaveError",
-            message:"An error occured weaving or unweaving the aspect."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.AspectError =  function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.AspectError",
-            message:"An error occured while applying an aspect."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
     
 })(  jQuery, Claypool, Claypool.AOP );
 

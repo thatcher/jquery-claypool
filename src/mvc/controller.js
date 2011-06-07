@@ -19,7 +19,7 @@
     $.extend($$MVC.Controller.prototype,
         $$.SimpleCachingStrategy.prototype,{
         handle: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
 	

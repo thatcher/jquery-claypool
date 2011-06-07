@@ -215,7 +215,7 @@
         'previous'
     ], function(index, value){
         $M.Model.prototype[value] = function(options){
-           throw new $$.MethodNotImplementedError();
+           throw "MethodNotImplementedError";
         };
     });
     

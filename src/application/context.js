@@ -24,36 +24,33 @@
             var contextObject,
             	contributor,
 				ns;
-            try{
-				//support for namespaces
-				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-				//namespaced app cache
-				if(!this.find(ns[0])){
-					this.add(ns[0], new $$.SimpleCachingStrategy());
-				}
-                this.logger.debug("Searching application context for object: %s" ,id);
-                contextObject = null;
-                contextObject = this.find(ns[0]).find(ns[1]);
-                if(contextObject !== null){
-                    this.logger.debug("Found object in global application context. Object id: %s", id);
-                    return contextObject;
-                }else{
-                    this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
-                    for(contributor in this.contextContributors){
-                        this.logger.debug("Checking Application Context Contributor %s." , contributor);
-                        contextObject = this.contextContributors[contributor].get(id);
-                        if(contextObject !== null){
-                            this.logger.debug("Found object in contributed application context. Object id: %s", id);
-                            return contextObject;
-                        }
+            
+			//support for namespaces
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			if(!this.find(ns[0])){
+				this.add(ns[0], new $$.SimpleCachingStrategy());
+			}
+            this.logger.debug("Searching application context for object: %s" ,id);
+            contextObject = null;
+            contextObject = this.find(ns[0]).find(ns[1]);
+            if(contextObject !== null){
+                this.logger.debug("Found object in global application context. Object id: %s", id);
+                return contextObject;
+            }else{
+                this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
+                for(contributor in this.contextContributors){
+                    this.logger.debug("Checking Application Context Contributor %s." , contributor);
+                    contextObject = this.contextContributors[contributor].get(id);
+                    if(contextObject !== null){
+                        this.logger.debug("Found object in contributed application context. Object id: %s", id);
+                        return contextObject;
                     }
                 }
-                this.logger.debug("Cannot find object in any application context. Object id: %s", id);
-                return null;
-            }catch(e){
-                throw new $$App.ContextError(e);
             }
+            this.logger.debug("Cannot find object in any application context. Object id: %s", id);
+            return null;
         },
         put: function(id, object){
 			//support for namespaces
@@ -88,7 +85,6 @@
          * @constructor
          */
         $$App.ContextContributor = function(options){
-            //??TODO: this works but, uh... why? $.extend( this, new $.ContextContributor(options));
             $$.extend(this, $$.ContextContributor);
             $.extend(true, this, options);
             this.logger = $.logger("Claypool.Application.ContextContributor");

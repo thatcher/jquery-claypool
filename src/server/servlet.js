@@ -62,7 +62,7 @@
          * @type String
          */
         handleGet: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -72,7 +72,7 @@
          * @type String
          */
         handlePost: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -82,7 +82,7 @@
          * @type String
          */
         handlePut: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -92,7 +92,7 @@
          * @type String
          */
         handleDelete: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -102,7 +102,7 @@
          * @type String
          */
         handleHead: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -112,7 +112,7 @@
          * @type String
          */
         handleOptions: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does

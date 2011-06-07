@@ -12,19 +12,19 @@
 	 */
     $$Log.Logger$Interface = {
         debug:      function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         info:       function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         warn:       function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         error:      function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         exception:  function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 	

@@ -11,10 +11,10 @@
     $$.CachingStrategy$Interface = {
         cache:  null,
         size:   null,
-        clear:  function(){ throw new $$.MethodNotImplementedError(); },
-        add:    function(id, object){ throw new $$.MethodNotImplementedError(); },
-        remove: function(id){ throw new $$.MethodNotImplementedError(); },
-        find:   function(id){ throw new $$.MethodNotImplementedError(); }
+        clear:  function(){ throw "MethodNotImplementedError"; },
+        add:    function(id, object){ throw "MethodNotImplementedError"; },
+        remove: function(id){ throw "MethodNotImplementedError"; },
+        find:   function(id){ throw "MethodNotImplementedError"; }
     };
 
 })(  jQuery, Claypool );

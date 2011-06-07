@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.2.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.2.9 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -101,10 +101,10 @@ var Claypool={
     $$.CachingStrategy$Interface = {
         cache:  null,
         size:   null,
-        clear:  function(){ throw new $$.MethodNotImplementedError(); },
-        add:    function(id, object){ throw new $$.MethodNotImplementedError(); },
-        remove: function(id){ throw new $$.MethodNotImplementedError(); },
-        find:   function(id){ throw new $$.MethodNotImplementedError(); }
+        clear:  function(){ throw "MethodNotImplementedError"; },
+        add:    function(id, object){ throw "MethodNotImplementedError"; },
+        remove: function(id){ throw "MethodNotImplementedError"; },
+        find:   function(id){ throw "MethodNotImplementedError"; }
     };
 
 })(  jQuery, Claypool );
@@ -204,8 +204,8 @@ var Claypool={
         
     $.extend($$.Context.prototype,
         $$.SimpleCachingStrategy.prototype,{
-        get: function(id){ throw new $$.MethodNotImplementedError();  },
-        put: function(id, object){ throw new $$.MethodNotImplementedError(); }
+        get: function(id){ throw "MethodNotImplementedError";  },
+        put: function(id, object){ throw "MethodNotImplementedError"; }
     });
 
 })(jQuery, Claypool);
@@ -226,7 +226,7 @@ var Claypool={
     $.extend($$.ContextContributor.prototype, 
         $$.Context.prototype, {
         registerContext: function(id){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
 	
@@ -383,7 +383,7 @@ var Claypool={
 (function($, $$){
     
     $$.Factory$Interface = {
-        create: function(){ throw new $$.MethodNotImplementedError(); }
+        create: function(){ throw "MethodNotImplementedError"; }
     };
 
 })(jQuery, Claypool);
@@ -408,10 +408,10 @@ var Claypool={
         configuration:null,//
         configurationUrl:null,//
         configurationType:null,//"json" or "xml"
-        getConfig: function(){ throw new $$.MethodNotImplementedError();},
-        loadConfig: function(){ throw new $$.MethodNotImplementedError();},
-        setConfig: function(){ throw new $$.MethodNotImplementedError();},
-        updateConfig: function(){ throw new $$.MethodNotImplementedError();}
+        getConfig: function(){ throw "MethodNotImplementedError";},
+        loadConfig: function(){ throw "MethodNotImplementedError";},
+        setConfig: function(){ throw "MethodNotImplementedError";},
+        updateConfig: function(){ throw "MethodNotImplementedError";}
     };
 })(jQuery, Claypool);
 
@@ -430,7 +430,7 @@ var Claypool={
     	// relies heavily on convention to reduce the development overhead.  In
     	// the end, it's job is to simply walk a namespace and build the internal
     	// representation of the equivalent hand-wire configuration
-        scan:function(){ throw new $$.MethodNotImplementedError();}
+        scan:function(){ throw "MethodNotImplementedError"; }
     };
 })(jQuery, Claypool);
 
@@ -474,19 +474,14 @@ var Claypool={
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
-                try{
-                	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
-                    if($$.Configuration[this.configurationId]){
-                        this.logger.debug("Found Claypool.Configuration");
-                        this.configuration = $$.Configuration[this.configurationId];
-                    }else if(!$$.Configuration){
-                        //it's not specified in js code so look for it remotely
-                        this.loadConfig();
-                    }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$.ConfigurationError(e);
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );      
+                this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
+                if($$.Configuration[this.configurationId]){
+                    this.logger.debug("Found Claypool.Configuration");
+                    this.configuration = $$.Configuration[this.configurationId];
+                }else if(!$$.Configuration){
+                    //it's not specified in js code so look for it remotely
+                    this.loadConfig();
                 }
             }
             return this.configuration;
@@ -505,31 +500,26 @@ var Claypool={
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
-            try{
-                jQuery.ajax({
-                    type: "Get",
-                  url: this.configurationUrl,
-                  async: false,
-                  data:{},
-                  dataType: "json",
-        	        success: function(json){
-        	            if(_this.configurationUrl == './app/configs/config.js'){
-        	                $$.Configuration = $$.Configuration||{};
-        	                $.extend(true, $$.Configuration, json);
-        	            }else{
-        	                _this.setConfig(_this.configurationId,
-        	                    json?json:null
-    	                    );
-	                    }
-	                    if(options.callback){
-	                    	options.callback($$.Configuration);
-	                    }
-        	        }
-        	    });
-    	    }catch(e){
-    	        this.logger.exception(e);
-                throw new $$.ConfigurationError(e);
-    	    }
+            jQuery.ajax({
+                type: "Get",
+              url: this.configurationUrl,
+              async: false,
+              data:{},
+              dataType: "json",
+    	        success: function(json){
+    	            if(_this.configurationUrl == './app/configs/config.js'){
+    	                $$.Configuration = $$.Configuration||{};
+    	                $.extend(true, $$.Configuration, json);
+    	            }else{
+    	                _this.setConfig(_this.configurationId,
+    	                    json?json:null
+	                    );
+                    }
+                    if(options.callback){
+                    	options.callback($$.Configuration);
+                    }
+    	        }
+    	    });
         },
         /**
          * Describe what this method does
@@ -551,102 +541,10 @@ var Claypool={
          * @type String
          */
         updateConfig: function(id){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         }
     });
 
-})(jQuery, Claypool);
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.Error = function(e, options){
-        $.extend(true, this, e||new Error());
-        this.name = (options&&options.name?options.name:"Claypool.UnknownError") +
-            " > Claypool.Error" + (this.name?(" > "+this.name):"") ;
-        this.message = (options&&options.name?options.name:"No Message Provided \n Nested exception is:\n\t") +
-            (this.message||"UnknownError");
-    };
-    
-})(jQuery, Claypool);
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.ConfigurationError = function(e, options){
-        var details = {
-            name:"Claypool.ConfigurationError",
-            message:"An error occured trying to locate or load the system configuration."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
-})(jQuery, Claypool);
-        
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.MethodNotImplementedError = function(e, options){
-        var details = {
-            name:"Claypool.MethodNotImplementedError",
-            message:"Method not implemented."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
-})(jQuery, Claypool);
-        
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.NameResolutionError = function(e, options){
-        var details = {
-            name:"Claypool.NameResolutionError",
-            message:"Unexpected error resolving name."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
 })(jQuery, Claypool);
 
 /**
@@ -719,22 +617,19 @@ var Claypool={
             var namespaces;
             var target; //the resolved object/function/array/thing or null
             var i;
-            try{
-                _resolver = function(name){
-                    return this[name];
-                };
-                namespaces = namespacedName.split('.');
-                target = null;
-                for( i = 0; i < namespaces.length; i++){
-                    target = _resolver.call(target,namespaces[i]);
-                    if(target === undefined){
-                        return target;
-                    }
+            
+            _resolver = function(name){
+                return this[name];
+            };
+            namespaces = namespacedName.split('.');
+            target = null;
+            for( i = 0; i < namespaces.length; i++){
+                target = _resolver.call(target,namespaces[i]);
+                if(target === undefined){
+                    return target;
                 }
-                return target;
-            }catch(e){
-                throw new $$.NameResolutionError(e);
             }
+            return target;
         },
 	    /**
 	     * Describe what this method does
@@ -910,19 +805,19 @@ Claypool.Logging={
 	 */
     $$Log.Logger$Interface = {
         debug:      function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         info:       function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         warn:       function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         error:      function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         exception:  function(){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 	
@@ -1250,7 +1145,7 @@ Claypool.Logging={
                     //message is e
                     //console_apply(console.error, this.formatter.format(level, category, 
                     //    message.message?[message.message]:[])); 
-                    console_apply(console.error, [printStackTrace({e:message}).join('\n')]);
+                    console_apply(console.error, [e]);//[printStackTrace({e:message}).join('\n')]);
                     break;
             }
         }
@@ -1271,7 +1166,7 @@ Claypool.Logging={
 	 */
     $$Log.Formatter$Interface = {
         format: function(level, category, objects){
-            throw new $.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 })(  jQuery, Claypool, Claypool.Logging );
@@ -1659,22 +1554,12 @@ Claypool.Logging={
             var loggingConfiguration;
             var logconf;
             var i;
-            try{
-                this.logger.debug("Configuring Claypool Logging");
-                this.clear();
-                loggingConfiguration = this.getConfig()||[];
-                for(i=0;i<loggingConfiguration.length;i++){
-                    try{
-                        logconf = loggingConfiguration[i];
-                        this.add( logconf.category, logconf );
-                    }catch(ee){
-                        this.logger.exception(ee);
-                        return false;
-                    }
-                }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$Log.ConfigurationError(e);
+            this.logger.debug("Configuring Claypool Logging");
+            this.clear();
+            loggingConfiguration = this.getConfig()||[];
+            for(i=0;i<loggingConfiguration.length;i++){
+                logconf = loggingConfiguration[i];
+                this.add( logconf.category, logconf );
             }
             return true;
         }
@@ -1682,43 +1567,6 @@ Claypool.Logging={
 	    
 })(  jQuery, Claypool, Claypool.Logging );
 
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Log){
-	/**
-	 * @constructor
-	 */
-    $$Log.ConfigurationError = function(e, options){
-        $.extend( this, new $$.ConfigurationError(e, options||{
-            name:"Claypool.Logging.ConfigurationError",
-            message: "An error occured trying to configure the logging system."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.Logging );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Log){
-	/**
-	 * @constructor
-	 */
-    $$Log.NoAppendersAvailableError = function(e, options){
-        $.extend( this, new $$.Error(e, options||{
-            name:"Claypool.Logging.NoAppendersAvailableError",
-            message: "An error occured trying to configure the logging system."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.Logging );
-	
 
 /**
  * Descibe this class
@@ -1777,375 +1625,6 @@ Claypool.Logging={
 	
 	
 })(  jQuery, Claypool, Claypool.Logging );
-//stacktrace-0.3 is included by claypool now - license info preserved below
-
-// Domain Public by Eric Wendelin http://eriwen.com/ (2008)
-//                  Luke Smith http://lucassmith.name/ (2008)
-//                  Loic Dachary <loic@dachary.org> (2008)
-//                  Johan Euphrosine <proppy@aminche.com> (2008)
-//                  Øyvind Sean Kinsey http://kinsey.no/blog (2010)
-//
-// Information and discussions
-// http://jspoker.pokersource.info/skin/test-printstacktrace.html
-// http://eriwen.com/javascript/js-stack-trace/
-// http://eriwen.com/javascript/stacktrace-update/
-// http://pastie.org/253058
-//
-// guessFunctionNameFromLines comes from firebug
-//
-// Software License Agreement (BSD License)
-//
-// Copyright (c) 2007, Parakey Inc.
-// All rights reserved.
-//
-// Redistribution and use of this software in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-// * Redistributions of source code must retain the above
-//   copyright notice, this list of conditions and the
-//   following disclaimer.
-//
-// * Redistributions in binary form must reproduce the above
-//   copyright notice, this list of conditions and the
-//   following disclaimer in the documentation and/or other
-//   materials provided with the distribution.
-//
-// * Neither the name of Parakey Inc. nor the names of its
-//   contributors may be used to endorse or promote products
-//   derived from this software without specific prior
-//   written permission of Parakey Inc.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-// IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-/**
- * Main function giving a function stack trace with a forced or passed in Error 
- *
- * @cfg {Error} e The error to create a stacktrace from (optional)
- * @cfg {Boolean} guess If we should try to resolve the names of anonymous functions
- * @return {Array} of Strings with functions, lines, files, and arguments where possible 
- */
-function printStackTrace(options) {
-    var ex = (options && options.e) ? options.e : null;
-    var guess = options ? !!options.guess : true;
-    
-    var p = new printStackTrace.implementation();
-    var result = p.run(ex);
-    return (guess) ? p.guessFunctions(result) : result;
-}
-
-printStackTrace.implementation = function() {};
-
-printStackTrace.implementation.prototype = {
-    run: function(ex) {
-        ex = ex ||
-            (function() {
-				var _err;
-                try {
-                    _err = __undef__ << 1;
-                } catch (e) {
-                    return e;
-                }
-            })();
-        // Use either the stored mode, or resolve it
-        var mode = this._mode || this.mode(ex);
-        if (mode === 'other') {
-            return this.other(arguments.callee);
-        } else {
-            return this[mode](ex);
-        }
-    },
-    
-    /**
-     * @return {String} mode of operation for the environment in question.
-     */
-    mode: function(e) {
-        if (e['arguments']) {
-            return (this._mode = 'chrome');
-        } else if (window.opera && e.stacktrace) {
-            return (this._mode = 'opera10');
-        } else if (e.stack) {
-            return (this._mode = 'firefox');
-        } else if (window.opera && !('stacktrace' in e)) { //Opera 9-
-            return (this._mode = 'opera');
-        }
-        return (this._mode = 'other');
-    },
-
-    /**
-     * Given a context, function name, and callback function, overwrite it so that it calls
-     * printStackTrace() first with a callback and then runs the rest of the body.
-     * 
-     * @param {Object} context of execution (e.g. window)
-     * @param {String} functionName to instrument
-     * @param {Function} function to call with a stack trace on invocation
-     */
-    instrumentFunction: function(context, functionName, callback) {
-        context = context || window;
-        context['_old' + functionName] = context[functionName];
-        context[functionName] = function() { 
-            callback.call(this, printStackTrace());
-            return context['_old' + functionName].apply(this, arguments);
-        };
-        context[functionName]._instrumented = true;
-    },
-    
-    /**
-     * Given a context and function name of a function that has been
-     * instrumented, revert the function to it's original (non-instrumented)
-     * state.
-     *
-     * @param {Object} context of execution (e.g. window)
-     * @param {String} functionName to de-instrument
-     */
-    deinstrumentFunction: function(context, functionName) {
-        if (context[functionName].constructor === Function &&
-                context[functionName]._instrumented &&
-                context['_old' + functionName].constructor === Function) {
-            context[functionName] = context['_old' + functionName];
-        }
-    },
-    
-    /**
-     * Given an Error object, return a formatted Array based on Chrome's stack string.
-     * 
-     * @param e - Error object to inspect
-     * @return Array<String> of function calls, files and line numbers
-     */
-    chrome: function(e) {
-        return e.stack.replace(/^[^\(]+?[\n$]/gm, '').replace(/^\s+at\s+/gm, '').replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@').split('\n');
-    },
-
-    /**
-     * Given an Error object, return a formatted Array based on Firefox's stack string.
-     * 
-     * @param e - Error object to inspect
-     * @return Array<String> of function calls, files and line numbers
-     */
-    firefox: function(e) {
-        return e.stack.replace(/(?:\n@:0)?\s+$/m, '').replace(/^\(/gm, '{anonymous}(').split('\n');
-    },
-
-    /**
-     * Given an Error object, return a formatted Array based on Opera 10's stacktrace string.
-     * 
-     * @param e - Error object to inspect
-     * @return Array<String> of function calls, files and line numbers
-     */
-    opera10: function(e) {
-        var stack = e.stacktrace;
-        var lines = stack.split('\n'), 
-			ANON = '{anonymous}',
-            lineRE = /.*line (\d+), column (\d+) in ((<anonymous function\:?\s*(\S+))|([^\(]+)\([^\)]*\))(?: in )?(.*)\s*$/i, 
-			i, j, len,
-			location,
-			fnName;
-        for (i = 2, j = 0, len = lines.length; i < len - 2; i++) {
-            if (lineRE.test(lines[i])) {
-                location = RegExp.$6 + ':' + RegExp.$1 + ':' + RegExp.$2;
-                fnName = RegExp.$3;
-                fnName = fnName.replace(/<anonymous function\:?\s?(\S+)?>/g, ANON);
-                lines[j++] = fnName + '@' + location;
-            }
-        }
-        
-        lines.splice(j, lines.length - j);
-        return lines;
-    },
-    
-    // Opera 7.x-9.x only!
-    opera: function(e) {
-        var lines = e.message.split('\n'), ANON = '{anonymous}', 
-            lineRE = /Line\s+(\d+).*script\s+(http\S+)(?:.*in\s+function\s+(\S+))?/i, 
-            i, j, len;
-        
-        for (i = 4, j = 0, len = lines.length; i < len; i += 2) {
-            //TODO: RegExp.exec() would probably be cleaner here
-            if (lineRE.test(lines[i])) {
-                lines[j++] = (RegExp.$3 ? RegExp.$3 + '()@' + RegExp.$2 + RegExp.$1 : ANON + '()@' + RegExp.$2 + ':' + RegExp.$1) + ' -- ' + lines[i + 1].replace(/^\s+/, '');
-            }
-        }
-        
-        lines.splice(j, lines.length - j);
-        return lines;
-    },
-    
-    // Safari, IE, and others
-    other: function(curr) {
-        var ANON = '{anonymous}', fnRE = /function\s*([\w\-$]+)?\s*\(/i,
-            stack = [], j = 0, fn, args;
-        
-        var maxStackSize = 10;
-        while (curr && stack.length < maxStackSize) {
-            fn = fnRE.test(curr.toString()) ? RegExp.$1 || ANON : ANON;
-            args = Array.prototype.slice.call(curr['arguments']);
-            stack[j++] = fn + '(' + this.stringifyArguments(args) + ')';
-            curr = curr.caller;
-        }
-        return stack;
-    },
-    
-    /**
-     * Given arguments array as a String, subsituting type names for non-string types.
-     *
-     * @param {Arguments} object
-     * @return {Array} of Strings with stringified arguments
-     */
-    stringifyArguments: function(args) {
-		var arg;
-        for (var i = 0; i < args.length; ++i) {
-            arg = args[i];
-            if (arg === undefined) {
-                args[i] = 'undefined';
-            } else if (arg === null) {
-                args[i] = 'null';
-            } else if (arg.constructor) {
-                if (arg.constructor === Array) {
-                    if (arg.length < 3) {
-                        args[i] = '[' + this.stringifyArguments(arg) + ']';
-                    } else {
-                        args[i] = '[' + this.stringifyArguments(Array.prototype.slice.call(arg, 0, 1)) + '...' + this.stringifyArguments(Array.prototype.slice.call(arg, -1)) + ']';
-                    }
-                } else if (arg.constructor === Object) {
-                    args[i] = '#object';
-                } else if (arg.constructor === Function) {
-                    args[i] = '#function';
-                } else if (arg.constructor === String) {
-                    args[i] = '"' + arg + '"';
-                }
-            }
-        }
-        return args.join(',');
-    },
-    
-    sourceCache: {},
-    
-    /**
-     * @return the text from a given URL.
-     */
-    ajax: function(url) {
-        var req = this.createXMLHTTPObject();
-        if (!req) {
-            return;
-        }
-        req.open('GET', url, false);
-        req.setRequestHeader('User-Agent', 'XMLHTTP/1.0');
-        req.send('');
-        return req.responseText;
-    },
-    
-    /**
-     * Try XHR methods in order and store XHR factory.
-     *
-     * @return <Function> XHR function or equivalent
-     */
-    createXMLHTTPObject: function() {
-        var xmlhttp, XMLHttpFactories = [
-            function() {
-                return new XMLHttpRequest();
-            }, function() {
-                return new ActiveXObject('Msxml2.XMLHTTP');
-            }, function() {
-                return new ActiveXObject('Msxml3.XMLHTTP');
-            }, function() {
-                return new ActiveXObject('Microsoft.XMLHTTP');
-            }
-        ];
-        for (var i = 0; i < XMLHttpFactories.length; i++) {
-            try {
-                xmlhttp = XMLHttpFactories[i]();
-                // Use memoization to cache the factory
-                this.createXMLHTTPObject = XMLHttpFactories[i];
-                return xmlhttp;
-            } catch (e) {}
-        }
-    },
-
-    /**
-     * Given a URL, check if it is in the same domain (so we can get the source
-     * via Ajax).
-     *
-     * @param url <String> source url
-     * @return False if we need a cross-domain request
-     */
-    isSameDomain: function(url) {
-        return url.indexOf(location.hostname) !== -1;
-    },
-    
-    /**
-     * Get source code from given URL if in the same domain.
-     *
-     * @param url <String> JS source URL
-     * @return <String> Source code
-     */
-    getSource: function(url) {
-        if (!(url in this.sourceCache)) {
-            this.sourceCache[url] = this.ajax(url).split('\n');
-        }
-        return this.sourceCache[url];
-    },
-    
-    guessFunctions: function(stack) {
-		var i,
-			reStack,
-			frame,
-			file,
-			functionName;
-        for (i = 0; i < stack.length; ++i) {
-            reStack = /\{anonymous\}\(.*\)@(\w+:\/\/([\-\w\.]+)+(:\d+)?[^:]+):(\d+):?(\d+)?/;
-            frame = stack[i];
- 			m = reStack.exec(frame);
-            if (m) {
-                file = m[1]; 
-				lineno = m[4]; //m[7] is character position in Chrome
-                if (file && this.isSameDomain(file) && lineno) {
-                    functionName = this.guessFunctionName(file, lineno);
-                    stack[i] = frame.replace('{anonymous}', functionName);
-                }
-            }
-        }
-        return stack;
-    },
-    
-    guessFunctionName: function(url, lineNo) {
-        try {
-            return this.guessFunctionNameFromLines(lineNo, this.getSource(url));
-        } catch (e) {
-            return 'getSource failed with url: ' + url + ', exception: ' + e.toString();
-        }
-    },
-    
-    guessFunctionNameFromLines: function(lineNo, source) {
-        var reFunctionArgNames = /function ([^(]*)\(([^)]*)\)/;
-        var reGuessFunction = /['"]?([0-9A-Za-z_]+)['"]?\s*[:=]\s*(function|eval|new Function)/;
-        // Walk backwards from the first line in the function until we find the line which
-        // matches the pattern above, which is the function definition
-        var line = "", 
-			maxLines = 10,
-			i, m;
-        for (i = 0; i < maxLines; ++i) {
-            line = source[lineNo - i] + line;
-            if (line !== undefined) {
-                m = reGuessFunction.exec(line);
-                if (m && m[1]) {
-                    return m[1];
-                } else {
-                    m = reFunctionArgNames.exec(line);
-                    if (m && m[1]) {
-                        return m[1];
-                    }
-                }
-            }
-        }
-        return '(?)';
-    }
-};
 Claypool.Application={
 /*
  * Claypool.Application @VERSION@ - A Web 1.6180339... Javascript Application Framework
@@ -2213,7 +1692,6 @@ Claypool.Application={
 	     * @type String
 	     */
 	    Reinitialize: function(callback){
-	        /**we probably should try/catch here*/
 	        $(document).trigger("claypool:reinitialize", [$$App]);
 	        //Allow extension of Initialize via callback
 	        if(callback){callback();}
@@ -2263,36 +1741,33 @@ Claypool.Application={
             var contextObject,
             	contributor,
 				ns;
-            try{
-				//support for namespaces
-				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-				//namespaced app cache
-				if(!this.find(ns[0])){
-					this.add(ns[0], new $$.SimpleCachingStrategy());
-				}
-                this.logger.debug("Searching application context for object: %s" ,id);
-                contextObject = null;
-                contextObject = this.find(ns[0]).find(ns[1]);
-                if(contextObject !== null){
-                    this.logger.debug("Found object in global application context. Object id: %s", id);
-                    return contextObject;
-                }else{
-                    this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
-                    for(contributor in this.contextContributors){
-                        this.logger.debug("Checking Application Context Contributor %s." , contributor);
-                        contextObject = this.contextContributors[contributor].get(id);
-                        if(contextObject !== null){
-                            this.logger.debug("Found object in contributed application context. Object id: %s", id);
-                            return contextObject;
-                        }
+            
+			//support for namespaces
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			if(!this.find(ns[0])){
+				this.add(ns[0], new $$.SimpleCachingStrategy());
+			}
+            this.logger.debug("Searching application context for object: %s" ,id);
+            contextObject = null;
+            contextObject = this.find(ns[0]).find(ns[1]);
+            if(contextObject !== null){
+                this.logger.debug("Found object in global application context. Object id: %s", id);
+                return contextObject;
+            }else{
+                this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
+                for(contributor in this.contextContributors){
+                    this.logger.debug("Checking Application Context Contributor %s." , contributor);
+                    contextObject = this.contextContributors[contributor].get(id);
+                    if(contextObject !== null){
+                        this.logger.debug("Found object in contributed application context. Object id: %s", id);
+                        return contextObject;
                     }
                 }
-                this.logger.debug("Cannot find object in any application context. Object id: %s", id);
-                return null;
-            }catch(e){
-                throw new $$App.ContextError(e);
             }
+            this.logger.debug("Cannot find object in any application context. Object id: %s", id);
+            return null;
         },
         put: function(id, object){
 			//support for namespaces
@@ -2327,7 +1802,6 @@ Claypool.Application={
          * @constructor
          */
         $$App.ContextContributor = function(options){
-            //??TODO: this works but, uh... why? $.extend( this, new $.ContextContributor(options));
             $$.extend(this, $$.ContextContributor);
             $.extend(true, this, options);
             this.logger = $.logger("Claypool.Application.ContextContributor");
@@ -2370,30 +1844,6 @@ Claypool.Application={
                 return $$App.getContext();
             }
         });
-    
-})(  jQuery, Claypool, Claypool.Application );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$App){
-    /**
-     * @constructor
-     */
-    $$App.ContextError = function(e, options){
-        var details = {
-            name:"Claypool.Application.ContextError",
-            message:"An unexpected error occured while searching the application context."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
     
 })(  jQuery, Claypool, Claypool.Application );
 
@@ -2554,29 +2004,25 @@ Claypool.AOP={
             }
             var _weave = function(methodName){
                 var pointcut, cutline, details;//new method , old method
-                try{
-                    _this.logger.debug( "Weaving Advice %s for Aspect %s", methodName, _this.id );
-                    
-                    _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
-                    cutline = _this.hasPrototype ? 
-                        _this.target.prototype[methodName] : 
-                        _this.target[methodName];
-                    pointcut = _this.advise(cutline, _this._target, methodName);
-                    if(!_this.hasPrototype){
-                        _this.target[methodName] = pointcut;
-                    }else{ 
-                        _this.target.prototype[methodName] = pointcut;
-                    }
-                    details = { 
-                        pointcut:pointcut,
-                        cutline:cutline,
-						method: methodName,
-						target: _this._target
-                    };
-					return details;
-                }catch(e){
-                    throw new $$AOP.WeaveError(e, "Weave");
+                _this.logger.debug( "Weaving Advice %s for Aspect %s", methodName, _this.id );
+                
+                _this.hasPrototype = typeof(_this.target.prototype) != 'undefined';
+                cutline = _this.hasPrototype ? 
+                    _this.target.prototype[methodName] : 
+                    _this.target[methodName];
+                pointcut = _this.advise(cutline, _this._target, methodName);
+                if(!_this.hasPrototype){
+                    _this.target[methodName] = pointcut;
+                }else{ 
+                    _this.target.prototype[methodName] = pointcut;
                 }
+                details = { 
+                    pointcut:pointcut,
+                    cutline:cutline,
+					method: methodName,
+					target: _this._target
+                };
+				return details;
             };
             //we dont want an aspect to be woven multiple times accidently so 
             //its worth a quick check to make sure the internal cache is empty.
@@ -2601,18 +2047,15 @@ Claypool.AOP={
          */
         unweave: function(){
             var aspect;
-            try{
-                for(var id in this.cache){
-                    aspect = this.find(id);
-                   if(!this.hasPrototype){
-                        this.target[this.method] = aspect.cutline;
-                    } else {
-                        this.target.prototype[this.method] = aspect.cutline;
-                    } this.hasPrototype = null;
-                } this.clear();
-            }catch(e){
-                throw new $$AOP.WeaveError(e, 'Unweave');
-            }
+            for(var id in this.cache){
+                aspect = this.find(id);
+               if(!this.hasPrototype){
+                    this.target[this.method] = aspect.cutline;
+                } else {
+                    this.target.prototype[this.method] = aspect.cutline;
+                } this.hasPrototype = null;
+            } 
+            this.clear();
             return true;
         },
         /**
@@ -2623,7 +2066,7 @@ Claypool.AOP={
          * @type String
          */
         advise: function(cutline){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
         
     });
@@ -2652,16 +2095,12 @@ Claypool.AOP={
             $$AOP.Aspect.prototype,{
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-                        //call the original function and then call the advice 
-                        //   aspect with the return value and return the aspects return value
-                        var returnValue = cutline.apply(this, arguments);//?should be this?
-                        return _this.advice.apply(_this, [returnValue, target, method]);
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "After");
-                }
+                return function() {
+                    //call the original function and then call the advice 
+                    //   aspect with the return value and return the aspects return value
+                    var returnValue = cutline.apply(this, arguments);//?should be this?
+                    return _this.advice.apply(_this, [returnValue, target, method]);
+                };
             }
         });
 
@@ -2696,24 +2135,20 @@ Claypool.AOP={
              */
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-						var args = [];
-						_this.logger.debug('cutline arguments length %s', arguments.length);
-						for(var i=0;i<arguments.length;i++){
-							args.push(arguments[i]);
-						}
-						args.push({
-							target: target,
-							method: method
-						});
-						_this.logger.debug('applying advice to %s.%s', target, method);
-                        _this.advice.apply(_this, args);
-                        return cutline.apply(this, arguments);//?should be this?
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "Before");
-                }
+                return function() {
+					var args = [];
+					_this.logger.debug('cutline arguments length %s', arguments.length);
+					for(var i=0;i<arguments.length;i++){
+						args.push(arguments[i]);
+					}
+					args.push({
+						target: target,
+						method: method
+					});
+					_this.logger.debug('applying advice to %s.%s', target, method);
+                    _this.advice.apply(_this, args);
+                    return cutline.apply(this, arguments);//?should be this?
+                };
             }
         });
         
@@ -2747,23 +2182,19 @@ Claypool.AOP={
              */
             advise: function(cutline, target, method){
                 var _this = this;
-                try{
-                    return function() {
-                        var invocation = { object: this, args: arguments};
-                        return _this.advice.apply(_this, [{ 
-                            object: invocation.object,
-                            arguments:  invocation.args, 
-							target: target, 
-							method: method,
-                            proceed :   function() {
-                                var returnValue = cutline.apply(invocation.object, invocation.args);
-                                return returnValue;
-                            }
-                        }] );
-                    };
-                }catch(e){
-                    throw new $$AOP.AspectError(e, "Around");
-                }
+                return function() {
+                    var invocation = { object: this, args: arguments};
+                    return _this.advice.apply(_this, [{ 
+                        object: invocation.object,
+                        arguments:  invocation.args, 
+						target: target, 
+						method: method,
+                        proceed :   function() {
+                            var returnValue = cutline.apply(invocation.object, invocation.args);
+                            return returnValue;
+                        }
+                    }] );
+                };
             }
         });
     
@@ -2805,111 +2236,102 @@ Claypool.AOP={
             var aopconf;//unit of config
             var i;
             var targetRef, namespace, prop, genconf;
-            try{
-                this.logger.debug("Configuring Claypool AOP AspectFactory");
-                aopConfiguration = this.getConfig()||[];
-                this.logger.debug("AOP Configurations: %d", aopConfiguration.length);
-                for(i=0;i<aopConfiguration.length;i++){
-                    aopconf = aopConfiguration[i];
-					//in the case where we are late binding (lazy loading) an application
-					//instance, the aopconf.target property will still be a string (otherwise an object)
-					//and so we can easily update the aop engine by only checking only those entries
-					if(typeof(aopconf.target)=='string'){
-                    	try{
-	                        //  resolve the advice which must be specified as an optionally
-	                        //  namespaced string eg 'Foo.Bar.goop' 
-	                        if(!$.isFunction(aopconf.advice)){
-	                            aopconf.advice = $.resolve(aopconf.advice);
-	                        }
-	                        //If the adive is to be applied to an application managed instance
-	                        //then bind to its lifecycle events to weave and unweave the
-	                        //aspect.  This works without modification for lazy loaded app-managed
-							//objects.
-	                        if(aopconf.target.match("^ref://")){
-	                            targetRef = aopconf.target.substr(6,aopconf.target.length);
-	                            $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
-	                                _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
-	                                var instance, ns;
-									//support for namespaces
-									ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-										[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-									if(!iocContainer.find(ns[0])){
-										iocContainer.add(ns[0], new $$.SimpleCachingStrategy());
-									}
-	 								instance = iocContainer.find(ns[0]).find(ns[1]);
-									aopconf.literal = {
-										scope: 'global',
-										object: id
-									};
-		                            aopconf._target = aopconf.target;
-	                                aopconf.target = instance._this;
-	                                _this.add(aopconf.id, aopconf);
-	                                //replace the ioc object with the aspect attached
-	                                var aspect = _this.create(aopconf.id);
-	                                instance._this = aspect.target;
-	                                iocContainer.find(ns[0]).remove(ns[1]);
-	                                iocContainer.find(ns[0]).add(ns[1], instance);
-	                                _this.logger.debug("Created aspect \n%s, \n%s");
-                                
-	                            }).bind("claypool:predestroy:"+targetRef, function(event, instance){
-	                                _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
-	                                var aspect = _this.aspectCache.find(aopconf.id);
-	                                if(aspect&&aspect.unweave){
-	                                    aspect.unweave();
-	                                }
-	                            });
-	                        }else{
-	                            /**
-	                            *   This is an aspect for an entire class of objects or a generic
-	                            *   instance.  We can apply it now so do it. We do like to be
-	                            *   flexible enough to allow a namespaced class, and in either case,
-	                            *   it's specified as a string so we have to resolve it
-	                            */
-	                            if(aopconf.target.match(/\.\*$/)){
-	                                //The string ends with '.*' which implies the target is every function
-	                                //in the namespace.  hence we resolve the namespace, look for every
-	                                //function and create a new filter for each function.
-	                                this.logger.debug("Broad aspect target %s", aopconf.target);
-									
-									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
-	                                	namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
-		                                for(prop in namespace){
-		                                    if($.isFunction(namespace[prop])){
-		                                        //extend the original aopconf replacing the id and target
-		                                        genconf = $.extend({}, aopconf, {
-		                                            id : aopconf.id+$$.uuid(),
-		                                            target : namespace[prop],
-		                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
-		                                        });
-		                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
-		                                            aopconf.target, prop, genconf.id);
-		                                        this.add(genconf.id, genconf);
-		                                        this.create(genconf.id);//this creates the aspect
-		                                    }
-		                                }
-									}
-	                            }else{	
-									//Finally when we do have a late target, make sure we only bother with checking
-									//aop configs that match the late targets clazz
-									if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
-	                                	this.logger.debug("Creating aspect id %s", aopconf.id);
-										aopconf._target = aopconf.target;
-		                                aopconf.target =  $.resolve(aopconf.target);
-								
-		                                this.add(aopconf.id, aopconf);
-		                                this.create(aopconf.id);//this creates the aspect
-									}
-	                            }
-	                        }
-	                    }catch(e){
-	                        //Log the expection but allow other Aspects to be configured.
-	                        this.logger.exception(e);
-	                    }
-					}
-                }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$AOP.ConfigurationError(e);
+            
+            this.logger.debug("Configuring Claypool AOP AspectFactory");
+            aopConfiguration = this.getConfig()||[];
+            this.logger.debug("AOP Configurations: %d", aopConfiguration.length);
+            for(i=0;i<aopConfiguration.length;i++){
+                aopconf = aopConfiguration[i];
+				//in the case where we are late binding (lazy loading) an application
+				//instance, the aopconf.target property will still be a string (otherwise an object)
+				//and so we can easily update the aop engine by only checking only those entries
+				if(typeof(aopconf.target)=='string'){
+                    //  resolve the advice which must be specified as an optionally
+                    //  namespaced string eg 'Foo.Bar.goop' 
+                    if(!$.isFunction(aopconf.advice)){
+                        aopconf.advice = $.resolve(aopconf.advice);
+                    }
+                    //If the adive is to be applied to an application managed instance
+                    //then bind to its lifecycle events to weave and unweave the
+                    //aspect.  This works without modification for lazy loaded app-managed
+					//objects.
+                    if(aopconf.target.match("^ref://")){
+                        targetRef = aopconf.target.substr(6,aopconf.target.length);
+                        $(document).bind("claypool:ioc:"+targetRef, function(event, id, iocContainer){
+                            _this.logger.debug("Creating aspect id %s for instance %s", aopconf.id);
+                            var instance, ns;
+							//support for namespaces
+							ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+								[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+							if(!iocContainer.find(ns[0])){
+								iocContainer.add(ns[0], new $$.SimpleCachingStrategy());
+							}
+								instance = iocContainer.find(ns[0]).find(ns[1]);
+							aopconf.literal = {
+								scope: 'global',
+								object: id
+							};
+                            aopconf._target = aopconf.target;
+                            aopconf.target = instance._this;
+                            _this.add(aopconf.id, aopconf);
+                            //replace the ioc object with the aspect attached
+                            var aspect = _this.create(aopconf.id);
+                            instance._this = aspect.target;
+                            iocContainer.find(ns[0]).remove(ns[1]);
+                            iocContainer.find(ns[0]).add(ns[1], instance);
+                            _this.logger.debug("Created aspect \n%s, \n%s");
+                        
+                        }).bind("claypool:predestroy:"+targetRef, function(event, instance){
+                            _this.logger.debug("Destroying aspect id %s for instance %s", aopconf.id);
+                            var aspect = _this.aspectCache.find(aopconf.id);
+                            if(aspect&&aspect.unweave){
+                                aspect.unweave();
+                            }
+                        });
+                    }else{
+                        /**
+                        *   This is an aspect for an entire class of objects or a generic
+                        *   instance.  We can apply it now so do it. We do like to be
+                        *   flexible enough to allow a namespaced class, and in either case,
+                        *   it's specified as a string so we have to resolve it
+                        */
+                        if(aopconf.target.match(/\.\*$/)){
+                            //The string ends with '.*' which implies the target is every function
+                            //in the namespace.  hence we resolve the namespace, look for every
+                            //function and create a new filter for each function.
+                            this.logger.debug("Broad aspect target %s", aopconf.target);
+							
+							if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+                            	namespace = $.resolve(aopconf.target.substring(0, aopconf.target.length - 2));
+                                for(prop in namespace){
+                                    if($.isFunction(namespace[prop])){
+                                        //extend the original aopconf replacing the id and target
+                                        genconf = $.extend({}, aopconf, {
+                                            id : aopconf.id+$$.uuid(),
+                                            target : namespace[prop],
+                                            _target: aopconf.target.substring(0, aopconf.target.length - 1)+prop
+                                        });
+                                        this.logger.debug("Creating aspect id %s [%s] (%s)", 
+                                            aopconf.target, prop, genconf.id);
+                                        this.add(genconf.id, genconf);
+                                        this.create(genconf.id);//this creates the aspect
+                                    }
+                                }
+							}
+                        }else{	
+							//Finally when we do have a late target, make sure we only bother with checking
+							//aop configs that match the late targets clazz
+							if(!lateTarget || (lateTarget.clazz.match(aopconf.target))){
+                            	this.logger.debug("Creating aspect id %s", aopconf.id);
+								aopconf._target = aopconf.target;
+                                aopconf.target =  $.resolve(aopconf.target);
+						
+                                this.add(aopconf.id, aopconf);
+                                this.create(aopconf.id);//this creates the aspect
+							}
+                        }
+                    }
+				}
             }
             return true;
         },
@@ -2944,41 +2366,36 @@ Claypool.AOP={
             }else{
                 //The aspect hasnt been created yet so look for the appropriate 
                 //configuration and create the aspect.
-                try{
-                    this.logger.debug("Looking for configuration for aspect %s", id);
-                    configuration = this.find(id);
-                    if(configuration === undefined || configuration === null){
-                        this.logger.debug("%s is not an Aspect.", id);
-                        return null;
-                    }else{
-                        this.logger.debug("Found configuration for instance %s", id);
-                        if(configuration.selector){
-                            this.logger.debug("Attaching contructor to an active selector");
-                            _this = this;
-                            _continuation = function(){
-                                aspect  = createWeave(configuration);
-                                _this.aspectCache.add(configuration.id+"#"+this.toString(), aspect);
-                                return aspect;
-                            };
-                            if(configuration.active){
-                                //Apply the weave to future dom objects matching the specific
-                                //selector.
-                                $(configuration.selector).livequery(_continuation);
-                            }else{
-                                //attach the aspect only to the current dom snapshot
-                                $(configuration.selector).each(_continuation);
-                            }
+                this.logger.debug("Looking for configuration for aspect %s", id);
+                configuration = this.find(id);
+                if(configuration === undefined || configuration === null){
+                    this.logger.debug("%s is not an Aspect.", id);
+                    return null;
+                }else{
+                    this.logger.debug("Found configuration for instance %s", id);
+                    if(configuration.selector){
+                        this.logger.debug("Attaching contructor to an active selector");
+                        _this = this;
+                        _continuation = function(){
+                            aspect  = createWeave(configuration);
+                            _this.aspectCache.add(configuration.id+"#"+this.toString(), aspect);
+                            return aspect;
+                        };
+                        if(configuration.active){
+                            //Apply the weave to future dom objects matching the specific
+                            //selector.
+                            $(configuration.selector).livequery(_continuation);
                         }else{
-                            //This is either a simple object or class
-                            aspect = createWeave(configuration);
-                            this.aspectCache.add(id, aspect);
+                            //attach the aspect only to the current dom snapshot
+                            $(configuration.selector).each(_continuation);
                         }
-                        /**remember this might not be fully initialized yet!*/
-                        return aspect;
+                    }else{
+                        //This is either a simple object or class
+                        aspect = createWeave(configuration);
+                        this.aspectCache.add(id, aspect);
                     }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$AOP.FactoryError(e);
+                    /**remember this might not be fully initialized yet!*/
+                    return aspect;
                 }
             }
         }
@@ -3040,146 +2457,29 @@ Claypool.AOP={
              */
             get: function(id){//id is #instance or $Class (ie Function)
                 var aspect, ns;
-                try{
-					//support for namespaces
-					ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-						[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-					//namespaced app cache
-					if(!this.find(ns[0])){
-						this.add(ns[0], new $$.SimpleCachingStrategy());
-					}
-                    this.logger.debug("Search for a container managed aspect :%s", id);
-                    aspect = this.find(ns[0]).find(ns[1]);
-                    if(aspect===undefined||aspect===null){
-                        this.logger.debug("Can't find a container managed aspect :%s", id);
-                        aspect = this.factory.create(ns[1], ns[0]);
-                        if(aspect !== null){
-                            this.find(ns[0]).add(ns[1], aspect);
-                            return aspect;
-                        }
-                    }else{
-                        this.logger.debug("Found container managed instance :%s", id);
+				//support for namespaces
+				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+				//namespaced app cache
+				if(!this.find(ns[0])){
+					this.add(ns[0], new $$.SimpleCachingStrategy());
+				}
+                this.logger.debug("Search for a container managed aspect :%s", id);
+                aspect = this.find(ns[0]).find(ns[1]);
+                if(aspect===undefined||aspect===null){
+                    this.logger.debug("Can't find a container managed aspect :%s", id);
+                    aspect = this.factory.create(ns[1], ns[0]);
+                    if(aspect !== null){
+                        this.find(ns[0]).add(ns[1], aspect);
                         return aspect;
                     }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$AOP.ContainerError(e);
+                }else{
+                    this.logger.debug("Found container managed instance :%s", id);
+                    return aspect;
                 }
                 return null;
             }
         });
-    
-})(  jQuery, Claypool, Claypool.AOP );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.ContainerError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.ContainerError",
-            message:"An error occured inside the aop container."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.ConfigurationError =  function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.ConfigurationError",
-            message:"An error occured updating the aop container configuration."
-        };
-        $.extend( this, new $$.ConfigurationError(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.FactoryError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.FactoryError",
-            message:"An error occured creating the aspect from the configuration."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.WeaveError = function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.WeaveError",
-            message:"An error occured weaving or unweaving the aspect."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-})(  jQuery, Claypool, Claypool.AOP );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$AOP){
-    /**
-     * @constructor
-     */
-    $$AOP.AspectError =  function(e, options){ 
-        var details = {
-            name:"Claypool.AOP.AspectError",
-            message:"An error occured while applying an aspect."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
     
 })(  jQuery, Claypool, Claypool.AOP );
 
@@ -3273,19 +2573,13 @@ Claypool.IoC={
          * @type String
          */
         precreate: function(){
-            try{
-                this._this = {claypoolId:this.id};//a temporary stand-in for the object we are creating
-                this.logger.debug("Precreating Instance");
-                $(document).trigger("claypool:precreate", [this._this, this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:precreate:"+this.id, [this._this]);
-                //TODO:  Apply function specified in ioc hook
-                return this;
-            }catch(e){
-                this.logger.error("An Error occured in the Pre-Create LifeCycle Phase");
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            this._this = {claypoolId:this.id};//a temporary stand-in for the object we are creating
+            this.logger.debug("Precreating Instance");
+            $(document).trigger("claypool:precreate", [this._this, this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:precreate:"+this.id, [this._this]);
+            //TODO:  Apply function specified in ioc hook
+            return this;
         },
         /**
          * Describe what this method does
@@ -3298,21 +2592,20 @@ Claypool.IoC={
             var factory,factoryClass,factoryMethod,retVal;
             var _this,_thisOrUndefined,C_onstructor,args;
             var injections, injectionValue;
-            try{
             /**
             *   The selector, if it isnt null, is used to create the default value
             *   of '_this' using $.  
             */
-                this.logger.debug("Applying Selector to Instance");
-                if(this.configuration.selector){
-                    // binds usto the elements via selector,
-                    //and/or sets defaults on the object we are managing (this._this)
-                    this._this  = $(this.configuration.selector);
-                    this.logger.debug("Result for selector : ", this._this);
-                }else{
-                    this.logger.debug("Using default empty object");
-                    this._this = {};
-                }
+            this.logger.debug("Applying Selector to Instance");
+            if(this.configuration.selector){
+                // binds usto the elements via selector,
+                //and/or sets defaults on the object we are managing (this._this)
+                this._this  = $(this.configuration.selector);
+                this.logger.debug("Result for selector : ", this._this);
+            }else{
+                this.logger.debug("Using default empty object");
+                this._this = {};
+            }
             /**  
             *   This is where we will create the actual instance from a constructor.
             *   Please use precreate and postcreate to hook you're needs into the
@@ -3322,61 +2615,61 @@ Claypool.IoC={
             *       2. make sure all references in the options are resolved
             *       3. apply the constructor
             */
-                if(this.configuration.factory){
-                    //The factory is either a managed instance (already constructed)
-                    //or it is the name of a factory class to temporarily instantiate
-                    factory = {};
-                    if(this.configuration.factory.substring(6,0)=="ref://"){
-                        //its a reference to a managed object
-                        this.logger.debug("Retreiving Factory from Application Context");
-                        factory = $.$(this.configuration.factory);
-                    }else{
-                        //Its a class, so instantiate it
-                        this.logger.info("Creating Instance from Factory");
-                        factoryClass = this.resolveConstructor(this.configuration.factory);
-                        retval = factoryClass.apply(factory, this.configuration.options);
-                        factory = retval||factory;
-                    }
-                    this.logger.debug("Applying factory creation method");
-                    factoryMethod = this.configuration.factoryMethod||"create";
-                    _this = factory[factoryMethod].apply(factory, this.configuration.options);
-                    this._this = $.extend(true,  _this, this._this);
+            if(this.configuration.factory){
+                //The factory is either a managed instance (already constructed)
+                //or it is the name of a factory class to temporarily instantiate
+                factory = {};
+                if(this.configuration.factory.substring(6,0)=="ref://"){
+                    //its a reference to a managed object
+                    this.logger.debug("Retreiving Factory from Application Context");
+                    factory = $.$(this.configuration.factory);
                 }else{
-                    //constructorName is just a simple class constructor
-                    /**
-                    *   This is here for complex reasons.  There are a plethora ways to instantiate a new object
-                    *   with javascript, and to be consistent, regardless of the particular approach, modifying the 
-                    *   prototype must do what it supposed to do.. This is the only way I've found to do that.
-                    *   PS If your constructor has more than 10 parameters, this wont work.  Why does your constructor
-                    *   have more than 10 parameters?
-                    */
-                    this.logger.info("Creating Instance simulating constructor: %s", this.configuration.clazz);
-                    C_onstructor = this.resolveConstructor(this.configuration.clazz);
-                    args = this.configuration.options||[];
-                    _this = {};
-                    switch(args.length){
-                        case 0: _this = new C_onstructor();break;
-                        case 1: _this = new C_onstructor(args[0]);break;
-                        case 2: _this = new C_onstructor(args[0],args[1]);break;
-                        case 3: _this = new C_onstructor(args[0],args[1],args[2]);break;
-                        case 4: _this = new C_onstructor(args[0],args[1],args[2],args[3]);break;
-                        case 5: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4]);break;
-                        case 6: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5]);break;
-                        case 7: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6]);break;
-                        case 8: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);break;
-                        case 9: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8]);break;
-                        default:
-                            //this affect the prototype nature so modifying th proto has no affect on the instance
-                            _thisOrUndefined = C_onstructor.apply(_this, args);
-                            _this = _thisOrUndefined||_this;
-                    }
-                    //Every Instance gets a logger!
-                    _this.$ns = this.configuration.clazz;
-                    _this.$log = $.logger(_this.$ns);
-                    _this.$log.debug("Created new instance of %s", _this.$ns);
-                    
-                    this._this = $.extend(true, _this, this._this);
+                    //Its a class, so instantiate it
+                    this.logger.info("Creating Instance from Factory");
+                    factoryClass = this.resolveConstructor(this.configuration.factory);
+                    retval = factoryClass.apply(factory, this.configuration.options);
+                    factory = retval||factory;
                 }
+                this.logger.debug("Applying factory creation method");
+                factoryMethod = this.configuration.factoryMethod||"create";
+                _this = factory[factoryMethod].apply(factory, this.configuration.options);
+                this._this = $.extend(true,  _this, this._this);
+            }else{
+                //constructorName is just a simple class constructor
+                /**
+                *   This is here for complex reasons.  There are a plethora ways to instantiate a new object
+                *   with javascript, and to be consistent, regardless of the particular approach, modifying the 
+                *   prototype must do what it supposed to do.. This is the only way I've found to do that.
+                *   PS If your constructor has more than 10 parameters, this wont work.  Why does your constructor
+                *   have more than 10 parameters?
+                */
+                this.logger.info("Creating Instance simulating constructor: %s", this.configuration.clazz);
+                C_onstructor = this.resolveConstructor(this.configuration.clazz);
+                args = this.configuration.options||[];
+                _this = {};
+                switch(args.length){
+                    case 0: _this = new C_onstructor();break;
+                    case 1: _this = new C_onstructor(args[0]);break;
+                    case 2: _this = new C_onstructor(args[0],args[1]);break;
+                    case 3: _this = new C_onstructor(args[0],args[1],args[2]);break;
+                    case 4: _this = new C_onstructor(args[0],args[1],args[2],args[3]);break;
+                    case 5: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4]);break;
+                    case 6: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5]);break;
+                    case 7: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6]);break;
+                    case 8: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);break;
+                    case 9: _this = new C_onstructor(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8]);break;
+                    default:
+                        //this affect the prototype nature so modifying th proto has no affect on the instance
+                        _thisOrUndefined = C_onstructor.apply(_this, args);
+                        _this = _thisOrUndefined||_this;
+                }
+                //Every Instance gets a logger!
+                _this.$ns = this.configuration.clazz;
+                _this.$log = $.logger(_this.$ns);
+                _this.$log.debug("Created new instance of %s", _this.$ns);
+                
+                this._this = $.extend(true, _this, this._this);
+            }
             /**
             *   Now that the object has been successfully created we 'inject' these items
             *   More importantly we scan the top level of the injections for values (not names)
@@ -3388,26 +2681,21 @@ Claypool.IoC={
             *   browsers supported the js 'get/set' because we could use a lazy pattern 
             *   here instead.
             */
-                injections = this.configuration.inject||{};
-                for(var dependency in injections){
-                    injectionValue = injections[dependency];
-                    if($.isFunction(injectionValue.substring) &&
-                       (injectionValue.substring(0,6) == 'ref://')){
-                        injections[dependency] = $.$(
-                            injectionValue.substring(6, injectionValue.length)
-                        );
-                    }
+            injections = this.configuration.inject||{};
+            for(var dependency in injections){
+                injectionValue = injections[dependency];
+                if($.isFunction(injectionValue.substring) &&
+                   (injectionValue.substring(0,6) == 'ref://')){
+                    injections[dependency] = $.$(
+                        injectionValue.substring(6, injectionValue.length)
+                    );
                 }
-                $.extend(this._this, injections);
-                $(document).trigger("claypool:create", [this._this, this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:create:"+this.id, [this._this]);
-                return this._this;
-            }catch(e){
-                this.logger.error("An Error occured in the Create LifeCycle Phase");
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
             }
+            $.extend(this._this, injections);
+            $(document).trigger("claypool:create", [this._this, this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:create:"+this.id, [this._this]);
+            return this._this;
         },
         /**
          * Describe what this method does
@@ -3417,18 +2705,12 @@ Claypool.IoC={
          * @type String
          */
         postcreate:function(){
-            try{
-                //TODO:  Apply function specified in ioc hook
-                this.logger.debug("PostCreate invoked");
-                $(document).trigger("claypool:postcreate", [this._this, this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:postcreate:"+this.id, [this._this]);
-                return this._this;
-            }catch(e){
-                this.logger.error("An Error occured in the Post-Create LifeCycle Phase");
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //TODO:  Apply function specified in ioc hook
+            this.logger.debug("PostCreate invoked");
+            $(document).trigger("claypool:postcreate", [this._this, this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:postcreate:"+this.id, [this._this]);
+            return this._this;
         },
         /**
          * Describe what this method does
@@ -3440,17 +2722,12 @@ Claypool.IoC={
         predestroy:function(){
             //If you need to do something to save state, eg make an ajax call to post
             //state to a server or local db (gears), do it here 
-            try{
-                //TODO:  Apply function specified in ioc hook
-                this.logger.debug("Predestory invoked");
-                $(document).trigger("claypool:predestroy", [this._this, this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:predestroy:"+this.id, [this._this]);
-                return this._this;
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //TODO:  Apply function specified in ioc hook
+            this.logger.debug("Predestory invoked");
+            $(document).trigger("claypool:predestroy", [this._this, this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:predestroy:"+this.id, [this._this]);
+            return this._this;
         },
         /**
          * Describe what this method does
@@ -3460,19 +2737,14 @@ Claypool.IoC={
          * @type String
          */
         destroy:function(){
-            try{
-                //TODO:  
-                //we dont actually do anyting here, yet... it might be
-                //a good place to 'delete' or null things
-                this.logger.info("Destroy invoked");
-                $(document).trigger("claypool:destroy", [this._this, this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:destroy:"+this.id, [this._this]);
-                return delete this._this;
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //TODO:  
+            //we dont actually do anyting here, yet... it might be
+            //a good place to 'delete' or null things
+            this.logger.info("Destroy invoked");
+            $(document).trigger("claypool:destroy", [this._this, this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:destroy:"+this.id, [this._this]);
+            return delete this._this;
         },
         /**
          * Describe what this method does
@@ -3482,19 +2754,12 @@ Claypool.IoC={
          * @type String
          */
         postdestroy:function(){
-            //If you need to do something now that the instance was successfully destroyed
-            //here is your lifecycle hook.  
-            try{
-                //TODO:  Apply functions specified in ioc hook
-                this.logger.debug("Postdestory invoked");
-                $(document).trigger("claypool:postdestroy", [this.id]);
-                //second event allow listening to the specific object lifecycle if you know it's id
-                $(document).trigger("claypool:postdestroy:"+this.id);
-                return this;
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //TODO:  Apply functions specified in ioc hook
+            this.logger.debug("Postdestory invoked");
+            $(document).trigger("claypool:postdestroy", [this.id]);
+            //second event allow listening to the specific object lifecycle if you know it's id
+            $(document).trigger("claypool:postdestroy:"+this.id);
+            return this;
         },
         /**
          * Describe what this method does
@@ -3504,18 +2769,12 @@ Claypool.IoC={
          * @type String
          */
         resolveConstructor:function(constructorName){
-            var constructor;
-            try{
-                constructor = $.resolve(constructorName); 
-                if( $.isFunction(constructor) ){
-                    this.logger.debug(" Resolved " +constructorName+ " to a function");
-                    return constructor;
-                }else{ 
-                    throw new Error("Constructor is not a function: " + constructorName);
-                }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.ConstructorResolutionError(e);
+            var constructor = $.resolve(constructorName); 
+            if( $.isFunction(constructor) ){
+                this.logger.debug(" Resolved " +constructorName+ " to a function");
+                return constructor;
+            }else{ 
+                throw ("NoSuchConstructor:" + constructorName);
             }
         }
     });
@@ -3551,16 +2810,10 @@ Claypool.IoC={
          * @type String
          */
         createLifeCycle: function(instance){
-            try{
-                //Walk the creation lifecycle
-                instance.precreate();
-                instance.create();
-                instance.postcreate();
-            }catch(e){
-                this.logger.error("An Error occured in the Creation Lifecycle.");
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //Walk the creation lifecycle
+            instance.precreate();
+            instance.create();
+            instance.postcreate();
         },
         /**
          * Describe what this method does
@@ -3570,16 +2823,10 @@ Claypool.IoC={
          * @type String
          */
         destroyLifeCycle: function(instance){
-            try{
-                //Walk the creation lifecycle
-                instance.predestroy();
-                instance.destroy();
-                instance.postdestroy();
-            }catch(e){
-                this.logger.error("An Error occured in the Destory Lifecycle.");
-                this.logger.exception(e);
-                throw new $$IoC.LifeCycleError(e);
-            }
+            //Walk the creation lifecycle
+            instance.predestroy();
+            instance.destroy();
+            instance.postdestroy();
         },
         /**
          * Describe what this method does
@@ -3594,126 +2841,122 @@ Claypool.IoC={
             	_this = this,
 				remote, folder, file, appbase,
 				literal;
-            try{	
-				namespace = namespace||'';
-				if(!this.find(namespace)){
-					this.logger.debug("Adding cache for namespace %s", namespace);
-					this.add(namespace, new $$.SimpleCachingStrategy());
-				}
-                this.logger.debug("Looking for configuration for instance %s%s", namespace, id);
-                configuration = this.find(namespace).find(id);
-                if(configuration === null){
-                    this.logger.warn("No known configuration for instance %s%s", namespace, id);
-					remote = id.match(/#([a-z]+([A-Z]?[a-z]+)+)([A-Z][a-z]+)+/);
-					if(remote){
-						_this.logger.debug('resolving lazyload %s', id);
-						//holds reference to names eg ['MyApp','Model','FooBar']
-						literal = [  $$.Namespaces[namespace] ];x
-						//now prepend appbase if specified otherwise use the root /
-						//and finally determine the intermediate package as 'models'
-						//'views', etc
-						literal[1] = remote.pop();
-						literal[1] = literal[1]+'s';
-						//allows 'appbase' to be null for default case, a single string,
-						//or a map of appbases per namespace
-						appbase = $.env('appbase');
-						if(appbase && namespace){
-						    //only use a namespace based folder if there is a namespace
-						    //and they havent specified an appbase
-						    folder = "";
-						}else if (namespace){
-						    folder = namespace + '/';
-						}else{
-						    folder = '';
-						}
-						appbase = (appbase === null) ? '/' :
-							typeof(appbase)=='string' ?
-								appbase :
-								appbase[namespace];
-						folder = appbase+literal[1].toLowerCase()+'/';
-						//finally determine the script itself which should be the lowercase
-						//foobar from an id like abc#fooBarModel or #fooBarModel or #foobarModel etc
-						literal[2] = remote[1].substring(0,1).toUpperCase()+remote[1].substring(1);
-						file = remote[1].toLowerCase()+'.js';
-						_this.logger.debug('attempting to lazyload %s from %s%s', id, folder, file);
-						if(_this.lazyLoadAttempts[folder+file]){
-							//avoid danger of infinite recursion here
-							_this.logger.debug('already attempted to load %s%s', folder, file);
-							return null;
-						}else{
-							_this.lazyLoadAttempts[folder+file] = 1;
-							$.ajax({
-								async:false,
-								url:folder+file,
-								dataType:'text',
-								timeout:3000,
-								success: function(text){
-									_this.logger.info('lazyloaded %s ', literal.join('.'));
-									if(!$.env('debug')){
-										jQuery.globalEval(text);
-									}else{
-										eval(text);
-									}
-									var config = {
-										id: id,
-										namespace: namespace,
-										clazz: literal.join('.')
-									};
-									if(literal[1] == 'Views'){
-										config.selector = '#'+literal[2].substring(0,1).toLowerCase()+literal[2].substring(1);
-									}
-									_this.find(namespace).add(id, config);
-									try{
-										//late bound (lazy loaded) application managed objects have to
-										//go through a process of iteration over the registered aop filters
-										//to see if any apply to it.  This call is sufficient to do that.
-										$$.Application["claypool:AOP"].factory.updateConfig(config);
-									}catch(e){
-										_this.logger.error('Failed in late binding to aop configuration').
-											exception(e);
-									}
-								},
-								error: function(xhr, status, e){
-									_this.logger.error('failed (%s) to load %s%s', xhr.status, folder, file).
+            
+			namespace = namespace||'';
+			if(!this.find(namespace)){
+				this.logger.debug("Adding cache for namespace %s", namespace);
+				this.add(namespace, new $$.SimpleCachingStrategy());
+			}
+            this.logger.debug("Looking for configuration for instance %s%s", namespace, id);
+            configuration = this.find(namespace).find(id);
+            if(configuration === null){
+                this.logger.warn("No known configuration for instance %s%s", namespace, id);
+				remote = id.match(/#([a-z]+([A-Z]?[a-z]+)+)([A-Z][a-z]+)+/);
+				if(remote){
+					_this.logger.debug('resolving lazyload %s', id);
+					//holds reference to names eg ['MyApp','Model','FooBar']
+					literal = [  $$.Namespaces[namespace] ];
+					//now prepend appbase if specified otherwise use the root /
+					//and finally determine the intermediate package as 'models'
+					//'views', etc
+					literal[1] = remote.pop();
+					literal[1] = literal[1]+'s';
+					//allows 'appbase' to be null for default case, a single string,
+					//or a map of appbases per namespace
+					appbase = $.env('appbase');
+					if(appbase && namespace){
+					    //only use a namespace based folder if there is a namespace
+					    //and they havent specified an appbase
+					    folder = "";
+					}else if (namespace){
+					    folder = namespace + '/';
+					}else{
+					    folder = '';
+					}
+					appbase = (appbase === null) ? '/' :
+						typeof(appbase)=='string' ?
+							appbase :
+							appbase[namespace];
+					folder = appbase+literal[1].toLowerCase()+'/';
+					//finally determine the script itself which should be the lowercase
+					//foobar from an id like abc#fooBarModel or #fooBarModel or #foobarModel etc
+					literal[2] = remote[1].substring(0,1).toUpperCase()+remote[1].substring(1);
+					file = remote[1].toLowerCase()+'.js';
+					_this.logger.debug('attempting to lazyload %s from %s%s', id, folder, file);
+					if(_this.lazyLoadAttempts[folder+file]){
+						//avoid danger of infinite recursion here
+						_this.logger.debug('already attempted to load %s%s', folder, file);
+						return null;
+					}else{
+						_this.lazyLoadAttempts[folder+file] = 1;
+						$.ajax({
+							async:false,
+							url:folder+file,
+							dataType:'text',
+							timeout:3000,
+							success: function(text){
+								_this.logger.info('lazyloaded %s ', literal.join('.'));
+								if(!$.env('debug')){
+									jQuery.globalEval(text);
+								}else{
+									eval(text);
+								}
+								var config = {
+									id: id,
+									namespace: namespace,
+									clazz: literal.join('.')
+								};
+								if(literal[1] == 'Views'){
+									config.selector = '#'+literal[2].substring(0,1).toLowerCase()+literal[2].substring(1);
+								}
+								_this.find(namespace).add(id, config);
+								try{
+									//late bound (lazy loaded) application managed objects have to
+									//go through a process of iteration over the registered aop filters
+									//to see if any apply to it.  This call is sufficient to do that.
+									$$.Application["claypool:AOP"].factory.updateConfig(config);
+								}catch(e){
+									_this.logger.error('Failed in late binding to aop configuration').
 										exception(e);
 								}
-							});		
-							_this.logger.info('completed lazyloaded for %s%s ', id, namespace);
-							return _this.create(id, namespace);
-						}
-						//Work In Progress
-					}else{
-						_this.logger.warn('id requested did not match those applicable for late loading %s', id);
+							},
+							error: function(xhr, status, e){
+								_this.logger.error('failed (%s) to load %s%s', xhr.status, folder, file).
+									exception(e);
+							}
+						});		
+						_this.logger.info('completed lazyloaded for %s%s ', id, namespace);
+						return _this.create(id, namespace);
 					}
-                    return null;
+					//Work In Progress
+				}else{
+					_this.logger.warn('id requested did not match those applicable for late loading %s', id);
+				}
+                return null;
+            }else{
+                this.logger.debug("Found configuration for instance %s%s", namespace, id);
+                instance = new $$IoC.Instance(configuration.id, configuration);
+                if(configuration.active&&configuration.selector){
+                    this.logger.debug("Attaching contructor to an active selector");
+                    // precreate so there is something to return from the container
+                    // even if the livequery hasnt triggered
+                    instance.precreate();
+                    //pass a flag so others know it's an active object
+                    instance._this["@claypool:activeobject"] = configuration.selector;
+                    instance._this["@claypool:id"] = instance.id;
+                    jQuery(configuration.selector).livequery(function(){
+                        _this.logger.debug("Processing Creation Lifecycle.");
+                        _this.createLifeCycle(instance);
+                    },function(){
+                        _this.logger.debug("Processing Destruction Lifecycle.");
+                        _this.destroyLifeCycle(instance);
+                    });
                 }else{
-                    this.logger.debug("Found configuration for instance %s%s", namespace, id);
-                    instance = new $$IoC.Instance(configuration.id, configuration);
-                    if(configuration.active&&configuration.selector){
-                        this.logger.debug("Attaching contructor to an active selector");
-                        // precreate so there is something to return from the container
-                        // even if the livequery hasnt triggered
-                        instance.precreate();
-                        //pass a flag so others know it's an active object
-                        instance._this["@claypool:activeobject"] = configuration.selector;
-                        instance._this["@claypool:id"] = instance.id;
-                        jQuery(configuration.selector).livequery(function(){
-                            _this.logger.debug("Processing Creation Lifecycle.");
-                            _this.createLifeCycle(instance);
-                        },function(){
-                            _this.logger.debug("Processing Destruction Lifecycle.");
-                            _this.destroyLifeCycle(instance);
-                        });
-                    }else{
-                        this.logger.debug("Processing Creation Lifecycle.");
-                        this.createLifeCycle(instance);
-                    }
-                    /**remember this might not be fully initialized yet!*/
-                    return instance;
+                    this.logger.debug("Processing Creation Lifecycle.");
+                    this.createLifeCycle(instance);
                 }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.FactoryError(e);
+                /**remember this might not be fully initialized yet!*/
+                return instance;
             }
         },
         /**
@@ -3727,43 +2970,34 @@ Claypool.IoC={
             var iocConfiguration;
             var iocconf;
             var i;
-            try{
-                this.logger.debug("Configuring Claypool IoC Factory");
-                iocConfiguration = this.getConfig()||[];
-                this.logger.debug("IoC Configurations: %d", iocConfiguration.length);
-                for(i=0;i<iocConfiguration.length;i++){
-                    try{
-                        iocconf = iocConfiguration[i];
-                        if(iocconf.scan && iocconf.factory){
-                            this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
-                            iocConfiguration = iocConfiguration.concat(
-                                iocconf.factory.scan(iocconf.scan, iocconf.namespace)
-                            );
-                        }else{
-                            this.logger.debug("IoC Configuration for Id: %s%s", 
-								iocconf.namespace||'', iocconf.id );
-							if(iocconf.namespace){
-								//namespaced app configs
-								if(!this.find(iocconf.namespace)){
-									this.add(iocconf.namespace, new $$.SimpleCachingStrategy());
-								}
-								this.find(iocconf.namespace).add(iocconf.id, iocconf);
-							}else{
-								//non-namespaced app configs
-								if(!this.find('')){
-									this.add('', new $$.SimpleCachingStrategy());
-								}
-								this.find('').add(iocconf.id, iocconf);
-							}
-                        }
-                    }catch(e){
-                        this.logger.exception(e);
-                        return false;
-                    }
+            
+            this.logger.debug("Configuring Claypool IoC Factory");
+            iocConfiguration = this.getConfig()||[];
+            this.logger.debug("IoC Configurations: %d", iocConfiguration.length);
+            for(i=0;i<iocConfiguration.length;i++){
+                iocconf = iocConfiguration[i];
+                if(iocconf.scan && iocconf.factory){
+                    this.logger.debug("Scanning %s with %s", iocconf.scan, iocconf.factory);
+                    iocConfiguration = iocConfiguration.concat(
+                        iocconf.factory.scan(iocconf.scan, iocconf.namespace)
+                    );
+                }else{
+                    this.logger.debug("IoC Configuration for Id: %s%s", 
+						iocconf.namespace||'', iocconf.id );
+					if(iocconf.namespace){
+						//namespaced app configs
+						if(!this.find(iocconf.namespace)){
+							this.add(iocconf.namespace, new $$.SimpleCachingStrategy());
+						}
+						this.find(iocconf.namespace).add(iocconf.id, iocconf);
+					}else{
+						//non-namespaced app configs
+						if(!this.find('')){
+							this.add('', new $$.SimpleCachingStrategy());
+						}
+						this.find('').add(iocconf.id, iocconf);
+					}
                 }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.ConfigurationError(e);
             }
             return true;
         }
@@ -3813,161 +3047,51 @@ Claypool.IoC={
         get: function(id){
             var instance,
 				ns,
-				_this=this;
-            try{	
-				//support for namespaces
-				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-				//namespaced app cache
-				if(!this.find(ns[0])){
-					this.add(ns[0], new $$.SimpleCachingStrategy());
-				}
-                this.logger.debug("Searching for a container managed instance :%s", id);
-                instance = this.find(ns[0]).find(ns[1]);
-                if(!instance){
-                    this.logger.debug("Can't find a container managed instance :%s", id);
-					//note order of args is id, namespace to ensure backward compat
-					//with claypool 1.x apps
-                    instance = this.factory.create(ns[1], ns[0]);
-                    if(instance){
-                        this.logger.debug("Storing managed instance %s in container", id);
-                        this.find(ns[0]).add(ns[1], instance);
-                        //The container must be smart enough to replace active objects bound to dom 
-                        if(instance._this["@claypool:activeobject"]){
-                            $(document).bind('claypool:postcreate:'+instance.id,  function(event, reattachedObject, id){
-                                _this.logger.info("Reattached Active Object Inside IoC Container");
-                                instance._this = reattachedObject;
-                            });
-                            $(document).bind('claypool:postdestroy:'+instance.id,  function(){
-                                _this.logger.info("Removed Active Object Inside IoC Container");
-                                _this.find(ns[0]).remove(ns[1]);
-                            });
-                        }else{
-                            //trigger notification of new id in ioc container
-                            $(document).trigger("claypool:ioc",[id, this]);
-                            //trigger specific notification for the new object
-                            $(document).trigger("claypool:ioc:"+id,[id, this]);
-                        }
-                        //is safer than returning instance._this becuase the the object may be modified
-                        //during the event hooks above
-                        return this.find(ns[0]).find(ns[1])._this;
+				_this = this;
+			//support for namespaces
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			if(!this.find(ns[0])){
+				this.add(ns[0], new $$.SimpleCachingStrategy());
+			}
+            this.logger.debug("Searching for a container managed instance :%s", id);
+            instance = this.find(ns[0]).find(ns[1]);
+            if(!instance){
+                this.logger.debug("Can't find a container managed instance :%s", id);
+				//note order of args is id, namespace to ensure backward compat
+				//with claypool 1.x apps
+                instance = this.factory.create(ns[1], ns[0]);
+                if(instance){
+                    this.logger.debug("Storing managed instance %s in container", id);
+                    this.find(ns[0]).add(ns[1], instance);
+                    //The container must be smart enough to replace active objects bound to dom 
+                    if(instance._this["@claypool:activeobject"]){
+                        $(document).bind('claypool:postcreate:'+instance.id,  function(event, reattachedObject, id){
+                            _this.logger.info("Reattached Active Object Inside IoC Container");
+                            instance._this = reattachedObject;
+                        });
+                        $(document).bind('claypool:postdestroy:'+instance.id,  function(){
+                            _this.logger.info("Removed Active Object Inside IoC Container");
+                            _this.find(ns[0]).remove(ns[1]);
+                        });
+                    }else{
+                        //trigger notification of new id in ioc container
+                        $(document).trigger("claypool:ioc",[id, this]);
+                        //trigger specific notification for the new object
+                        $(document).trigger("claypool:ioc:"+id,[id, this]);
                     }
-                }else{
-                    this.logger.debug("Found container managed instance :%s", id);
-                    return instance._this;
+                    //is safer than returning instance._this becuase the the object may be modified
+                    //during the event hooks above
+                    return this.find(ns[0]).find(ns[1])._this;
                 }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$IoC.ContainerError(e);
+            }else{
+                this.logger.debug("Found container managed instance :%s", id);
+                return instance._this;
             }
             return null;
         }
     });
-    
-})(  jQuery, Claypool, Claypool.IoC );
-
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$IoC){
-    /**
-     * @constructor
-     */
-    $$IoC.ContainerError = function(e){
-        $.extend( this, new $$.Error(e, {
-            name:"Claypool.IoC.ContainerError",
-            message: "An error occured in the ioc instance factory."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.IoC );
-        
-        
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$IoC){
-    /**
-     * @constructor
-     */
-    $$IoC.FactoryError = function(e){
-        $.extend( this, new $$.Error(e, {
-            name:"Claypool.IoC.FactoryError",
-            message: "An error occured in the ioc factory."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.IoC );
-        
-        
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$IoC){
-    /**
-     * @constructor
-     */
-    $$IoC.ConfigurationError = function(e){
-        $.extend( this, new $$.ConfigurationError(e, {
-            name:"Claypool.IoC.ConfigurationError",
-            message: "An error occured updating the ioc container configuration."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.IoC );
-        
-        
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$IoC){
-    /**
-     * @constructor
-     */
-    $$IoC.LifeCycleError = function(e){
-        $.extend( this, new $$.Error(e, {
-            name:"Claypool.IoC.LifeCycleError",
-            message: "An error occured during the lifecycle process."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.IoC );
-        
-        
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$IoC){
-    /**
-     * @constructor
-     */
-    $$IoC.ConstructorResolutionError = function(e){
-        $.extend( this, new $$.NameResolutionError(e, {
-            name:"Claypool.IoC.ConstructorResolutionError",
-            message: "An error occured trying to resolve the constructor."
-        }));
-    };
     
 })(  jQuery, Claypool, Claypool.IoC );
 
@@ -4106,7 +3230,7 @@ Claypool.MVC = {
          * @type String
          */
         update: function(model){//refresh screen display logic
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -4116,7 +3240,7 @@ Claypool.MVC = {
          * @type String
          */
         think: function(){//display activity occuring, maybe block
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     };
 	
@@ -4142,7 +3266,7 @@ Claypool.MVC = {
     $.extend($$MVC.Controller.prototype,
         $$.SimpleCachingStrategy.prototype,{
         handle: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
 	
@@ -4211,126 +3335,118 @@ Claypool.MVC = {
                     action, 
                     defaultView,
                     targetId;
-                try{
-                    _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
-                    target = $.$(this.payload.controller);
-                    targetId = this.payload.controller;
-                    //the default view for 'fooController' or 'fooService' is 'fooView' otherwise the writer
-                    //is required to provide it before a mvc flow can be resolved.
-                    defaultView = this.payload.controller.match('Controller') ?
-                        this.payload.controller.replace('Controller', 'View') : null;
-                    defaultView = this.payload.controller.match('Service') ?
-                        this.payload.controller.replace('Service', 'View') : defaultView;
-                    //make params object represent the normalized state accentuated by route param map
-                    this.map = $.extend(state, this.map);
-                    (function(t){
-                        var m,v,c, eventflow = $.extend( {}, _event, {
-                            m: function(){
-                                if(arguments.length === 0){
-                                    return m;
-                                }else if(arguments.length === 1){
-                                    if(typeof(arguments[0]) == 'string'){
-                                        return m[arguments[0]];
-                                    }else if(arguments[0] instanceof Array){
-                                        m.length += arguments[0].length;
-                                        Array.prototype.push.apply(m,arguments[0]);
-                                    }else if(arguments[0] instanceof Object){
-                                        $.extend(true, m, arguments[0]);
-                                    }
-                                }else if(arguments.length === 2){
-                                    if(arguments[1] instanceof Array){
-                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
-                                            m[arguments[0]] = [];
-                                        }
-                                        $.merge(m[arguments[0]], arguments[1]);
-                                    }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
-                                        m[arguments[0]] = arguments[1];
-                                    }else if(arguments[1] instanceof Object){
-                                        if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
-                                            m[arguments[0]] = {};
-                                        }
-                                        $.extend(true, m[arguments[0]], arguments[1]);
-                                    }
+                    
+                _this.logger.info("Forwaring to registered controller %s", this.payload.controller);
+                target = $.$(this.payload.controller);
+                targetId = this.payload.controller;
+                //the default view for 'fooController' or 'fooService' is 'fooView' otherwise the writer
+                //is required to provide it before a mvc flow can be resolved.
+                defaultView = this.payload.controller.match('Controller') ?
+                    this.payload.controller.replace('Controller', 'View') : null;
+                defaultView = this.payload.controller.match('Service') ?
+                    this.payload.controller.replace('Service', 'View') : defaultView;
+                //make params object represent the normalized state accentuated by route param map
+                this.map = $.extend(state, this.map);
+                (function(t){
+                    var m,v,c, eventflow = $.extend( {}, _event, {
+                        m: function(){
+                            if(arguments.length === 0){
+                                return m;
+                            }else if(arguments.length === 1){
+                                if(typeof(arguments[0]) == 'string'){
+                                    return m[arguments[0]];
+                                }else if(arguments[0] instanceof Array){
+                                    m.length += arguments[0].length;
+                                    Array.prototype.push.apply(m,arguments[0]);
+                                }else if(arguments[0] instanceof Object){
+                                    $.extend(true, m, arguments[0]);
                                 }
-                                return this;//chain
-                            },
-                            v: function(view){
-                                if(!view){
-                                    return v;
-                                }
-                                if(view && typeof(view)=='string'){
-                                    view = view.split('.');
-                                    if(view.length === 1){
-                                        v = view;
-                                    }else if(view.length === 2){
-                                        if(view[0] !== ""){
-                                            v = view.join('.');
-                                        }else{
-                                            v = v.split('.')[0]+"."+view[1];
-                                        }
+                            }else if(arguments.length === 2){
+                                if(arguments[1] instanceof Array){
+                                    if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
+                                        m[arguments[0]] = [];
                                     }
-                                }
-                                return this;//chain
-                            },
-                            c : function(){
-                                var target, action, controller;
-                                if(arguments.length === 0){
-                                    return c;
-                                }else if(arguments.length > 0 && typeof(arguments[0]) == "string"){
-                                    //allow forwarded controller to have extra params info passed
-                                    //along with it.  .c('#fooController', { extra: 'info' });
-                                    if(arguments.length > 1 && $.isPlainObject(arguments[1])){
-                                        t.map = $.extend(true, t.map||{}, arguments[1]);
+                                    $.merge(m[arguments[0]], arguments[1]);
+                                }else if(arguments[1] instanceof XML || arguments[1] instanceof XMLList){
+                                    m[arguments[0]] = arguments[1];
+                                }else if(arguments[1] instanceof Object){
+                                    if(typeof(arguments[0]) == 'string' && !(arguments[0] in  m)){
+                                        m[arguments[0]] = {};
                                     }
-                                    //expects "target{.action}"
-                                    target = arguments[0].split(".");
-                                    //TODO: verify this was unintended and is bug. before this function
-                                    //      is called, internal 'c' is an object, after this function it 
-                                    //      is a string (if next line was reincluded)
-                                    //c = target[0]; 
-                                    v  = target[0].match('Controller') ? target[0].replace('Controller', 'View') : null;
-                                    v  = target[0].match('Service') ? target[0].replace('Service', 'View') : v;
-                                    action = (target.length>1&&target[1].length>0)?target[1]:"handle";
-                                    controller = _this.find(target[0]);
-                                    if(controller === null){
-                                        controller = $.$(target[0]);
-                                        //cache it for speed on later use
-                                        _this.add(target[0], controller);
-                                    }
-                                    controller[action||"handle"].apply(controller,  [this].concat(extra) );
-                                }
-                                return this;//chain
-                            },
-                            render:_this.renderer(),
-                            reset:function(){
-                                m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
-                                v = defaultView;
-                                c = targetId;
-                                m.reset = function resetm(){ m = {flash:[], length:0}; m.reset = resetm; return eventflow; };
-                                v.reset = function resetv(){ v = defaultView; v.reset = resetv; return eventflow; };
-                                c.reset = function resetc(){ c = targetId; c.reset = resetc; return eventflow; };
-                                return this;//chain
-                            },
-                            params: function(param){
-                                if (arguments.length === 0) {
-                                    return t.map ? t.map : {};
-                                } else {
-                                    return (t.map && (param in t.map)) ? t.map[param] : null;
+                                    $.extend(true, m[arguments[0]], arguments[1]);
                                 }
                             }
-                        });
-                        eventflow.reset();
-                        //tack back on the extra event arguments
-                        target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
-                    })(this);
-                }catch(e){
-                    e = e?e:new Error();
-                    if(e.name&&e.name.indexOf("Claypool.Application.ContextError")>-1){
-                        _this.logger.warn("No controller with id: %s", this.payload.controller);
-                    }else{  /**propogate unknown errors*/
-                        _this.logger.exception(e); throw e;
-                    }
-                }
+                            return this;//chain
+                        },
+                        v: function(view){
+                            if(!view){
+                                return v;
+                            }
+                            if(view && typeof(view)=='string'){
+                                view = view.split('.');
+                                if(view.length === 1){
+                                    v = view;
+                                }else if(view.length === 2){
+                                    if(view[0] !== ""){
+                                        v = view.join('.');
+                                    }else{
+                                        v = v.split('.')[0]+"."+view[1];
+                                    }
+                                }
+                            }
+                            return this;//chain
+                        },
+                        c : function(){
+                            var target, action, controller;
+                            if(arguments.length === 0){
+                                return c;
+                            }else if(arguments.length > 0 && typeof(arguments[0]) == "string"){
+                                //allow forwarded controller to have extra params info passed
+                                //along with it.  .c('#fooController', { extra: 'info' });
+                                if(arguments.length > 1 && $.isPlainObject(arguments[1])){
+                                    t.map = $.extend(true, t.map||{}, arguments[1]);
+                                }
+                                //expects "target{.action}"
+                                target = arguments[0].split(".");
+                                //TODO: verify this was unintended and is bug. before this function
+                                //      is called, internal 'c' is an object, after this function it 
+                                //      is a string (if next line was reincluded)
+                                //c = target[0]; 
+                                v  = target[0].match('Controller') ? target[0].replace('Controller', 'View') : null;
+                                v  = target[0].match('Service') ? target[0].replace('Service', 'View') : v;
+                                action = (target.length>1&&target[1].length>0)?target[1]:"handle";
+                                controller = _this.find(target[0]);
+                                if(controller === null){
+                                    controller = $.$(target[0]);
+                                    //cache it for speed on later use
+                                    _this.add(target[0], controller);
+                                }
+                                controller[action||"handle"].apply(controller,  [this].concat(extra) );
+                            }
+                            return this;//chain
+                        },
+                        render:_this.renderer(),
+                        reset:function(){
+                            m = {flash:[], length:0};//each in flash should be {id:"", msg:""}
+                            v = defaultView;
+                            c = targetId;
+                            m.reset = function resetm(){ m = {flash:[], length:0}; m.reset = resetm; return eventflow; };
+                            v.reset = function resetv(){ v = defaultView; v.reset = resetv; return eventflow; };
+                            c.reset = function resetc(){ c = targetId; c.reset = resetc; return eventflow; };
+                            return this;//chain
+                        },
+                        params: function(param){
+                            if (arguments.length === 0) {
+                                return t.map ? t.map : {};
+                            } else {
+                                return (t.map && (param in t.map)) ? t.map[param] : null;
+                            }
+                        }
+                    });
+                    eventflow.reset();
+                    //tack back on the extra event arguments
+                    target[t.payload.action||"handle"].apply(target, [eventflow].concat(extra) );
+                })(this);
             });
         },
         /**
@@ -4432,79 +3548,74 @@ Claypool.MVC = {
                     callbackStack.push(callback);
                 }
                 _this.logger.debug(" - Resolving Control - %s)", this.c());
-                try{
-                    //a view can specifiy a method other than the default 'update'
-                    //by providing a '.name' on the view
-                    view = this.v();
-                    //If a writer is provided, the default view method is 'render'
-                    viewMethod = $.isFunction(this.write)?
-                        //since claypool 1.1.4 we prefer 'write' as the default 
-                        //server-side view action since jquery.tmpl is being
-                        //introduced an adds $.fn.render
-                        ($.isFunction($.render)?"write":"render"):
-                        //live dom modification should prefer the method 'update'
-                        "update";
-                    if(view.indexOf(".") > -1){
-                        viewMethod = view.split('.');
-                        view = viewMethod[0];
-                        //always use the last so we can additively use the mvc v value in closures
-                        viewMethod = viewMethod[viewMethod.length-1];
-                    }
-                    _this.logger.debug("Calling View %s.%s", view, viewMethod);
-                    view = $.$(view);
-                    if(view){
-                        if($.isFunction(view[viewMethod])){
-                            switch(viewMethod){
-                                case "write":
-                                case "writeln":
-                                    //calls event.write/event.writeln on the return
-                                    //value from view.write/view.writeln
-                                    this[viewMethod](view[viewMethod](this.m(), this));
-                                    break;
-                                case "render":
-                                    //pre 1.1.4 the api called render and the
-                                    //view invoked 'write' but jquery.fn.tmpl
-                                    //uses render
-                                    view.write = this.write;
-                                    view.writeln = this.writeln;
-                                    view[viewMethod](this.m(), this);
-                                    break;
-                                default:
-                                    //of course allow the users preference for view method
-                                    view[viewMethod](this.m(), this);
-                            }
+                
+                //a view can specifiy a method other than the default 'update'
+                //by providing a '.name' on the view
+                view = this.v();
+                //If a writer is provided, the default view method is 'render'
+                viewMethod = $.isFunction(this.write)?
+                    //since claypool 1.1.4 we prefer 'write' as the default 
+                    //server-side view action since jquery.tmpl is being
+                    //introduced an adds $.fn.render
+                    ($.isFunction($.render)?"write":"render"):
+                    //live dom modification should prefer the method 'update'
+                    "update";
+                if(view.indexOf(".") > -1){
+                    viewMethod = view.split('.');
+                    view = viewMethod[0];
+                    //always use the last so we can additively use the mvc v value in closures
+                    viewMethod = viewMethod[viewMethod.length-1];
+                }
+                _this.logger.debug("Calling View %s.%s", view, viewMethod);
+                view = $.$(view);
+                if(view){
+                    if($.isFunction(view[viewMethod])){
+                        switch(viewMethod){
+                            case "write":
+                            case "writeln":
+                                //calls event.write/event.writeln on the return
+                                //value from view.write/view.writeln
+                                this[viewMethod](view[viewMethod](this.m(), this));
+                                break;
+                            case "render":
+                                //pre 1.1.4 the api called render and the
+                                //view invoked 'write' but jquery.fn.tmpl
+                                //uses render
+                                view.write = this.write;
+                                view.writeln = this.writeln;
+                                view[viewMethod](this.m(), this);
+                                break;
+                            default:
+                                //of course allow the users preference for view method
+                                view[viewMethod](this.m(), this);
+                        }
+                        _this.logger.debug("Cascading callbacks");
+                        while(callbackStack.length > 0){ (callbackStack.pop())(); }
+                    }else if (view["@claypool:activeobject"]){
+                        //some times a view is removed and reattached.  such 'active' views
+                        //are bound to the post create lifecycle event so they can resolve 
+                        //as soon as possible
+                        guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$$.uuid();
+                        $(document).bind(guidedEventRegistration,function(event, newView){
+                            _this.logger.warn("The view is reattached to the dom.");
+                            //unbind handler
+                            $(document).unbind(guidedEventRegistration);
+                            newView.update(this.m());
                             _this.logger.debug("Cascading callbacks");
                             while(callbackStack.length > 0){ (callbackStack.pop())(); }
-                        }else if (view["@claypool:activeobject"]){
-                            //some times a view is removed and reattached.  such 'active' views
-                            //are bound to the post create lifecycle event so they can resolve 
-                            //as soon as possible
-                            guidedEventRegistration = "claypool:postcreate:"+view["@claypool:id"]+"."+$$.uuid();
-                            $(document).bind(guidedEventRegistration,function(event, newView){
-                                _this.logger.warn("The view is reattached to the dom.");
-                                //unbind handler
-                                $(document).unbind(guidedEventRegistration);
-                                newView.update(this.m());
-                                _this.logger.debug("Cascading callbacks");
-                                while(callbackStack.length > 0){ (callbackStack.pop())(); }
-                            });
-                        }else{
-                            _this.logger.debug("View method cannot be resolve", viewMethod);
-                        }
+                        });
                     }else{
-                        _this.logger.warn("Cant resolve view %s. ", this.v());
+                        _this.logger.debug("View method cannot be resolve", viewMethod);
                     }
-                }catch(e){
-                    _this.logger.error("Error resolving flow %s => %s", this.c(), this.v()).
-                        exception(e);
-                    throw e;
+                }else{
+                    _this.logger.warn("Cant resolve view %s. ", this.v());
                 }
                 return this;//chain
             };
         },
         /**returns some part of the event to use in router, eg event.type*/
         target: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
     
@@ -4546,16 +3657,12 @@ Claypool.MVC = {
                 type,
                 id,
                 i;
-            try{
-                this.logger.debug("Configuring Claypool MVC Controller Factory");
-                mvcConfig = this.getConfig()||{};//returns mvc specific configs
-                //Extension point for custom low-level hijax controllers
-                $(document).trigger("claypool:hijax", [this, this.initializeHijaxController, mvcConfig]);
                 
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$MVC.ConfigurationError(e);
-            }
+            this.logger.debug("Configuring Claypool MVC Controller Factory");
+            mvcConfig = this.getConfig()||{};//returns mvc specific configs
+            //Extension point for custom low-level hijax controllers
+            $(document).trigger("claypool:hijax", [this, this.initializeHijaxController, mvcConfig]);
+                
         },
         /**
          * Describe what this method does
@@ -4580,46 +3687,29 @@ Claypool.MVC = {
 
 			namespace = namespace||'';
             log.debug("Scanning %s%s", namespace, name);
-            try{
-				if(name.split('.').length == 1){
-					//MyApp
-					scanBase = $.resolve(name);
-					for(prop in scanBase){
-						log.debug("Scan Checking %s.%s" , name, prop);
-						if($.isPlainObject(scanBase[prop])){
-							log.debug("Scan Following %s.%s" , name, prop);
-							//we now get $.scan(['MyApp.Models', 'MyApp.Configs', etc])
-							configsByConvention.push(this.scan(name+'.'+prop, namespace));
-						}
+            
+			if(name.split('.').length == 1){
+				//MyApp
+				scanBase = $.resolve(name);
+				for(prop in scanBase){
+					log.debug("Scan Checking %s.%s" , name, prop);
+					if($.isPlainObject(scanBase[prop])){
+						log.debug("Scan Following %s.%s" , name, prop);
+						//we now get $.scan(['MyApp.Models', 'MyApp.Configs', etc])
+						configsByConvention.push(this.scan(name+'.'+prop, namespace));
 					}
-					
-				}else if(name.split('.').length == 2){
-					//MyApp.Controllers
-					scanBase = $.resolve(name);
-					for(prop in scanBase){
-						log.debug("Scan Checking %s.%s" , name, prop);
-						if($.isFunction(scanBase[prop])){
-							log.debug("Configuring by Convention %s.%s" , name, prop);
-							config = {
-								id: idNamingConvention(prop, name.split('.')[1]),
-								clazz: name+"."+prop,
-								namespace: namespace
-							};
-							if(name.match(".Views")){
-								//by convention views bind to element with id
-								config.selector = domNamingConvention(prop);
-							}
-							configsByConvention.push(config);
-						} 
-					}
-				}else if(name.split('.').length == 3){
-					//MyApp.Controllers.Admin
-					scanBase = $.resolve(name);
-					if($.isFunction(scanBase)){
-						log.debug('Appending to Configuration by Convention %s', name);
+				}
+				
+			}else if(name.split('.').length == 2){
+				//MyApp.Controllers
+				scanBase = $.resolve(name);
+				for(prop in scanBase){
+					log.debug("Scan Checking %s.%s" , name, prop);
+					if($.isFunction(scanBase[prop])){
+						log.debug("Configuring by Convention %s.%s" , name, prop);
 						config = {
-							id: idNamingConvention(prop, name.split('.')[2]),
-							clazz: name,
+							id: idNamingConvention(prop, name.split('.')[1]),
+							clazz: name+"."+prop,
 							namespace: namespace
 						};
 						if(name.match(".Views")){
@@ -4627,11 +3717,25 @@ Claypool.MVC = {
 							config.selector = domNamingConvention(prop);
 						}
 						configsByConvention.push(config);
-					}
+					} 
 				}
-            }catch(e){
-                log.error("Error Scanning %s!!", name).exception(e);   
-            }
+			}else if(name.split('.').length == 3){
+				//MyApp.Controllers.Admin
+				scanBase = $.resolve(name);
+				if($.isFunction(scanBase)){
+					log.debug('Appending to Configuration by Convention %s', name);
+					config = {
+						id: idNamingConvention(prop, name.split('.')[2]),
+						clazz: name,
+						namespace: namespace
+					};
+					if(name.match(".Views")){
+						//by convention views bind to element with id
+						config.selector = domNamingConvention(prop);
+					}
+					configsByConvention.push(config);
+				}
+			}
             return configsByConvention;
         },
         /**
@@ -4695,95 +3799,34 @@ Claypool.MVC = {
         get: function(id){
             var controller,
 				ns;
-            try{	
-                this.logger.debug("Search for a container managed controller : %s", id);
-				//support for namespaces
-				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-				//namespaced app cache
-				if(!this.find(ns[0])){
-					this.add(ns[0], new $$.SimpleCachingStrategy());
-				}
-                controller = this.find(ns[0]).find(ns[1]);
-                if(controller===undefined||controller===null){
-                    this.logger.debug("Can't find a container managed controller : %s", id);
-					//recall order of args for create is id, namespace so we maintain
-					//backward compatability
-                    controller = this.factory.create( ns[1], ns[0]);
-                    if(controller !== null){
-                        this.find(ns[0]).add(ns[1], controller);
-                        return controller._this;
-                    }else{
-                        return null;
-                    }
-                }else{ 
-                    this.logger.debug("Found container managed controller : %s", id);
+				
+            this.logger.debug("Search for a container managed controller : %s", id);
+			//support for namespaces
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			if(!this.find(ns[0])){
+				this.add(ns[0], new $$.SimpleCachingStrategy());
+			}
+            controller = this.find(ns[0]).find(ns[1]);
+            if(controller===undefined||controller===null){
+                this.logger.debug("Can't find a container managed controller : %s", id);
+				//recall order of args for create is id, namespace so we maintain
+				//backward compatability
+                controller = this.factory.create( ns[1], ns[0]);
+                if(controller !== null){
+                    this.find(ns[0]).add(ns[1], controller);
                     return controller._this;
+                }else{
+                    return null;
                 }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$MVC.ContainerError();
+            }else{ 
+                this.logger.debug("Found container managed controller : %s", id);
+                return controller._this;
             }
-            throw new $$MVC.FactoryError(id);
+            throw ("UnknownID:"+id);
         }
     });
-    
-})(  jQuery, Claypool, Claypool.MVC );
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MVC){
-    /**
-     * @constructor
-     */
-    $$MVC.ContainerError = function(e){
-        $.extend( this, new $$.Error(e, {
-            name:"Claypool.MVC.ContainerError",
-            message: "An error occurred trying to retreive a container managed object."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.MVC );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MVC){
-    /**
-     * @constructor
-     */
-    $$MVC.FactoryError = function(e){
-        $.extend( this, new $$.Error(e, {
-            name:"Claypool.MVC.FactoryError",
-            message: "An error occured trying to create the factory object."
-        }));
-    };
-})(  jQuery, Claypool, Claypool.MVC );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$MVC){
-    /**
-     * @constructor
-     */
-    $$MVC.ConfigurationError = function(e){
-        $.extend( this, new $$.ConfigurationError(e, {
-            name:"Claypool.MVC.ConfigurationError",
-            message: "An error occured during the configuration."
-        }));
-    };
     
 })(  jQuery, Claypool, Claypool.MVC );
 
@@ -5208,7 +4251,7 @@ Claypool.Configuration.index = [];
         'previous'
     ], function(index, value){
         $M.Model.prototype[value] = function(options){
-           throw new $$.MethodNotImplementedError();
+           throw "MethodNotImplementedError";
         };
     });
     
@@ -6092,7 +5135,7 @@ Claypool.Server={
          * @type String
          */
         handleGet: function(event){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6102,7 +5145,7 @@ Claypool.Server={
          * @type String
          */
         handlePost: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6112,7 +5155,7 @@ Claypool.Server={
          * @type String
          */
         handlePut: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6122,7 +5165,7 @@ Claypool.Server={
          * @type String
          */
         handleDelete: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6132,7 +5175,7 @@ Claypool.Server={
          * @type String
          */
         handleHead: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6142,7 +5185,7 @@ Claypool.Server={
          * @type String
          */
         handleOptions: function(event){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         },
         /**
          * Describe what this method does
@@ -6746,22 +5789,6 @@ Claypool.Server={
     });
 
 })(jQuery, Claypool, Claypool.Services);
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$Web){
-	/**
-	 * @constructor
-	 */
-    //TODO There should be some useful errors so we can handle common issues
-    //like error pages for 500's, 404's etc
-	
-})(  jQuery, Claypool, Claypool.Server );
-
 (function($, $$, $$Web){
 
     var log,

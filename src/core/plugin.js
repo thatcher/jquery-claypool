@@ -69,22 +69,19 @@
             var namespaces;
             var target; //the resolved object/function/array/thing or null
             var i;
-            try{
-                _resolver = function(name){
-                    return this[name];
-                };
-                namespaces = namespacedName.split('.');
-                target = null;
-                for( i = 0; i < namespaces.length; i++){
-                    target = _resolver.call(target,namespaces[i]);
-                    if(target === undefined){
-                        return target;
-                    }
+            
+            _resolver = function(name){
+                return this[name];
+            };
+            namespaces = namespacedName.split('.');
+            target = null;
+            for( i = 0; i < namespaces.length; i++){
+                target = _resolver.call(target,namespaces[i]);
+                if(target === undefined){
+                    return target;
                 }
-                return target;
-            }catch(e){
-                throw new $$.NameResolutionError(e);
             }
+            return target;
         },
 	    /**
 	     * Describe what this method does

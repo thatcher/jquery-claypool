@@ -187,7 +187,6 @@
             <fileset dir="${CLAYPOOL_CORE}" includes="context.js" />
             <fileset dir="${CLAYPOOL_CORE}" includes="router.js" />
             <fileset dir="${CLAYPOOL_CORE}" includes="factory.js" />
-            <fileset dir="${CLAYPOOL_CORE}" includes="error.js" />
             <fileset dir="${CLAYPOOL_CORE}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
@@ -204,9 +203,7 @@
             <fileset dir="${CLAYPOOL_LOGGING}" includes="appender.js" />
             <fileset dir="${CLAYPOOL_LOGGING}" includes="formatter.js" />
             <fileset dir="${CLAYPOOL_LOGGING}" includes="factory.js" />
-            <fileset dir="${CLAYPOOL_LOGGING}" includes="error.js" />
             <fileset dir="${CLAYPOOL_LOGGING}" includes="plugin.js" />
-            <fileset dir="${CLAYPOOL_LOGGING}" includes="stacktrace.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
             <arg value="${BUILD_DIR}/logging.js" />
@@ -218,7 +215,6 @@
         <concat destfile="${BUILD_DIR}/app.js">
             <fileset dir="${CLAYPOOL_APPLICATION}" includes="namespace.js" />
             <fileset dir="${CLAYPOOL_APPLICATION}" includes="context.js" />
-            <fileset dir="${CLAYPOOL_APPLICATION}" includes="error.js" />
             <fileset dir="${CLAYPOOL_APPLICATION}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
@@ -233,7 +229,6 @@
             <fileset dir="${CLAYPOOL_IOC}" includes="instance.js" />
             <fileset dir="${CLAYPOOL_IOC}" includes="factory.js" />
             <fileset dir="${CLAYPOOL_IOC}" includes="container.js" />
-            <fileset dir="${CLAYPOOL_IOC}" includes="error.js" />
             <fileset dir="${CLAYPOOL_IOC}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
@@ -250,7 +245,6 @@
             <fileset dir="${CLAYPOOL_MVC}" includes="hijax.js" />
             <fileset dir="${CLAYPOOL_MVC}" includes="factory.js" />
             <fileset dir="${CLAYPOOL_MVC}" includes="container.js" />
-            <fileset dir="${CLAYPOOL_MVC}" includes="error.js" />
             <fileset dir="${CLAYPOOL_MVC}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
@@ -281,7 +275,6 @@
             <fileset dir="${CLAYPOOL_AOP}" includes="aspect.js" />
             <fileset dir="${CLAYPOOL_AOP}" includes="factory.js" />
             <fileset dir="${CLAYPOOL_AOP}" includes="container.js" />
-            <fileset dir="${CLAYPOOL_AOP}" includes="error.js" />
             <fileset dir="${CLAYPOOL_AOP}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">
@@ -297,7 +290,6 @@
             <fileset dir="${CLAYPOOL_SERVER}" includes="rest.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="proxy.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="manage.js" />
-            <fileset dir="${CLAYPOOL_SERVER}" includes="error.js" />
             <fileset dir="${CLAYPOOL_SERVER}" includes="plugin.js" />
         </concat>
         <java jar="${JSLINT_JAR}" classpath="${RHINO_JAR}" fork="true">

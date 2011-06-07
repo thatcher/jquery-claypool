@@ -16,8 +16,8 @@
         
     $.extend($$.Context.prototype,
         $$.SimpleCachingStrategy.prototype,{
-        get: function(id){ throw new $$.MethodNotImplementedError();  },
-        put: function(id, object){ throw new $$.MethodNotImplementedError(); }
+        get: function(id){ throw "MethodNotImplementedError";  },
+        put: function(id, object){ throw "MethodNotImplementedError"; }
     });
 
 })(jQuery, Claypool);
@@ -38,7 +38,7 @@
     $.extend($$.ContextContributor.prototype, 
         $$.Context.prototype, {
         registerContext: function(id){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
 	

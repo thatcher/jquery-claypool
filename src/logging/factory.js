@@ -85,22 +85,12 @@
             var loggingConfiguration;
             var logconf;
             var i;
-            try{
-                this.logger.debug("Configuring Claypool Logging");
-                this.clear();
-                loggingConfiguration = this.getConfig()||[];
-                for(i=0;i<loggingConfiguration.length;i++){
-                    try{
-                        logconf = loggingConfiguration[i];
-                        this.add( logconf.category, logconf );
-                    }catch(ee){
-                        this.logger.exception(ee);
-                        return false;
-                    }
-                }
-            }catch(e){
-                this.logger.exception(e);
-                throw new $$Log.ConfigurationError(e);
+            this.logger.debug("Configuring Claypool Logging");
+            this.clear();
+            loggingConfiguration = this.getConfig()||[];
+            for(i=0;i<loggingConfiguration.length;i++){
+                logconf = loggingConfiguration[i];
+                this.add( logconf.category, logconf );
             }
             return true;
         }

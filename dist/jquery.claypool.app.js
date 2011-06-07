@@ -1,6 +1,6 @@
 var Claypool={
 /**
- * Claypool jquery.claypool.1.2.8 - A Web 1.6180339... Javascript Application Framework
+ * Claypool jquery.claypool.1.2.9 - A Web 1.6180339... Javascript Application Framework
  *
  * Copyright (c) 2008-2010 Chris Thatcher (claypooljs.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
@@ -101,10 +101,10 @@ var Claypool={
     $$.CachingStrategy$Interface = {
         cache:  null,
         size:   null,
-        clear:  function(){ throw new $$.MethodNotImplementedError(); },
-        add:    function(id, object){ throw new $$.MethodNotImplementedError(); },
-        remove: function(id){ throw new $$.MethodNotImplementedError(); },
-        find:   function(id){ throw new $$.MethodNotImplementedError(); }
+        clear:  function(){ throw "MethodNotImplementedError"; },
+        add:    function(id, object){ throw "MethodNotImplementedError"; },
+        remove: function(id){ throw "MethodNotImplementedError"; },
+        find:   function(id){ throw "MethodNotImplementedError"; }
     };
 
 })(  jQuery, Claypool );
@@ -204,8 +204,8 @@ var Claypool={
         
     $.extend($$.Context.prototype,
         $$.SimpleCachingStrategy.prototype,{
-        get: function(id){ throw new $$.MethodNotImplementedError();  },
-        put: function(id, object){ throw new $$.MethodNotImplementedError(); }
+        get: function(id){ throw "MethodNotImplementedError";  },
+        put: function(id, object){ throw "MethodNotImplementedError"; }
     });
 
 })(jQuery, Claypool);
@@ -226,7 +226,7 @@ var Claypool={
     $.extend($$.ContextContributor.prototype, 
         $$.Context.prototype, {
         registerContext: function(id){
-            throw new $$.MethodNotImplementedError();
+            throw "MethodNotImplementedError";
         }
     });
 	
@@ -383,7 +383,7 @@ var Claypool={
 (function($, $$){
     
     $$.Factory$Interface = {
-        create: function(){ throw new $$.MethodNotImplementedError(); }
+        create: function(){ throw "MethodNotImplementedError"; }
     };
 
 })(jQuery, Claypool);
@@ -408,10 +408,10 @@ var Claypool={
         configuration:null,//
         configurationUrl:null,//
         configurationType:null,//"json" or "xml"
-        getConfig: function(){ throw new $$.MethodNotImplementedError();},
-        loadConfig: function(){ throw new $$.MethodNotImplementedError();},
-        setConfig: function(){ throw new $$.MethodNotImplementedError();},
-        updateConfig: function(){ throw new $$.MethodNotImplementedError();}
+        getConfig: function(){ throw "MethodNotImplementedError";},
+        loadConfig: function(){ throw "MethodNotImplementedError";},
+        setConfig: function(){ throw "MethodNotImplementedError";},
+        updateConfig: function(){ throw "MethodNotImplementedError";}
     };
 })(jQuery, Claypool);
 
@@ -430,7 +430,7 @@ var Claypool={
     	// relies heavily on convention to reduce the development overhead.  In
     	// the end, it's job is to simply walk a namespace and build the internal
     	// representation of the equivalent hand-wire configuration
-        scan:function(){ throw new $$.MethodNotImplementedError();}
+        scan:function(){ throw "MethodNotImplementedError"; }
     };
 })(jQuery, Claypool);
 
@@ -474,19 +474,14 @@ var Claypool={
         getConfig: function(){
             if( !this.configuration ){
                 //First look for an object name Claypool.Configuration
-                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );
-                try{
-                	this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
-                    if($$.Configuration[this.configurationId]){
-                        this.logger.debug("Found Claypool.Configuration");
-                        this.configuration = $$.Configuration[this.configurationId];
-                    }else if(!$$.Configuration){
-                        //it's not specified in js code so look for it remotely
-                        this.loadConfig();
-                    }
-                }catch(e){
-                    this.logger.exception(e);
-                    throw new $$.ConfigurationError(e);
+                this.logger.debug( "Configuration for <%s> has not been set explicitly or has been updated implicitly.",  this.configurationId );      
+                this.logger.debug("$$.Configuration: \n %o", $$.Configuration);
+                if($$.Configuration[this.configurationId]){
+                    this.logger.debug("Found Claypool.Configuration");
+                    this.configuration = $$.Configuration[this.configurationId];
+                }else if(!$$.Configuration){
+                    //it's not specified in js code so look for it remotely
+                    this.loadConfig();
                 }
             }
             return this.configuration;
@@ -505,31 +500,26 @@ var Claypool={
             //a non async call because we need to configure the loggers
             //with this info before they are called!
             var _this = this;
-            try{
-                jQuery.ajax({
-                    type: "Get",
-                  url: this.configurationUrl,
-                  async: false,
-                  data:{},
-                  dataType: "json",
-        	        success: function(json){
-        	            if(_this.configurationUrl == './app/configs/config.js'){
-        	                $$.Configuration = $$.Configuration||{};
-        	                $.extend(true, $$.Configuration, json);
-        	            }else{
-        	                _this.setConfig(_this.configurationId,
-        	                    json?json:null
-    	                    );
-	                    }
-	                    if(options.callback){
-	                    	options.callback($$.Configuration);
-	                    }
-        	        }
-        	    });
-    	    }catch(e){
-    	        this.logger.exception(e);
-                throw new $$.ConfigurationError(e);
-    	    }
+            jQuery.ajax({
+                type: "Get",
+              url: this.configurationUrl,
+              async: false,
+              data:{},
+              dataType: "json",
+    	        success: function(json){
+    	            if(_this.configurationUrl == './app/configs/config.js'){
+    	                $$.Configuration = $$.Configuration||{};
+    	                $.extend(true, $$.Configuration, json);
+    	            }else{
+    	                _this.setConfig(_this.configurationId,
+    	                    json?json:null
+	                    );
+                    }
+                    if(options.callback){
+                    	options.callback($$.Configuration);
+                    }
+    	        }
+    	    });
         },
         /**
          * Describe what this method does
@@ -551,102 +541,10 @@ var Claypool={
          * @type String
          */
         updateConfig: function(id){
-            throw new $$.MethodNotImplementedError();
+             throw "MethodNotImplementedError";
         }
     });
 
-})(jQuery, Claypool);
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.Error = function(e, options){
-        $.extend(true, this, e||new Error());
-        this.name = (options&&options.name?options.name:"Claypool.UnknownError") +
-            " > Claypool.Error" + (this.name?(" > "+this.name):"") ;
-        this.message = (options&&options.name?options.name:"No Message Provided \n Nested exception is:\n\t") +
-            (this.message||"UnknownError");
-    };
-    
-})(jQuery, Claypool);
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.ConfigurationError = function(e, options){
-        var details = {
-            name:"Claypool.ConfigurationError",
-            message:"An error occured trying to locate or load the system configuration."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
-})(jQuery, Claypool);
-        
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.MethodNotImplementedError = function(e, options){
-        var details = {
-            name:"Claypool.MethodNotImplementedError",
-            message:"Method not implemented."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
-})(jQuery, Claypool);
-        
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$){
-    /**
-     * @constructor
-     */
-    $$.NameResolutionError = function(e, options){
-        var details = {
-            name:"Claypool.NameResolutionError",
-            message:"Unexpected error resolving name."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
-    
 })(jQuery, Claypool);
 
 /**
@@ -719,22 +617,19 @@ var Claypool={
             var namespaces;
             var target; //the resolved object/function/array/thing or null
             var i;
-            try{
-                _resolver = function(name){
-                    return this[name];
-                };
-                namespaces = namespacedName.split('.');
-                target = null;
-                for( i = 0; i < namespaces.length; i++){
-                    target = _resolver.call(target,namespaces[i]);
-                    if(target === undefined){
-                        return target;
-                    }
+            
+            _resolver = function(name){
+                return this[name];
+            };
+            namespaces = namespacedName.split('.');
+            target = null;
+            for( i = 0; i < namespaces.length; i++){
+                target = _resolver.call(target,namespaces[i]);
+                if(target === undefined){
+                    return target;
                 }
-                return target;
-            }catch(e){
-                throw new $$.NameResolutionError(e);
             }
+            return target;
         },
 	    /**
 	     * Describe what this method does
@@ -900,7 +795,6 @@ var Claypool={
 	     * @type String
 	     */
 	    Reinitialize: function(callback){
-	        /**we probably should try/catch here*/
 	        $(document).trigger("claypool:reinitialize", [$$App]);
 	        //Allow extension of Initialize via callback
 	        if(callback){callback();}
@@ -950,36 +844,33 @@ var Claypool={
             var contextObject,
             	contributor,
 				ns;
-            try{
-				//support for namespaces
-				ns = typeof(id)=='string'&&id.indexOf('#')>-1?
-					[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
-				//namespaced app cache
-				if(!this.find(ns[0])){
-					this.add(ns[0], new $$.SimpleCachingStrategy());
-				}
-                this.logger.debug("Searching application context for object: %s" ,id);
-                contextObject = null;
-                contextObject = this.find(ns[0]).find(ns[1]);
-                if(contextObject !== null){
-                    this.logger.debug("Found object in global application context. Object id: %s", id);
-                    return contextObject;
-                }else{
-                    this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
-                    for(contributor in this.contextContributors){
-                        this.logger.debug("Checking Application Context Contributor %s." , contributor);
-                        contextObject = this.contextContributors[contributor].get(id);
-                        if(contextObject !== null){
-                            this.logger.debug("Found object in contributed application context. Object id: %s", id);
-                            return contextObject;
-                        }
+            
+			//support for namespaces
+			ns = typeof(id)=='string'&&id.indexOf('#')>-1?
+				[id.split('#')[0],'#'+id.split('#')[1]]:['', id];
+			//namespaced app cache
+			if(!this.find(ns[0])){
+				this.add(ns[0], new $$.SimpleCachingStrategy());
+			}
+            this.logger.debug("Searching application context for object: %s" ,id);
+            contextObject = null;
+            contextObject = this.find(ns[0]).find(ns[1]);
+            if(contextObject !== null){
+                this.logger.debug("Found object in global application context. Object id: %s", id);
+                return contextObject;
+            }else{
+                this.logger.debug("Searching for object in contributed application context. Object id: %s", id);
+                for(contributor in this.contextContributors){
+                    this.logger.debug("Checking Application Context Contributor %s." , contributor);
+                    contextObject = this.contextContributors[contributor].get(id);
+                    if(contextObject !== null){
+                        this.logger.debug("Found object in contributed application context. Object id: %s", id);
+                        return contextObject;
                     }
                 }
-                this.logger.debug("Cannot find object in any application context. Object id: %s", id);
-                return null;
-            }catch(e){
-                throw new $$App.ContextError(e);
             }
+            this.logger.debug("Cannot find object in any application context. Object id: %s", id);
+            return null;
         },
         put: function(id, object){
 			//support for namespaces
@@ -1014,7 +905,6 @@ var Claypool={
          * @constructor
          */
         $$App.ContextContributor = function(options){
-            //??TODO: this works but, uh... why? $.extend( this, new $.ContextContributor(options));
             $$.extend(this, $$.ContextContributor);
             $.extend(true, this, options);
             this.logger = $.logger("Claypool.Application.ContextContributor");
@@ -1057,30 +947,6 @@ var Claypool={
                 return $$App.getContext();
             }
         });
-    
-})(  jQuery, Claypool, Claypool.Application );
-
-
-/**
- * Descibe this class
- * @author 
- * @version $Rev$
- * @requires OtherClassName
- */
-(function($, $$, $$App){
-    /**
-     * @constructor
-     */
-    $$App.ContextError = function(e, options){
-        var details = {
-            name:"Claypool.Application.ContextError",
-            message:"An unexpected error occured while searching the application context."
-        };
-        $.extend( this, new $$.Error(e, options?{
-            name:(options.name?(options.name+" > "):"")+details.name,
-            message:(options.message?(options.message+" \n "):"")+details.message
-        }:details));
-    };
     
 })(  jQuery, Claypool, Claypool.Application );
 

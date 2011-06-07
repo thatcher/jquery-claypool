@@ -166,7 +166,7 @@
                     //message is e
                     //console_apply(console.error, this.formatter.format(level, category, 
                     //    message.message?[message.message]:[])); 
-                    console_apply(console.error, [printStackTrace({e:message}).join('\n')]);
+                    console_apply(console.error, [e]);//[printStackTrace({e:message}).join('\n')]);
                     break;
             }
         }

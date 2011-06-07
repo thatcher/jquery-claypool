@@ -65,7 +65,6 @@ Claypool.Application={
 	     * @type String
 	     */
 	    Reinitialize: function(callback){
-	        /**we probably should try/catch here*/
 	        $(document).trigger("claypool:reinitialize", [$$App]);
 	        //Allow extension of Initialize via callback
 	        if(callback){callback();}
